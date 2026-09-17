@@ -1,0 +1,4 @@
+# Markov Chain encoder
+# Transforms prompts into stochastic process notation.
+encoder_type: llm_markov_chain
+use_few_shot: true

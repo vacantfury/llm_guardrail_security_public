@@ -1,0 +1,4 @@
+
+surface_nonlatin_ratio: 0.15   # >15% of letters beyond Latin Ext-B → rare-language / homoglyph
+surface_b64_run: 24            # min base64-alphabet run length → cipher marker
+surface_hex_run: 10            # min hex-pair run count → cipher marker

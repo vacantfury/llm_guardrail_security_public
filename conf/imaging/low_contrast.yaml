@@ -1,0 +1,10 @@
+# Low-Contrast attack (Adversarial Smuggling — "Perceptual Blindness" pathway).
+# Reference: other_repos/smugglebench (Li et al., ACL 2026).
+#
+# The payload is rendered fully but at a low fg/bg contrast: human-readable,
+# OCR/decode-hostile. Reuses the plain renderer — this is purely a color knob.
+renderer_type: plain
+
+fg_color: "#B0B0B0"   # light grey text …
+bg_color: "#FFFFFF"   # … on white → low ΔE, still human-legible
+font_size: 28

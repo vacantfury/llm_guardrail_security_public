@@ -1,0 +1,19 @@
+# Distraction-grid attack (Text-DJ / CS-DJ distraction-jailbreak family).
+# Reference: other_repos/CS-DJ (Yang et al., CVPR 2025) + Text-DJ (Chen 2026).
+#
+# Decompose the harmful query into a few benign sub-questions (aux-LLM), render
+# them as numbered cells scattered among benign distractor questions in a grid,
+# and point the model at only the sub-question cells. Text-distractor variant —
+# no CLIP image-retrieval / image pool (Text-DJ showed text distractors suffice).
+renderer_type: distraction_grid
+
+# Aux-LLM used to decompose the query into sub-questions.
+model: gpt-4.1-mini
+
+num_subquestions: 3
+num_distractors: 9
+grid_cols: 3
+cell_size: 360
+cell_padding: 16
+font_size: 22
+# decompose_prompt / wrapper_instruction / distractors: defaults live in code

@@ -1,0 +1,23 @@
+num_main_job_threads: 2
+num_cluster_jobs: 1          # orchestrator only -- nothing is served at this stage
+
+tasks:
+  # ---- code x FIXED --------------------------------------------------------
+  - mode: prompt_transform
+    source_file: data/harmbench_bon_100.jsonl
+    prompt_range: [0, 9999]
+    benchmark: harmbench
+    campaign: bestofn_attack_r11_codefix
+    transformation_list:
+      - type: code_attack
+        params: {}
+
+  # ---- code x VARIED (paraphrase -> code), same source r8 used -------------
+  - mode: prompt_transform
+    source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050204_64308095/variance_channel_bon
+    prompt_range: [0, 9999]
+    benchmark: harmbench
+    campaign: bestofn_attack_r11_codefix
+    transformation_list:
+      - type: code_attack
+        params: {}

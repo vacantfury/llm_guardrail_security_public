@@ -1,0 +1,22 @@
+
+num_main_job_threads: 3
+
+# Same encoding the rest of the grid consumed (AICR 285658, fixed encoder).
+_text:  &text  outputs/image_presence_threshold/prompt_transform/harmbench/code_attack_ir_constant_20260805_213025_3168031/code_attack
+_decoy: &decoy outputs/image_presence_threshold/prompt_transform/harmbench/code_attack_ir_constant_20260805_213025_3168031/ir_constant
+
+_base: &base
+  mode: defense+evaluate
+  benchmark: harmbench
+  target_model: gemini-2.0-flash
+  judge_model: gpt-5-mini
+  campaign: paper_b_fidelity_regrid
+
+_ecso: &ecso
+  defense: ecso
+  defense_config: {query_source: encoded}   # deployable arm — no oracle read
+
+tasks:
+  - {<<: [*base, *ecso], source_transform_subdir: *text}    # ECSO-text (= no-defense text, short-circuit)
+  - {<<: [*base, *ecso], source_transform_subdir: *decoy}   # ECSO + decoy (deployable arm)
+  - {<<: *base, defense: no_defense, source_transform_subdir: *decoy}   # decoy-alone control

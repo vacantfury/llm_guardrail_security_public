@@ -1,0 +1,32 @@
+# Qwen2.5-7B-Instruct (alibaba) — Paper-D (BoN-wrapped CodeAttack) text-LLM target.
+#
+# Created 2026-07-26 for the P2 temperature-1.0 re-run. Until now this target ran on the
+# bare defaults (num_instances=1), which is why Round 7 serialized all six Qwen cells on a
+# single replica. Standard bf16 serve — 7B ≈ 15 GB, fits one AICR 96GB GPU per replica; no
+# trust_remote_code / mm flags, and the 20480 default context is within Qwen2.5's 32k
+# window so no max_model_len / max_tokens override is needed (contrast gemma2_9b_it.yaml,
+# whose 8192 sliding-window ceiling forces both).
+model:
+  model: Qwen/Qwen2.5-7B-Instruct
+
+cluster:
+  # 3 replicas: Qwen's six cells sum to 45.4h of measured work and its longest single cell
+  # is 16.0h (SemanticSmooth+surface), so 3 replicas put the makespan at that 16.0h floor
+  # (45.4/3 = 15.1h < 16.0h). Sharing a run with Gemma at 2: 5 replicas + wildguard +
+  # orchestrator = 7 jobs, exactly AICR's budget.
+  # 🔴 NEVER LET A WORKHORSE TARGET LAND ON A V100 (added 2026-08-07, generalizing the R14a
+  # loss). SLURM hands out whatever is free; on NURC that is usually a v100-sxm2 (~900 GB/s),
+  # which is ~5x slower to decode than an a100/h200 and gives a KV cache of only ~105k tokens
+  # (vs ~452k on an a100), so vLLM's own "Maximum concurrency" line drops from 22x to 5x.
+  # R14a died at the 8h wall because of exactly this. The field is LIVE despite being unused
+  # in src/: llm_utils/cluster_server_manager.py:1005 resolves it to an `--exclude=` node
+  # list via sinfo (GPU types are not all SLURM features, so --constraint can't express them).
+  gpu_types_excluded: ["v100-pcie", "v100-sxm2", "t4", "p100"]
+
+  # ⚠️ num_instances=3 is sized for a TWO-MODEL preset on NURC (target x3 + wildguard = 4,
+  # which is NOT > the gpu QOS cap of 4, so the floor-division allocator does not fire).
+  # A preset that also serves a shadow/guard model is THREE models: 3+1+1=5 > 4 triggers
+  # `max(available_slots // n_models, 1)` = 1 and every model collapses to one replica.
+  # That is acceptable for the small 2-cell groups (~20k calls ≈ 100 min at one replica) —
+  # do NOT "fix" it by raising this number, which makes the capping worse, not better.
+  num_instances: 3

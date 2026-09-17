@@ -1,0 +1,20 @@
+# Llama-Guard-4-12B (Meta) — natively multimodal GUARD.
+# Llama4ForConditionalGeneration: dense 12B (pruned from Llama 4 Scout's MoE —
+# shared expert kept, routed experts densified; NOT MoE at inference time).
+# Gated HF repo — accept the Meta license before downloading (separate gate
+# from Llama-Guard-3-8B / Llama-3.2-11B-Vision).
+
+model:
+  model: meta-llama/Llama-Guard-4-12B
+  max_tokens: 128   # output is short: "safe" / "unsafe\nS9" style verdicts
+
+# 12B dense weights ≈ 24GB at BF16 + vision tower + KV cache. gpu_types_excluded
+# rules out V100/T4/P100 (no hardware bf16 support, and too little VRAM
+# headroom regardless) — same reasoning as the judge models below, whose
+# role (inspect/classify, not attack target) this shares. That leaves
+# A100 (40/80GB) or H200 on this cluster's `gpu` partition, either of which
+# should fit 12B on a single GPU without tensor-parallel.
+cluster:
+  num_gpus: 1
+  mem_gb: 64   # comparable size class to HARMBENCH_LLAMA_2_13B_CLS (13B); mirror its bump from the 32GB default
+  gpu_types_excluded: ["v100-pcie", "v100-sxm2", "t4", "p100"]

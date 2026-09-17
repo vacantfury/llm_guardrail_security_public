@@ -1,0 +1,38 @@
+
+num_main_job_threads: 8
+num_cluster_jobs: 1
+
+_rj: &rj
+  mode: rejudge
+  judge_model: gpt-5-mini
+  judge_method: harmbench
+  campaign: paper_c_camo_gpt5mini
+
+tasks:
+  # ── floor ──
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_no_defense_ir_camo_20260731_215903_81400831}                # floor no_defense
+
+  # ── guard_baseline: guard ALONE on the raw CAMO attack ──
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_guard_baseline_ir_camo_20260731_215903_28263045}            # gb wildguard
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_guard_baseline_ir_camo_20260731_215903_65114594}            # gb qwen3guard_gen_8b
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_guard_baseline_ir_camo_20260731_215903_83264805}            # gb guardreasoner_vl_7b
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_guard_baseline_ir_camo_20260731_215903_9447939}             # gb llama_guard_3_8b
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_guard_baseline_ir_camo_20260731_215903_77876669}            # gb thinkguard
+
+  # ── modality_complete: recover+DECODE amplifier + guard ──
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_220224_17794691}         # mc wildguard
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_220251_65680474}         # mc qwen3guard_gen_8b
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_220338_49342461}         # mc guardreasoner_vl_7b
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_220508_15760012}         # mc llama_guard_3_8b
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_220552_85197988}         # mc thinkguard
+
+  # ── +rg: recover+decode + guard + reguard_original ──
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_220716_78953069}         # +rg wildguard
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_220906_12065968}         # +rg qwen3guard_gen_8b
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_221012_80105059}         # +rg guardreasoner_vl_7b
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_221145_41561070}         # +rg llama_guard_3_8b
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_221302_57939428}         # +rg thinkguard
+
+  # ── decode-isolation ablation: recover WITHOUT decode (= CAMO's OCR-classifier config) ──
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_221437_42392452}         # mc-recoveronly wildguard
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_camo_20260731_221527_16940715}         # mc-recoveronly llama_guard_3_8b

@@ -1,0 +1,34 @@
+# ⚠️ HISTORICAL (audit 2026-07-24) — 2026-07-13-era preset superseded by later
+# rounds; may reference frozen/removed output dirs. Kept for provenance; do not run as-is.
+# ============================================================
+# Stage 2b: Rendering Ablation (Table 2)
+# ============================================================
+# Usage: python main.py imaging_ablation
+#
+# Each renderer_type loads defaults from conf/imaging/<name>.yaml.
+# Task-level 'renderer:' overrides take priority.
+
+tasks:
+  # FigStep — params from conf/imaging/figstep.yaml
+  - mode: imaging
+    renderer_type: figstep
+    source_dir: outputs/encode_math_YYYYMMDD_HHMMSS
+
+  # FC-Typography — params from conf/imaging/fc_typography.yaml
+  - mode: imaging
+    renderer_type: fc_typography
+    source_dir: outputs/encode_math_YYYYMMDD_HHMMSS
+
+  # FC-Flowchart — params from conf/imaging/fc_flowchart.yaml
+  - mode: imaging
+    renderer_type: fc_flowchart
+    source_dir: outputs/encode_math_YYYYMMDD_HHMMSS
+
+  # Degradation — plain baseline + degradation overrides
+  - mode: imaging
+    renderer_type: plain
+    renderer:
+      blur_radius: 2
+      jpeg_quality: 30
+      noise_std: 10
+    source_dir: outputs/encode_math_YYYYMMDD_HHMMSS

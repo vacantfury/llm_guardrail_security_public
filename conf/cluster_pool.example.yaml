@@ -1,0 +1,7 @@
+# Copy to conf/cluster_pool.yaml and replace placeholders before dispatch.
+# Supply your own job wrapper and matching conf/clusters/<name>.yaml profile.
+clusters:
+  - name: example
+    ssh: your-user@cluster.example.invalid
+    repo: ~/projects/llm_guardrail_security_public
+pins: {}

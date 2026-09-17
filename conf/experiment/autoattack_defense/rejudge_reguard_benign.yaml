@@ -1,0 +1,13 @@
+# gpt-5-mini rejudge of the 6 BENIGN reguard cells (over-refusal cost axis) — 2026-07-21.
+# judge_method orbench_benign_hard + gpt-5-mini, matching the panel benign rejudge.
+# Reads saved responses; no target re-query. Completes the reguard tradeoff (harmful ASR
+# rejudge was rejudge_paperc.yaml, 33 cells). 3 guards x {text, image} = 6 cells.
+num_cluster_jobs: 1
+num_main_job_threads: 6
+tasks:
+  - {mode: rejudge, judge_model: gpt-5-mini, judge_method: orbench, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_modality_complete_non_llm_baseline_20260721_044537_94244571}
+  - {mode: rejudge, judge_model: gpt-5-mini, judge_method: orbench, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_modality_complete_non_llm_baseline_20260721_044618_72702687}
+  - {mode: rejudge, judge_model: gpt-5-mini, judge_method: orbench, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_modality_complete_non_llm_baseline_20260721_075756_73034313}
+  - {mode: rejudge, judge_model: gpt-5-mini, judge_method: orbench, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_modality_complete_ir_plain_20260721_044555_48219861}
+  - {mode: rejudge, judge_model: gpt-5-mini, judge_method: orbench, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_modality_complete_ir_plain_20260721_044622_75168782}
+  - {mode: rejudge, judge_model: gpt-5-mini, judge_method: orbench, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_modality_complete_ir_plain_20260721_075824_85956817}

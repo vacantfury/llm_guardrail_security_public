@@ -1,0 +1,13 @@
+# Classical Chinese Traditional (繁體文言文) encoder configuration
+# Same content as classical_chinese.yaml (simplified), but output is
+# converted to traditional characters via opencc (deterministic 1:1 mapping).
+#
+# In the paper: "Same classical Chinese encoding with traditional character
+# forms (繁體字), converted via one-to-one simplified→traditional mapping."
+encoder_type: llm_classical_language
+language: classical_chinese_traditional
+
+# Uses the same prompts as classical_chinese.yaml — the encoder loads
+# classical_chinese templates and applies opencc s2t post-processing.
+# See llm_classical_language_encoder.py for implementation.
+base_language: classical_chinese_simplified

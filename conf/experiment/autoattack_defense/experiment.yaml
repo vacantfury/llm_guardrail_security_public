@@ -1,0 +1,75 @@
+
+num_main_job_threads: 6        # in-process task concurrency (>= one per server)
+num_cluster_jobs: 5            # orchestrator + qwen + internvl3 + pixtral + guardreasoner (<= 8)
+
+# ── target VLMs (campaign-tagged: run_index.py --campaign paper_c_round3_amplifier) ──
+_qwen:     &qwen      {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: [0, 99], campaign: paper_c_round3_amplifier}
+_internvl: &internvl  {mode: defense+evaluate, target_model: internvl3_8b, prompt_range: [0, 99], campaign: paper_c_round3_amplifier}
+_pixtral:  &pixtral   {mode: defense+evaluate, target_model: pixtral_12b,  prompt_range: [0, 99], campaign: paper_c_round3_amplifier}
+
+# ── guard config anchor (the external off-the-shelf guard the amplifier feeds) ──
+_gr:    &gr    guardreasoner_vl_7b
+
+# ── Stage-1 sources (present on cluster from Rounds 1/1b/2img) ──
+_st:     &st     outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+_fl:     &fl     outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+_ca:     &ca     outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+_st_img: &st_img outputs/autoattack_defense/prompt_transform/harmbench/llm_set_theory_ir_plain_20260605_093357_74173344/ir_plain
+_fl_img: &fl_img outputs/autoattack_defense/prompt_transform/harmbench/llm_formal_logic_ir_plain_20260605_093357_24164176/ir_plain
+
+tasks:
+  # ══ Qwen2.5-VL-7B ══════════════════════════════════════════
+  # set_theory (text)
+  - {<<: *qwen, defense: no_defense,                                                              source_transform_subdir: *st}
+  - {<<: *qwen, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *st}
+  - {<<: *qwen, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *st}
+  # formal_logic (text)
+  - {<<: *qwen, defense: no_defense,                                                              source_transform_subdir: *fl}
+  - {<<: *qwen, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *fl}
+  - {<<: *qwen, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *fl}
+  # code_attack (text-only)
+  - {<<: *qwen, defense: no_defense,                                                              source_transform_subdir: *ca}
+  - {<<: *qwen, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *ca}
+  - {<<: *qwen, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *ca}
+  # set_theory (ir_plain image)
+  - {<<: *qwen, defense: no_defense,                                                              source_transform_subdir: *st_img}
+  - {<<: *qwen, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *st_img}
+  - {<<: *qwen, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *st_img}
+  # formal_logic (ir_plain image)
+  - {<<: *qwen, defense: no_defense,                                                              source_transform_subdir: *fl_img}
+  - {<<: *qwen, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *fl_img}
+  - {<<: *qwen, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *fl_img}
+
+  # ══ InternVL3-8B ═══════════════════════════════════════════
+  - {<<: *internvl, defense: no_defense,                                                              source_transform_subdir: *st}
+  - {<<: *internvl, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *st}
+  - {<<: *internvl, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *st}
+  - {<<: *internvl, defense: no_defense,                                                              source_transform_subdir: *fl}
+  - {<<: *internvl, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *fl}
+  - {<<: *internvl, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *fl}
+  - {<<: *internvl, defense: no_defense,                                                              source_transform_subdir: *ca}
+  - {<<: *internvl, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *ca}
+  - {<<: *internvl, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *ca}
+  - {<<: *internvl, defense: no_defense,                                                              source_transform_subdir: *st_img}
+  - {<<: *internvl, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *st_img}
+  - {<<: *internvl, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *st_img}
+  - {<<: *internvl, defense: no_defense,                                                              source_transform_subdir: *fl_img}
+  - {<<: *internvl, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *fl_img}
+  - {<<: *internvl, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *fl_img}
+
+  # ══ Pixtral-12B ════════════════════════════════════════════
+  - {<<: *pixtral, defense: no_defense,                                                              source_transform_subdir: *st}
+  - {<<: *pixtral, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *st}
+  - {<<: *pixtral, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *st}
+  - {<<: *pixtral, defense: no_defense,                                                              source_transform_subdir: *fl}
+  - {<<: *pixtral, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *fl}
+  - {<<: *pixtral, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *fl}
+  - {<<: *pixtral, defense: no_defense,                                                              source_transform_subdir: *ca}
+  - {<<: *pixtral, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *ca}
+  - {<<: *pixtral, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *ca}
+  - {<<: *pixtral, defense: no_defense,                                                              source_transform_subdir: *st_img}
+  - {<<: *pixtral, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *st_img}
+  - {<<: *pixtral, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *st_img}
+  - {<<: *pixtral, defense: no_defense,                                                              source_transform_subdir: *fl_img}
+  - {<<: *pixtral, defense: guard_baseline,    defense_config: {guard_model: *gr},                    source_transform_subdir: *fl_img}
+  - {<<: *pixtral, defense: modality_complete, defense_config: {guard_model: *gr, decode_text: true}, source_transform_subdir: *fl_img}

@@ -1,0 +1,13 @@
+# Cipher encoder (non-LLM, rule-based).
+# Deterministic classical cipher family, ported from CipherChat
+# (Yuan et al., ICLR 2024, github.com/RobustNLP/CipherChat). Tests the
+# "classifier fooled, model understands" decode gap on the TEXT channel via
+# a reversible re-encoding of the harmful request.
+encoder_type: non_llm_cipher
+
+cipher: base64            # 'base64' (default) or 'caesar'
+shift: 3                  # Caesar shift amount (matches CipherChat's CaesarExpert); ignored by base64
+
+# Ciphertext alone doesn't tell the target which cipher was used, so this
+# relies on default.yaml's generic decode prefix ("Please decode and
+# respond..."), same as addition_equation / conditional_probability.

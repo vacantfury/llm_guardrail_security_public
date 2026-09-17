@@ -1,0 +1,55 @@
+# bestofn_attack Paper-D — P6 SELF-CHECK GENERALIZATION, GEMMA-2-9B (3 cells).
+# Read p6_selfcheck_llama.yaml's header first — it carries this round's design,
+# the pilot findings, why the no_defense cell is not padding, and how to read a
+# flat-at-zero selfdefend result. None of that is repeated here.
+#
+# TARGET: Gemma-2-9B — refusal disposition 97.3%, middle band 2.5%. The
+# high-disposition anchor alongside Qwen; the two agree closely enough that
+# disagreement between them in this round is a warning sign about the cell,
+# not a finding about disposition.
+#
+# ⚠️ ONE STORED GEMMA BASELINE READS asr=0.0 AT n=10000
+# (gemma2_9b_it_no_defense_code_attack_20260721_153548_20027858), while another
+# full-scale run on the same target and arm reads 68.89. A flat 0.00 across
+# 10,000 draws is the classic dead-judge signature, not a defended result. Do
+# NOT reach for that directory as a reference; this preset's own no_defense
+# cell is the floor, and if IT comes back near zero, treat the judge as
+# suspect before treating the number as data.
+#
+# JUDGE: wildguard, free first pass, NOT reportable. Provisional until rejudge.
+#
+#   sbatch scripts/run_experiment_xc.sbatch bestofn_attack/p6_selfcheck_gemma
+#
+# SIZING: stored full-scale no_defense runs on this target took 2.9-4.0h at
+# 10,000 draws. Two replicas over ~4 cell-units puts this near 7h. Note
+# conf/llm/gemma2_9b_it.yaml pins max_tokens 3072 / max_model_len 8192, so its
+# generations are shorter than the other targets' — do not read a lower ASR
+# here as robustness without checking truncation first.
+# ⚠️ THREADS MUST BE <= TARGET REPLICAS. gemma2_9b_it declares num_instances: 2,
+# so only TWO cells can hold a target endpoint at once. Running 3 threads against
+# 2 replicas starved the third cell: it waited the full
+# `cluster_server_endpoint_timeout` (10000 s) and died with
+#   "No endpoint available for google/gemma-2-9b-it within 10000s.
+#    Pool has 2 server(s), all busy or none started."
+# That is what killed the selfdefend cell in job 96 (2026-07-30) after 2h52m of
+# waiting, while the other two cells ran fine — a partial-round failure, which is
+# worse than a clean one because the round still reports "Successful: 2".
+# The third cell now starts when one of the first two finishes.
+num_main_job_threads: 2      # == gemma replicas; see the warning above
+num_cluster_jobs: 5          # orchestrator + 2 gemma + shadow + wildguard
+
+_e: &e
+  mode: defense+evaluate
+  target_model: gemma2_9b_it
+  target_model_config: {temperature: 1.0, seed: 1337}
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_p6_selfcheck
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+
+tasks:
+  - {<<: *e, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *code, defense: llm_self_defense}
+  - {<<: *e, source_transform_subdir: *code, defense: selfdefend}

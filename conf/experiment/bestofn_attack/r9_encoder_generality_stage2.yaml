@@ -1,0 +1,25 @@
+num_main_job_threads: 6
+num_cluster_jobs: 7
+
+_e: &e
+  mode: defense+evaluate
+  target_model: llama3_1_8b_cluster
+  target_model_config: {temperature: 1.0}
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r9_encgen
+
+_SET: &set_theory outputs/bestofn_attack/prompt_transform/harmbench/r9_llm_set_theory_fixed/llm_set_theory
+_FL:  &formal_logic outputs/bestofn_attack/prompt_transform/harmbench/r9_llm_formal_logic_fixed/llm_formal_logic
+
+tasks:
+  # ---- set_theory x fixed --------------------------------------------------
+  - {<<: *e, source_transform_subdir: *set_theory, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *set_theory, defense: sage}
+  - {<<: *e, source_transform_subdir: *set_theory, defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b}}
+
+  # ---- formal_logic x fixed ------------------------------------------------
+  - {<<: *e, source_transform_subdir: *formal_logic, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *formal_logic, defense: sage}
+  - {<<: *e, source_transform_subdir: *formal_logic, defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b}}

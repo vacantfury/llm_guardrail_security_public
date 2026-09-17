@@ -1,0 +1,29 @@
+num_main_job_threads: 2      # = gemma replica count; extra threads would only queue on acquire_endpoint
+num_cluster_jobs: 6          # 5 servers (gemma x2 + shadow + guard + wildguard) + orchestrator
+
+_e: &e
+  mode: defense+evaluate
+  source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260805_212854_26701649/code_attack
+  target_model: gemma2_9b_it
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r16_gemma_mechanism
+
+tasks:
+  # ---- CONTROL: no verdict at all — isolates answer-sampling from verdict-sampling ----
+  - {<<: *e, defense: no_defense, target_model_config: {temperature: 1.0, max_concurrency: 64}}
+  - {<<: *e, defense: no_defense, target_model_config: {temperature: 0.0, max_concurrency: 64}}
+  # ---- STOCHASTIC VERDICT (screens with the TARGET) -> predict COLLAPSE at T=0 ----
+  - {<<: *e, defense: sage, target_model_config: {temperature: 1.0, max_concurrency: 64}}
+  - {<<: *e, defense: sage, target_model_config: {temperature: 0.0, max_concurrency: 64}}
+  - {<<: *e, defense: llm_self_defense, target_model_config: {temperature: 1.0, max_concurrency: 64}}
+  - {<<: *e, defense: llm_self_defense, target_model_config: {temperature: 0.0, max_concurrency: 64}}
+  # ---- SEPARATE + GREEDY shadow -> predict NULL at T=0 ----
+  - {<<: *e, defense: selfdefend, target_model_config: {temperature: 1.0, max_concurrency: 64}}
+  - {<<: *e, defense: selfdefend, target_model_config: {temperature: 0.0, max_concurrency: 64}}
+  # ---- SEPARATE + GREEDY classifier gate -> predict NULL at T=0 ----
+  - {<<: *e, defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b},
+     target_model_config: {temperature: 1.0, max_concurrency: 64}}
+  - {<<: *e, defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b},
+     target_model_config: {temperature: 0.0, max_concurrency: 64}}

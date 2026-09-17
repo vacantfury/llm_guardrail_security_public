@@ -1,0 +1,7 @@
+# Canonicalize defense (Paper D) — effective-N reduction against Best-of-N.
+# Handles the canonicalizable head of BoN's text augmentations; the word-scramble
+# + ASCII-noise tail is irreducible here (spell-correction = future work).
+nfkc: true                 # Unicode NFKC — collapses homoglyph / compatibility variants
+strip_control: true        # remove control + zero-width / BOM / bidi chars
+case_fold: true            # collapse random capitalization
+normalize_whitespace: true # collapse whitespace runs to single spaces

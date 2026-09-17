@@ -1,0 +1,28 @@
+# HarmBench Llama-2-13B classifier (judge for the `harmbench` evaluator).
+#
+# Note: model-request params (temperature, max_tokens, prompt) are canonical
+# and hard-bound in src/evaluation/harmbench_evaluation/constants.py — the
+# `model:` block below is purely informational; HarmBenchEvaluator passes its
+# own constants directly to LLMServiceFactory.create() and ignores YAML.
+# This file exists only to drive cluster job parameters consumed by
+# ClusterModelServerManager._generate_sbatch().
+
+model:
+  model: cais/HarmBench-Llama-2-13b-cls
+  max_tokens: 32
+
+# 13B weights ≈ 26 GB at FP16 — comfortably fits on a single A100 (40 or 80 GB).
+# Inputs are short (behavior + generation + LLAMA2_CLS_PROMPT template), and
+# the model is Llama-2 architecture with max_position_embeddings=2048 (a hard
+# RoPE ceiling — vLLM refuses to serve at higher max_model_len, and the
+# LLMConfig validator catches this at config-load time).
+cluster:
+  num_gpus: 1
+  mem_gb: 64
+  max_model_len: 2048
+  # NOTE: chat_template is NOT set here — it's an architectural property of
+  # the model (HarmBench classifier needs `passthrough` because its training
+  # prompts are pre-wrapped in Llama-2 [INST] syntax), so it lives on the
+  # LLMModel.HARMBENCH_LLAMA_2_13B_CLS ModelSpec in src/llm_utils/llm_model.py.
+  # Set `chat_template:` here only as a per-deployment override.
+  gpu_types_excluded: ["v100-pcie", "v100-sxm2", "t4", "p100"]

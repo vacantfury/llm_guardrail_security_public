@@ -1,0 +1,41 @@
+# ============================================================
+# Bedrock invoke smoke — xc cluster (AWS Bedrock via AWS_PROFILE).
+# ============================================================
+# Purpose: confirm Provider.BEDROCK invoke works end-to-end through
+# BedrockService (boto3 bedrock-runtime.converse). Runs 1 prompt through a
+# Bedrock Claude-Haiku encoder LLM (~nil cost) — a self-contained invoke check
+# that needs no GPU, no SLURM, no upstream data.
+#
+# Usage (ON the xc cluster, after the one-time clone + light env — see the
+# runbook cluster_files/xc_cluster_properties.md):
+#     AWS_PROFILE=<xc profile> AWS_REGION=us-east-1 python main.py bedrock_smoke
+#
+# VALIDATED on xc 2026-07-18. Gotcha this file originally hit: per-step encoder
+# overrides MUST be nested under `params:` (TransformationSpec = {type, params});
+# a top-level `model:` on the step is silently ignored → default gpt-4.1-mini →
+# "OpenAI API key not found" on a box that has no OpenAI key.
+
+num_main_job_threads: 1
+
+tasks:
+  # 1 prompt → Bedrock Claude-Haiku-4.5 encoder. Confirms the converse invoke +
+  # credential chain. Swap the model id for any Provider.BEDROCK row to smoke
+  # another model (Claude ids are us.*-prefixed inference profiles; qwen/
+  # deepseek/nova use the bare on-demand id).
+  # Source = a genuinely innocuous prompt (photosynthesis) ON PURPOSE: the jbb
+  # "benign" set is jailbreak-adjacent (row 0 is a heroin story) and trips both
+  # encoder refusals AND Bedrock's own content filter, muddying an INVOKE smoke.
+  # A neutral prompt isolates the thing under test: does Provider.BEDROCK invoke.
+  # Encoder = Amazon Nova-Lite (compliant + cheap). Swap `model` to any
+  # Provider.BEDROCK row to smoke another family (Claude ids are us.*-prefixed
+  # inference profiles; qwen/deepseek/nova use the bare on-demand id). Invoke
+  # verified on xc 2026-07-18 across Claude/Nova/Qwen/DeepSeek.
+  - mode: prompt_transform
+    source_file: data/smoke_innocuous.jsonl
+    benchmark: harmbench          # arbitrary — only used for the output subdir name;
+                                  # the innocuous path can't be auto-inferred.
+    prompt_range: [0, 0]
+    transformation_list:
+      - type: set_theory
+        params:
+          model: us.amazon.nova-lite-v1:0

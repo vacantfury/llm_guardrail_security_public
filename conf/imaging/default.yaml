@@ -1,0 +1,41 @@
+# ============================================================
+# Default imaging parameters — all renderers inherit these.
+# Specific renderer YAMLs only need to override what differs.
+# ============================================================
+
+renderer_type: plain
+
+# Canvas
+width: 1024
+height: 768
+
+# Colors
+bg_color: "#FFFFFF"
+fg_color: "#000000"
+
+# Text layout
+font_size: 28
+padding: 40
+line_spacing: 8
+
+# Pagination budget — max images per prompt for multimodal defense+evaluate;
+# prompts over this are excluded + flagged is_within_maxlen=False (never
+# truncated). Coupled to the served --max-model-len (20480): more pages =
+# more vision tokens. Read by task.py::_max_pages_per_prompt (code fallback 8).
+max_pages_per_prompt: 8
+
+# Readability constraint — renderers adapt to keep aspect ratio within this limit
+max_aspect_ratio: 3.0
+
+# Degradation (post-processing)
+blur_radius: 0
+jpeg_quality: 100
+noise_std: 0
+
+# Quality check — applied after every imaging task
+# fail_threshold: ink % below which images are certainly broken (tofu) → task fails
+# warn_threshold: ink % below which images are suspicious → logged warning
+quality_check:
+  fail_threshold: 1.0
+  warn_threshold: 3.0
+  sample_size: 5

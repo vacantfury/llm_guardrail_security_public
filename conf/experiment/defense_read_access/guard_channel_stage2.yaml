@@ -1,0 +1,35 @@
+
+num_main_job_threads: 4
+num_cluster_jobs: 5          # orchestrator + target + 3 guard servers.
+
+# ARM T — canonical harmful text, no image. Shared with the symmetry test and
+# the exchange-rate round, so arms pair per prompt id by construction.
+_text:  &text  outputs/image_presence_threshold/prompt_transform/harmbench/non_llm_baseline_ir_blank_20260806_151849_37565903/non_llm_baseline
+# ARM I — same payload, image channel only (xc job 242; verified 100 images and
+# exactly ONE distinct text-channel value, the placeholder).
+_image: &image outputs/image_presence_threshold/prompt_transform/harmbench/non_llm_baseline_ir_plain_20260808_044746_98303811/ir_plain
+
+_b: &b
+  mode: defense+evaluate
+  target_model: qwen3_vl_8b_instruct
+  prompt_range: [0, 99]
+  benchmark: harmbench
+  judge_method: harmbench
+  judge_model: gpt-5-mini
+  campaign: paper_b_guard_channel
+
+tasks:
+  # ---- undefended baseline, per channel (the denominator) -------------------
+  - {<<: *b, defense: no_defense, source_transform_subdir: *text}
+  - {<<: *b, defense: no_defense, source_transform_subdir: *image}
+
+  # ---- TEXT-ONLY guards: establish the gap ---------------------------------
+  - {<<: *b, defense: guard_baseline, defense_config: {guard_model: wildguard},        source_transform_subdir: *text}
+  - {<<: *b, defense: guard_baseline, defense_config: {guard_model: wildguard},        source_transform_subdir: *image}
+  - {<<: *b, defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b}, source_transform_subdir: *text}
+  - {<<: *b, defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b}, source_transform_subdir: *image}
+
+  # ---- MULTIMODAL guard: does the obvious fix close it? --------------------
+  - {<<: *b, defense: guard_baseline, defense_config: {guard_model: guardreasoner_vl_7b}, source_transform_subdir: *text}
+  - {<<: *b, defense: guard_baseline, defense_config: {guard_model: guardreasoner_vl_7b}, source_transform_subdir: *image}
+

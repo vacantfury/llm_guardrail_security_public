@@ -1,0 +1,30 @@
+# ArtPrompt encoder (non-LLM, rule-based).
+# "ASCII Art-based Jailbreak Attacks against Aligned LLMs" (Jiang et al., ACL 2024).
+#
+# Masks one sensitive word and renders it as ASCII art; the target must visually
+# decode the art to recover the word. TEXT-channel only — do NOT chain into the
+# imaging stage (ir_plain): the art is whitespace-sensitive (see code_dev_plan.md).
+encoder_type: non_llm_artprompt
+
+# --- font (KEY parameter; this is the one to sweep) ---
+# 'gen' = hardcoded 5x5 grid, NO dependency BUT surface-readable: it fills each
+#   letter's cell with the letter itself, so the word leaks into the raw text.
+#   => fine for smoke tests / dependency-free runs, but a WEAK/CONFOUNDED probe
+#      for the decode-gap experiment (a defense could "catch" it by reading, not
+#      decoding).
+# For the real decode-gap experiment use an `art`-library font (needs
+#   `pip install art`) whose letters are drawn in NON-letter ink, so the word is
+#   recoverable ONLY by decoding the visual structure. Recommended sweep set
+#   (ArtPrompt's top fonts): cards, alphabet, puzzle  (also: letters, keyboard).
+font: gen                 # smoke-test default; switch to cards/alphabet for experiments
+
+# --- word_selection (which content word to mask) ---
+# 'first_content' (default) or 'longest'. NOTE: neither reliably hides the most
+# harmful word (e.g. "build a bomb" -> both pick "build", leaving "bomb" visible).
+# This is the documented non-LLM conservatism; sweep both, or upgrade to a
+# sensitivity-aware masker (lexicon/LLM) later.
+word_selection: first_content
+
+# Output is a complete, self-contained prompt — suppress the generic decode prefix.
+# (The encoder also force-empties this internally; set here for clarity.)
+target_prefix: ""

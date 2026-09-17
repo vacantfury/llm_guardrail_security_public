@@ -1,0 +1,4 @@
+# Addition Equation encoder (non-LLM)
+# Splits prompt into parts and reassembles as mathematical summation.
+encoder_type: non_llm_addition_equation_split_reassemble
+num_parts: 6

@@ -1,0 +1,10 @@
+# Best-of-N text augmentation (Hughes et al., NeurIPS 2025). One stochastic
+# augmented variant per call; N variants come from N dataset rows of a behavior
+# (scripts/expand_bon_dataset.py). Reimplemented from the reference, not vendored.
+encoder_type: non_llm_best_of_n
+sigma: 0.4                 # severity in [0,1] (BoN default); scramble/caps use sigma**0.5, ascii noise sigma**3
+seed: 0                    # RNG seed for reproducible variant draws over a batch
+word_scrambling: true
+random_capitalization: true
+ascii_perturbation: true
+target_prefix: ""          # BoN sends the augmented request directly — NO decode wrapper (override default.yaml)

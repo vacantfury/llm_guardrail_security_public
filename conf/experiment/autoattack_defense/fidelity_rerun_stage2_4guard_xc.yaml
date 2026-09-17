@@ -1,0 +1,47 @@
+
+num_main_job_threads: 6
+num_cluster_jobs: 6
+
+# ── Stage-1 sources: the FIXED encoders (NURC job 8957825, verified on xc) ──
+_code: &code outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260805_215649_22270770/code_attack
+_fig:  &fig  outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260805_215649_72871103/ir_figstep
+
+_base: &base
+  mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range: [0, 99]
+  judge_model: gpt-5-mini
+  campaign: paper_c_fidelity_rerun
+
+tasks:
+  # ── LlamaGuard-3-8B ──
+  - {<<: *base, defense: guard_baseline,    source_transform_subdir: *code, defense_config: {guard_model: llama_guard_3_8b}}
+  - {<<: *base, defense: guard_baseline,    source_transform_subdir: *fig,  defense_config: {guard_model: llama_guard_3_8b}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *code, defense_config: {guard_model: llama_guard_3_8b, decode_text: true, decode_style: recover}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *fig,  defense_config: {guard_model: llama_guard_3_8b, decode_text: true, decode_style: recover}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *code, defense_config: {guard_model: llama_guard_3_8b, decode_text: true, decode_style: recover, reguard_original: true}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *fig,  defense_config: {guard_model: llama_guard_3_8b, decode_text: true, decode_style: recover, reguard_original: true}}
+
+  # ── Qwen3Guard-Gen-8B ──
+  - {<<: *base, defense: guard_baseline,    source_transform_subdir: *code, defense_config: {guard_model: qwen3guard_gen_8b}}
+  - {<<: *base, defense: guard_baseline,    source_transform_subdir: *fig,  defense_config: {guard_model: qwen3guard_gen_8b}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *code, defense_config: {guard_model: qwen3guard_gen_8b, decode_text: true, decode_style: recover}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *fig,  defense_config: {guard_model: qwen3guard_gen_8b, decode_text: true, decode_style: recover}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *code, defense_config: {guard_model: qwen3guard_gen_8b, decode_text: true, decode_style: recover, reguard_original: true}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *fig,  defense_config: {guard_model: qwen3guard_gen_8b, decode_text: true, decode_style: recover, reguard_original: true}}
+
+  # ── ThinkGuard ──
+  - {<<: *base, defense: guard_baseline,    source_transform_subdir: *code, defense_config: {guard_model: thinkguard}}
+  - {<<: *base, defense: guard_baseline,    source_transform_subdir: *fig,  defense_config: {guard_model: thinkguard}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *code, defense_config: {guard_model: thinkguard, decode_text: true, decode_style: recover}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *fig,  defense_config: {guard_model: thinkguard, decode_text: true, decode_style: recover}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *code, defense_config: {guard_model: thinkguard, decode_text: true, decode_style: recover, reguard_original: true}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *fig,  defense_config: {guard_model: thinkguard, decode_text: true, decode_style: recover, reguard_original: true}}
+
+  # ── GuardReasoner-VL-7B (multimodal guard) ──
+  - {<<: *base, defense: guard_baseline,    source_transform_subdir: *code, defense_config: {guard_model: guardreasoner_vl_7b}}
+  - {<<: *base, defense: guard_baseline,    source_transform_subdir: *fig,  defense_config: {guard_model: guardreasoner_vl_7b}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *code, defense_config: {guard_model: guardreasoner_vl_7b, decode_text: true, decode_style: recover}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *fig,  defense_config: {guard_model: guardreasoner_vl_7b, decode_text: true, decode_style: recover}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *code, defense_config: {guard_model: guardreasoner_vl_7b, decode_text: true, decode_style: recover, reguard_original: true}}
+  - {<<: *base, defense: modality_complete, source_transform_subdir: *fig,  defense_config: {guard_model: guardreasoner_vl_7b, decode_text: true, decode_style: recover, reguard_original: true}}

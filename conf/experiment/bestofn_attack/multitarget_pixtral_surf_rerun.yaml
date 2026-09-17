@@ -1,0 +1,23 @@
+# bestofn_attack — R5 re-run of the 2 Pixtral SURFACE cells that timed out in
+# multitarget_pixtral_rerun.yaml. ROOT CAUSE (log mj_8481607.err): 3 cells shared
+# 1 Pixtral server; code/guard hogged it for 8142s, so the 2 surf cells hit the
+# 10000s endpoint-wait timeout ("No endpoint available for Pixtral within 10000s").
+# FIX: num_main_job_threads=1 -> the 2 cells run STRICTLY SERIAL, so neither ever
+# waits on a busy endpoint. ~2h/cell serial -> ~4h wall (< NURC 8h). Reuses transforms.
+# Campaign unchanged so these land alongside the existing r5 cells.
+num_main_job_threads: 1
+num_cluster_jobs: 3          # orchestrator + pixtral(target) + wildguard(guard+judge)
+
+_e: &e
+  mode: defense+evaluate
+  target_model: pixtral_12b
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r5_multitarget
+
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+tasks:
+  - {<<: *e, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *surf, defense: canonicalize_guard, defense_config: {guard_model: wildguard}}

@@ -1,0 +1,48 @@
+# Paper D / R4 gate — PHASE 1 (transforms).
+# Produce full / head / tail Best-of-N augmentations on HarmBench + JailbreakBench
+# for the canonicalize->guard adaptive-carve experiment (proposal.md §9).
+# Run this FIRST; then identify each output subdir (by its results.json transform
+# params) and fill the CHAIN_* placeholders in r4_gate.yaml (Phase 2).
+#
+#   head = random_capitalization only     -> canonicalizable (case-fold collapses it)
+#   tail = word_scramble + ascii_noise    -> irreducible (survives canon) = ADAPTIVE attacker
+#   full = all three (BoN default)         -> the naive attacker
+#
+# Datasets (scripts/expand_bon_dataset.py, 40 behaviors x 100 variants):
+#   data/harmbench_bon_r4.jsonl   data/jbb_bon_r4.jsonl   (both gitignored -> sync to cluster)
+
+num_main_job_threads: 8
+
+tasks:
+  # ---------- HarmBench ----------
+  - mode: prompt_transform          # HB full
+    source_file: data/harmbench_bon_r4.jsonl
+    transformation_list:
+      - type: non_llm_best_of_n
+        params: {sigma: 0.4, seed: 0}
+  - mode: prompt_transform          # HB head (caps only)
+    source_file: data/harmbench_bon_r4.jsonl
+    transformation_list:
+      - type: non_llm_best_of_n
+        params: {sigma: 0.4, seed: 0, word_scrambling: false, random_capitalization: true, ascii_perturbation: false}
+  - mode: prompt_transform          # HB tail (scramble + ascii) = adaptive
+    source_file: data/harmbench_bon_r4.jsonl
+    transformation_list:
+      - type: non_llm_best_of_n
+        params: {sigma: 0.4, seed: 0, word_scrambling: true, random_capitalization: false, ascii_perturbation: true}
+  # ---------- JailbreakBench ----------
+  - mode: prompt_transform          # JBB full
+    source_file: data/jbb_bon_r4.jsonl
+    transformation_list:
+      - type: non_llm_best_of_n
+        params: {sigma: 0.4, seed: 0}
+  - mode: prompt_transform          # JBB head (caps only)
+    source_file: data/jbb_bon_r4.jsonl
+    transformation_list:
+      - type: non_llm_best_of_n
+        params: {sigma: 0.4, seed: 0, word_scrambling: false, random_capitalization: true, ascii_perturbation: false}
+  - mode: prompt_transform          # JBB tail (scramble + ascii) = adaptive
+    source_file: data/jbb_bon_r4.jsonl
+    transformation_list:
+      - type: non_llm_best_of_n
+        params: {sigma: 0.4, seed: 0, word_scrambling: true, random_capitalization: false, ascii_perturbation: true}

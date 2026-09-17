@@ -1,0 +1,22 @@
+# ⚠️ HISTORICAL (audit 2026-07-24) — 2026-07-13-era preset superseded by later
+# rounds; may reference frozen/removed output dirs. Kept for provenance; do not run as-is.
+# ============================================================
+# Stage 2: Render encoded prompts as images (Plain baseline)
+# ============================================================
+# Usage: python main.py imaging
+#
+# Renderer params loaded from conf/imaging/plain.yaml automatically.
+# Override individual params in the 'renderer:' block if needed.
+
+tasks:
+  - mode: imaging
+    renderer_type: plain
+    source_dir: outputs/encode_plain_YYYYMMDD_HHMMSS
+
+  - mode: imaging
+    renderer_type: plain
+    source_dir: outputs/encode_math_YYYYMMDD_HHMMSS
+
+  - mode: imaging
+    renderer_type: plain
+    source_dir: outputs/encode_classical_chinese_YYYYMMDD_HHMMSS

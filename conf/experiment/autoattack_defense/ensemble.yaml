@@ -1,0 +1,83 @@
+# ⚠️ HISTORICAL (audit 2026-07-24) — single-target DRAFT pilot superseded by
+# ensemble_full.yaml (2026-07-17). Kept for provenance; do not run as-is.
+# ============================================================
+# Paper C · Stage 2 — DEFENSE MATRIX over the multimodal-attack ensemble  (2026-07-16)
+# ============================================================
+# DRAFT for review. The coverage-map headline on the image surface: each
+# established multimodal attack × {no_defense control, the single-surface
+# specialists SAGE/ECSO that should MISS it, our modality_complete that should
+# CATCH it}. One workhorse target for the pilot.
+#
+# >>> BEFORE RUNNING <<<
+#  1. Run ensemble_render.yaml (Stage 1) first; it prints the output dirs.
+#  2. Fill each _* source anchor below with its real dir (they carry timestamps).
+#  3. Pilot = qwen only, prompt_range [0,19], WildGuard judge (free, cheap-first).
+#     Full run: add internvl3_8b / pixtral_12b targets, bump range to [0,99],
+#     and rejudge headline numbers with gpt-5-mini (cheap-first: free judge for
+#     the pilot, API judge only for the final table).
+#
+# modality_complete here is the STANDALONE amplifier (guard_model unset -> SAGE-
+# style self-check on the target); the external-guard condition (guardreasoner_vl)
+# is the separate Round-3 story, not this pilot.
+#
+# num_cluster_jobs = orchestrator(1) + qwen target(1) + wildguard judge(1) = 3.
+# (SAGE/ECSO/modality_complete run on the target itself — no extra servers.)
+# ============================================================
+
+num_main_job_threads: 4
+num_cluster_jobs: 3
+
+# ── target + judge anchor (WildGuard = free cluster 7B judge, cheap-first) ──
+_qwen: &qwen
+  mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range: [0, 19]
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_ensemble_pilot
+
+# ── Stage-1 sources — FILLED from ensemble_render.yaml (NURC job mj_8406284, 2026-07-16) ──
+_figstep:  &figstep  outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260716_194159_70433849/ir_figstep
+_fcflow:   &fcflow   outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260716_194159_69181110/ir_fc_flowchart
+_lowcon:   &lowcon   outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260716_194159_9379140/ir_low_contrast
+_occluded: &occluded outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260716_194159_10657917/ir_occluded
+_mmtypo:   &mmtypo   outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260716_194203_32634422/ir_mm_typo
+_distract: &distract outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260716_194203_7625970/ir_distraction_grid
+_camoimg:  &camoimg  outputs/autoattack_defense/prompt_transform/harmbench/semantic_camo_ir_plain_20260716_194205_29992788/ir_plain
+
+tasks:
+  # ── FigStep ──
+  - {<<: *qwen, defense: no_defense,        source_transform_subdir: *figstep}
+  - {<<: *qwen, defense: sage,              source_transform_subdir: *figstep}
+  - {<<: *qwen, defense: ecso,              source_transform_subdir: *figstep}
+  - {<<: *qwen, defense: modality_complete, source_transform_subdir: *figstep}
+  # ── FC-Attack ──
+  - {<<: *qwen, defense: no_defense,        source_transform_subdir: *fcflow}
+  - {<<: *qwen, defense: sage,              source_transform_subdir: *fcflow}
+  - {<<: *qwen, defense: ecso,              source_transform_subdir: *fcflow}
+  - {<<: *qwen, defense: modality_complete, source_transform_subdir: *fcflow}
+  # ── Adversarial Smuggling: Low-Contrast ──
+  - {<<: *qwen, defense: no_defense,        source_transform_subdir: *lowcon}
+  - {<<: *qwen, defense: sage,              source_transform_subdir: *lowcon}
+  - {<<: *qwen, defense: ecso,              source_transform_subdir: *lowcon}
+  - {<<: *qwen, defense: modality_complete, source_transform_subdir: *lowcon}
+  # ── Adversarial Smuggling: Occluded-Text ──
+  - {<<: *qwen, defense: no_defense,        source_transform_subdir: *occluded}
+  - {<<: *qwen, defense: sage,              source_transform_subdir: *occluded}
+  - {<<: *qwen, defense: ecso,              source_transform_subdir: *occluded}
+  - {<<: *qwen, defense: modality_complete, source_transform_subdir: *occluded}
+  # ── MM-SafetyBench TYPO ──
+  - {<<: *qwen, defense: no_defense,        source_transform_subdir: *mmtypo}
+  - {<<: *qwen, defense: sage,              source_transform_subdir: *mmtypo}
+  - {<<: *qwen, defense: ecso,              source_transform_subdir: *mmtypo}
+  - {<<: *qwen, defense: modality_complete, source_transform_subdir: *mmtypo}
+  # ── Distraction grid (Text-DJ / CS-DJ) ──
+  - {<<: *qwen, defense: no_defense,        source_transform_subdir: *distract}
+  - {<<: *qwen, defense: sage,              source_transform_subdir: *distract}
+  - {<<: *qwen, defense: ecso,              source_transform_subdir: *distract}
+  - {<<: *qwen, defense: modality_complete, source_transform_subdir: *distract}
+  # ── Semantic-camouflage-in-image ──
+  - {<<: *qwen, defense: no_defense,        source_transform_subdir: *camoimg}
+  - {<<: *qwen, defense: sage,              source_transform_subdir: *camoimg}
+  - {<<: *qwen, defense: ecso,              source_transform_subdir: *camoimg}
+  - {<<: *qwen, defense: modality_complete, source_transform_subdir: *camoimg}

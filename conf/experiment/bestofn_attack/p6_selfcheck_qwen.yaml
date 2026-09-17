@@ -1,0 +1,38 @@
+# bestofn_attack Paper-D — P6 SELF-CHECK GENERALIZATION, QWEN2.5-7B (3 cells).
+# Read p6_selfcheck_llama.yaml's header first — it carries this round's design,
+# the pilot findings, why the no_defense cell is not padding, and how to read a
+# flat-at-zero selfdefend result. None of that is repeated here.
+#
+# TARGET: Qwen2.5-7B — refusal disposition 96.3%, middle band 2.4%. Together
+# with Gemma it anchors the high-disposition end of the range, where borrowed
+# strength predicts the same-model defenses look STRONGEST. Qwen and Gemma
+# agree to within a point on disposition, so they are a within-round
+# replication of each other, not two independent points.
+#
+# JUDGE: wildguard, free first pass, NOT reportable. Provisional until rejudge.
+#
+#   sbatch scripts/run_experiment_xc.sbatch bestofn_attack/p6_selfcheck_qwen
+#
+# SIZING: the slowest of the three small targets by a wide margin — its stored
+# full-scale no_defense run took 6.7h at 10,000 draws, roughly double Llama's
+# 3.4h on the same arm. Three replicas over ~4 cell-units puts this near 9h,
+# which is why conf/clusters/xc.yaml's server wall had to go from 8h to 24h
+# before this preset could run at all.
+num_main_job_threads: 3      # all three cells in flight across the replicas
+num_cluster_jobs: 6          # orchestrator + 3 qwen + shadow + wildguard
+
+_e: &e
+  mode: defense+evaluate
+  target_model: qwen2_5_7b_instruct
+  target_model_config: {temperature: 1.0, seed: 1337}
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_p6_selfcheck
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+
+tasks:
+  - {<<: *e, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *code, defense: llm_self_defense}
+  - {<<: *e, source_transform_subdir: *code, defense: selfdefend}

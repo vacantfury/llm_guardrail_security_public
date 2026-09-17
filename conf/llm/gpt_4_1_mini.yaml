@@ -1,0 +1,4 @@
+# GPT-4.1-mini (OpenAI) — cost-efficient helper for text encoding
+
+model:
+  model: gpt-4.1-mini

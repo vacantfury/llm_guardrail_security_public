@@ -1,0 +1,35 @@
+# bestofn_attack Paper-1 — PUBLISHED-defense axis, SMOKE (validate + measure cost).
+# Adds the two PUBLISHED defenses to Paper 1's defense axis:
+#   - SAGE (Ding et al., ACL Findings 2025): single self-check call, ~1x target cost.
+#   - SemanticSmooth (Ji et al., AACL-IJCNLP 2025): n_copies=5 paraphrase+vote, ~5x
+#     target cost (5 paraphrase-gen + 5 target-answer + 5 vote-judge per draw).
+# This smoke runs qwen only, ~2 behaviors, to (a) confirm both defenses work on the
+# bestofn stage-1 transforms in BoN context and (b) MEASURE SemanticSmooth's real
+# per-draw wall-clock before committing the full round.
+#
+# FREE — everything on served models: SemanticSmooth's API defaults (perturbation
+# gemini-2.5-flash-lite, internal judge gpt-5-nano) are OVERRIDDEN to
+# perturbation_model=null (use the qwen target) + judge_model=wildguard. ASR judge =
+# wildguard first-pass; the gpt-5-mini rejudge is a SEPARATE gated step afterward.
+num_main_job_threads: 2      # SemanticSmooth is heavy; cap concurrency on the 1 qwen server
+num_cluster_jobs: 3          # orchestrator + qwen + wildguard (SS internal vote + ASR judge)
+
+_e: &e
+  mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  prompt_range: [0, 199]      # ~2 behaviors x 100 draws — smoke scale
+  campaign: bestofn_attack_p1_pubdef_smoke
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+_SS: &ss {n_copies: 5, perturbation_model: null, judge_model: wildguard}   # null -> paraphrase with the target; free served vote
+
+tasks:
+  - {<<: *e, source_transform_subdir: *code, defense: sage}
+  - {<<: *e, source_transform_subdir: *surf, defense: sage}
+  - {<<: *e, source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *e, source_transform_subdir: *surf, defense: semantic_smooth, defense_config: *ss}

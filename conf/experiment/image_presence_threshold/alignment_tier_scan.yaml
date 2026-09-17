@@ -1,0 +1,39 @@
+
+num_main_job_threads: 6
+num_cluster_jobs: 7          # orchestrator + 6 vLLM servers (xc server budget = 6).
+
+# Reused from xc job 204 (serving-stack stage 1a). Deterministic renders, so
+# reuse is safe and keeps the text channel identical to the published arm:
+#   text  n=100, no images
+#   blank 1024x768 (renderer default = the published presence-control arm),
+#         100 images, exactly 1 distinct hash
+_text:  &text  outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260807_223202_80871327/non_llm_baseline
+_blank: &blank outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260807_223202_80871327/ir_blank
+
+_b: &b
+  mode: defense+evaluate
+  defense: no_defense
+  prompt_range: [0, 99]
+  benchmark: jailbreakbench_benign
+  judge_method: jbb_refusal
+  judge_model: gpt-5-mini
+  campaign: paper_b_alignment_tier_scan
+
+tasks:
+  # ---- STRONG tier: the hypothesis's headline prediction --------------------
+  - {<<: *b, target_model: llama3_2_11b_vision, source_transform_subdir: *text}
+  - {<<: *b, target_model: llama3_2_11b_vision, source_transform_subdir: *blank}
+
+  # ---- MID tier ------------------------------------------------------------
+  - {<<: *b, target_model: google/gemma-3-12b-it, source_transform_subdir: *text}
+  - {<<: *b, target_model: google/gemma-3-12b-it, source_transform_subdir: *blank}
+  - {<<: *b, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *text}
+  - {<<: *b, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *blank}
+  - {<<: *b, target_model: qwen2_5_vl_7b,        source_transform_subdir: *text}
+  - {<<: *b, target_model: qwen2_5_vl_7b,        source_transform_subdir: *blank}
+  - {<<: *b, target_model: internvl3_8b,         source_transform_subdir: *text}
+  - {<<: *b, target_model: internvl3_8b,         source_transform_subdir: *blank}
+
+  # ---- WEAK tier -----------------------------------------------------------
+  - {<<: *b, target_model: pixtral_12b,          source_transform_subdir: *text}
+  - {<<: *b, target_model: pixtral_12b,          source_transform_subdir: *blank}

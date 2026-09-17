@@ -1,0 +1,33 @@
+
+num_main_job_threads: 4
+
+_decoy: &decoy
+  type: ir_constant
+  params: {image_path: src/prompt_transformations/image/images/mountain.png}
+
+tasks:
+  # ---- code_attack, on the FIXED encoder (free) ----
+  - mode: prompt_transform
+    benchmark: harmbench
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 99]
+    campaign: paper_b_fidelity_reencode
+    transformation_list:
+      - {type: code_attack}
+      - *decoy
+
+  # ---- semantic camouflage, on the FIXED encoder (~$0.15 of helper calls) ----
+  # `model` is pinned EXPLICITLY. conf/text_encoding/default.yaml does carry
+  # `model: gpt-4.1-mini`, but it does not reach the encoder when the step is part
+  # of a chain ending in an image transform — run AICR 285658 failed here with
+  # "model is required" while the code_attack task in the same preset succeeded.
+  # gpt-4.1-mini is also what the paper's original camo run recorded in its
+  # results_history, so this pins comparability rather than choosing something new.
+  - mode: prompt_transform
+    benchmark: harmbench
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 99]
+    campaign: paper_b_fidelity_reencode
+    transformation_list:
+      - {type: llm_semantic_camo, params: {model: gpt-4.1-mini}}
+      - *decoy

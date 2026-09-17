@@ -1,0 +1,30 @@
+# Evaluation defaults — judge LLM configuration.
+#
+# All evaluators (HarmBench, JBB harmful, JBB refusal, OR-Bench) instantiate
+# their judge service via LLMServiceFactory.create(model, **judge_kwargs)
+# where these values are passed through. Per-task can override at the task
+# YAML level (rarely needed).
+#
+# Evaluator selection is DERIVED from the benchmark slug in source_dir,
+# not configurable here — see EvaluatorFactory.create_from_benchmark.
+# This file controls WHICH MODEL judges, not WHICH EVALUATOR is used.
+
+judge_llm_config:
+  model: gpt-5-mini       # project-wide headline ASR judge (RESOLVED 2026-07-15,
+  max_tokens: 16384       # room for JSON-wrapped output with "reasoning" field
+  temperature: 0.0        # deterministic classification
+  use_batch_api: false    # NEVER route judging through a provider's native batch
+                          # API. llm_utils v5 auto-routes a job to batch (50%
+                          # cheaper) when its WORST-CASE cost estimate clears
+                          # $1 — and that estimate multiplies by max_tokens
+                          # above, so a 100-prompt judge job "costs" ~$3 and
+                          # batches, while its real cost is ~$0.07. The batch
+                          # then has to finish inside batch_timeout (3600s) or
+                          # the judge is abandoned: on 2026-08-07 this left FOUR
+                          # cells of the open-weight round at
+                          # `status=partial_judge` with rate=None across two
+                          # clusters. Realtime judging of 100 prompts takes
+                          # ~1 min at max_concurrency=20 and costs cents, so the
+                          # 50% saving never justified the failure mode.
+                          # Target-model calls are unaffected — they do not read
+                          # this config.

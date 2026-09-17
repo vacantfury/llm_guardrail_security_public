@@ -20,7 +20,17 @@ All papers above share one experiment harness:
 - **Defenses.** Published black-box defenses and guard classifiers behind one interface, plus a recover, decode, then guard pipeline that lets a guard see an obfuscated payload before it decides.
 - **Measurement.** A target model answers, and an external judge scores harm (HarmBench rubric) and over-refusal (OR-Bench rubric). The headline metric is ensemble attack success: a behavior counts as broken if any attack in the suite breaks it.
 
-**Code release.** The reproducible code for the papers above is being prepared for this repository. Until it lands, the code for the first paper is available at [math_encoding_llm_jailbreaking](https://github.com/vacantfury/math_encoding_llm_jailbreaking).
+**Code release.** This release is the harness state used for the arXiv versions listed above (snapshot 2026-08-09). From the repository root, use Python 3.12 or 3.13 and run:
+
+```bash
+uv sync --locked
+uv run python -c "import src; from src.defense import defender_factory; from src.prompt_transformations import transformation_factory"
+# Export your chosen provider's API environment variables, then:
+uv run python main.py test
+```
+
+The `test` preset makes encoder API calls for two prompts (about $0.01). Reproduction presets live under `conf/experiment/`; evaluation presets require the output paths produced by their earlier stages. Cluster runs require your own SLURM wrapper and configuration based on `conf/clusters/example.yaml` and `conf/cluster_pool.example.yaml`. Dataset terms are in [DATA_LICENSES.md](DATA_LICENSES.md).
+
 
 ## Ongoing work
 

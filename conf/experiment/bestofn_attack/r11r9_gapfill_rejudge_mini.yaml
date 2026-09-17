@@ -1,0 +1,17 @@
+num_cluster_jobs: 1
+num_main_job_threads: 8
+tasks:
+# ---- R11 gate cells (campaign bestofn_attack_r11_codefix) -------------------
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_guard_baseline_code_attack_20260806_045750_19000735
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_guard_baseline_variance_channel_bon_code_attack_20260806_045750_58995952
+  judge_model: gpt-5-mini
+# ---- R9 gap-fill cells (campaign bestofn_attack_r9_encgen) ------------------
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_guard_baseline__20260805_031935_80681059
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_no_defense__20260805_031935_43504077
+  judge_model: gpt-5-mini

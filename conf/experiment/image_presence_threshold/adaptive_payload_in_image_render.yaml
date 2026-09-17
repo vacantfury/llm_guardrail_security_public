@@ -1,0 +1,19 @@
+
+num_main_job_threads: 2
+
+_base: &base
+  mode: prompt_transform
+  benchmark: harmbench
+  prompt_range: [0, 99]
+  campaign: paper_b_adaptive_payload_in_image
+  # keep_text: false => payload rendered into the image, text channel becomes the
+  # stock neutral pointer. This single flag IS the attack.
+  transformation_list:
+    - {type: ir_plain, params: {keep_text: false}}
+
+tasks:
+  - <<: *base
+    source_transform_subdir: outputs/image_presence_threshold/prompt_transform/harmbench/code_attack_ir_constant_20260805_213025_3168031/code_attack
+
+  - <<: *base
+    source_transform_subdir: outputs/image_presence_threshold/prompt_transform/harmbench/llm_semantic_camo_ir_constant_20260805_213349_39577158/llm_semantic_camo

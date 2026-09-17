@@ -1,0 +1,55 @@
+# CAMO — Cross-modal Obfuscation (Jiang et al. 2025, arXiv 2506.16760, CoRR).
+# Reimplemented from the paper's §3 Methodology (no code released — DBLP CoRR
+# only). Source LaTeX: paper/literature/cross-modal-obfuscation/source/.
+#
+# MECHANISM: each character of a selected harmful keyword is replaced by a math
+# question whose numeric answer indexes a character-grid drawn in the image; the
+# model must solve -> index -> transcribe -> reassemble before the request even
+# exists. NON-LLM and deterministic (seeded per prompt id) — costs nothing to build.
+#
+# WHY IT IS IN PAPER C: this is the "legible but unassembled" attack class the
+# paper's Related Work + Limitations single out. Their own Table reports 100%
+# "safe" from an OCR-based classifier fed the image text = our RECOVER-only
+# ablation. The paper PREDICTS CAMO is self-defeating against recover+DECODE
+# (decode performs the reconstruction before the guard sees anything); this
+# transform lets us MEASURE that instead of asserting it.
+#
+# DECLARED DEVIATION (headed for the appendix): the adaptive difficulty loop
+# (Algorithm 2 — raise r then k, re-query until success within a budget) is NOT
+# run. We generate ONE artifact per prompt at a FIXED (r, k), because we test
+# whether decode closes the composition gap, not the attacker's outer search
+# over a live target. This is a LOWER BOUND on the attack, exactly as we treat
+# CC-BOS's `direct` ablation arm.
+#
+# ---- PRE-REGISTERED PREDICTION (written before any eval, cannot be fitted) ----
+# CAMO carries NO readable request on either channel: the text has numbered
+# blanks + math, the image has an unlabelled character grid. So:
+#   * guard_baseline (input guard on the raw attack): should PASS almost
+#     everything -> ASR near the undefended target's own CAMO success rate,
+#     because a classifier reading either channel sees benign math/letters.
+#   * modality_complete WITHOUT decode (recover only, image->text union): still
+#     passes — recover transcribes "a grid of letters", which is what CAMO's own
+#     OCR-classifier evaluation already shows scores 100% safe.
+#   * modality_complete WITH decode (+rg / full amplifier): should COLLAPSE the
+#     attack — decode instructs the target to perform CAMO's own reconstruction
+#     and hand the assembled request to the guard, which then blocks it.
+# FALSIFIED IF decode does NOT materially drop CAMO's ASR versus recover-only —
+# that would mean the target cannot reconstruct on demand what it reconstructs
+# when complying, and the decode-gap story would need qualifying.
+
+renderer_type: camo
+
+# r (§3.4): fraction of selected keywords that get masked. 1.0 = mask all picked.
+mask_word_ratio: 1.0
+# k (§3.4): prefix character fraction masked within each masked word. 1.0 = whole word.
+mask_char_depth: 1.0
+# how many keywords to select+obfuscate per prompt (paper's |W| cap via alpha).
+max_keywords: 3
+# benign decoy grid cells (random letters) added for stealth; shuffled in.
+num_decoy_cells: 6
+grid_cols: 6
+cell_size: 90
+font_size: 34
+spacy_model: en_core_web_sm
+seed: 20260731
+# sensitive_terms / template: defaults live in src/prompt_transformations/image/camo.py

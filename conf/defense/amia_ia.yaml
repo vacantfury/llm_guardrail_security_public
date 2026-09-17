@@ -1,0 +1,42 @@
+# AMIA — Automatic Masking and Joint Intention Analysis.
+# Zhang et al., Findings of EMNLP 2025 (arXiv 2505.24519). ESTABLISHED LITERATURE
+# — a published third-party defense, not a proposal of ours.
+# Implementation: src/defense/amia_ia.py
+# Reference impl: NONE — the authors' repo alphadl/SafeVLM_with_AMIA is still an
+# empty 3 KB placeholder (re-checked 2026-08-05), so this is from-paper.
+#
+# THE INTENTION-ANALYSIS INSTRUCTION IS THE PAPER'S, VERBATIM — recovered
+# 2026-08-05 from the arXiv source's Figure 3 (images/ia_prompt.pdf is vector
+# text, extractable from the PDF content stream; the old note that it was "not
+# transcribable" was never checked). It is hardcoded in the defender, not
+# configurable, because editing it silently would make this a different defense.
+# The earlier hand-written reconstruction primed the model for "encoded,
+# obfuscated" content and told it to "decode or reconstruct" — i.e. it handed the
+# defense the decode step this repo's thesis is about, and it emitted Title-Case
+# tags the parser then missed on every row. Any AMIA number collected before
+# 2026-08-05 is void.
+#
+# type_name stays `amia_ia` for continuity with existing presets; BOTH of AMIA's
+# components are implemented as of 2026-08-05.
+
+masking: true
+
+# VisRAG-Ret, the encoder the paper names (following Wang et al. 2025). Loaded
+# lazily on the GPU node; ~3B, so it costs a model slot on the defense side.
+mask_encoder: openbmb/VisRAG-Ret
+
+# Paper §4.1: "For simplicity and reproducibility, we set N=16 and K=3 for all
+# models and settings." N must be a perfect square — the sensitivity study sweeps
+# sqrt(N)=2,3,4,5,6 with K=1,2,3,5,7 to hold the masking ratio roughly fixed
+# (Appendix). NOT free knobs: these are the published defaults, and changing them
+# makes the run a variant rather than AMIA. If they are ever swept, that sweep is
+# the tuning path and its results belong beside the number.
+n_patches: 16
+k_mask: 3
+
+device: cuda
+
+# VALIDATION TARGET before trusting any AMIA number we report: AMIA's Table 1
+# gives DSR on FigStep, which is in our own attack suite — 98.8 (Llava-1.5-7B),
+# 99.0 (Llava-1.5-13B), 100.0 (Qwen2-VL-7B-Instruct). A faithful reimplementation
+# should land near those; a large shortfall indicts this module, not AMIA.

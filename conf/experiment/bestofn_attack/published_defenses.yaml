@@ -1,0 +1,21 @@
+num_main_job_threads: 2      # SAGE outputs are long; cap concurrency on the 1 qwen server (avoid endpoint contention)
+num_cluster_jobs: 3          # orchestrator + qwen + wildguard (SS internal vote + ASR judge)
+
+_e: &e
+  mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_p1_pubdef
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+_SS: &ss {n_copies: 5, perturbation_model: null, judge_model: wildguard}   # null -> paraphrase with the target; free served vote
+
+tasks:
+  - {<<: *e, source_transform_subdir: *code, defense: sage}
+  - {<<: *e, source_transform_subdir: *surf, defense: sage}
+  - {<<: *e, source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *e, source_transform_subdir: *surf, defense: semantic_smooth, defense_config: *ss}

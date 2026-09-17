@@ -1,0 +1,76 @@
+# Llama-3.3-70B-Instruct — judge for `jailbreakbench`, `refusal`, and `orbench`
+# evaluators.
+#
+# Note: model-request params (temperature, max_tokens, system message) are
+# canonical and hard-bound per-evaluator in:
+#   - src/evaluation/jailbreakbench_evaluation/constants.py
+#   - src/evaluation/jailbreakbench_refusal_evaluation/constants.py
+#   - src/evaluation/orbench_evaluation/constants.py
+# The `model:` block below is purely informational. This file exists only to
+# drive cluster job parameters consumed by ClusterModelServerManager.
+
+model:
+  model: meta-llama/Llama-3.3-70B-Instruct
+  max_tokens: 512
+
+cluster:
+  # --- cluster-invariant sizing ---
+  num_gpus: 1
+  quantization: fp8
+  mem_gb: 128
+  max_model_len: 8192
+  gpu_memory_utilization: 0.92
+  dtype: bfloat16
+  gpu_types_excluded: ["v100-pcie", "v100-sxm2", "t4", "p100"]
+
+  profiles:
+    nurc:
+      # H200 nodes; the A100-80GB pair is drained. No `|` OR — sbatch chokes on it.
+      gpu_constraint: "cascadelake"
+      # Short wall so SLURM can backfill this 1-GPU job into a gap. Safe on NURC
+      # only because its own cap is 08:00:00 anyway.
+      time_limit: "01:00:00"
+    aicr:
+      gpu_constraint: null
+      # Inherit AICR's 24h wall rather than NURC's 1h backfill trick: a 70B
+      # serving 40k generations needs hours, and a server that dies at 01:00:00
+      # strands every cell still queued behind it.
+      time_limit: "24:00:00"
+      # Load-balancing is PER-CELL, so a single replica serialises all four cells
+      # of a round onto one endpoint. Measured reference: one 8B replica served a
+      # 10k-draw cell in 66 min; a 70B at fp8 is roughly 5-6x slower per token, so
+      # one replica would put a 4-cell round at ~24h — exactly the wall, with no
+      # margin. Three replicas bring the makespan to the longest single cell.
+      # 3 replicas + wildguard = 4 GPU jobs, well inside AICR's max_gpu_jobs=12.
+      num_instances: 3
+      # MUST be >= the request max_tokens or vLLM 400s EVERY request (see the same
+      # warning in conf/llm/gemma2_9b_it.yaml). 20480 matches the 8B panel exactly,
+      # which is what makes the generation budget comparable across targets — the
+      # 8B ran max_model_len=20480 / max_tokens=16384. Leaving this at the 8192
+      # default while the preset asked for 16384 tokens rejected all 40,000 requests
+      # and the run still reported "Successful: 4" (job 227537, 2026-07-28).
+      # 70B fp8 ~70 GB on a 96 GB card at utilization 0.92 leaves ~18 GB of KV cache;
+      # one full 20480-token sequence needs ~6.7 GB, so the server starts and vLLM
+      # simply bounds concurrency.
+      max_model_len: 20480
+    xc:
+      # Single-node, homogeneous 8x A100-SXM4-80GB — no node feature to constrain
+      # on, and naming one is an sbatch error (same as aicr).
+      gpu_constraint: null
+      # TWO GPUs here, unlike every other cluster. This is the one place the
+      # "1 GPU everywhere" rule breaks: fp8 70B is ~70 GB, which fits an AICR
+      # RTX PRO 6000-96G or an H200-141G with KV headroom to spare, but on an
+      # 80 GB A100 at utilization 0.92 (73.6 GB usable) it leaves only ~3 GB of
+      # KV cache — less than the ~6.7 GB a single 20480-token sequence needs.
+      # Tensor-parallel across 2 cards puts ~35 GB of weights on each and leaves
+      # ample KV. Do NOT "optimise" this back to 1 without re-checking card size.
+      num_gpus: 2
+      num_instances: 1
+      # conf/clusters/xc.yaml defaults the server wall to 08:00:00, too short for
+      # a 3-cell 70B round; a server dying mid-round strands every queued cell.
+      # xc's own cap is 24:00:00.
+      time_limit: "20:00:00"
+      # MUST be >= the preset's max_tokens (16384) or vLLM 400s every request
+      # while the run still reports success (job 227537, 2026-07-28). Matches aicr
+      # so the generation budget stays comparable across targets.
+      max_model_len: 20480

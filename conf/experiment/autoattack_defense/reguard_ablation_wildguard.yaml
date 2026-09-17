@@ -1,0 +1,58 @@
+# ============================================================
+# Paper C · RQ4 reguard ablation — WILDGUARD RE-RUN (2026-07-21)
+# ============================================================
+# Completes the reguard ablation: the wildguard cells failed in the first xc run
+# (job 25) because xc had no HF token → wildguard's GATED repo returned 401. Fixed
+# 2026-07-21: HF token wired into xc ~/.xc_env (from the maintainer's secret manager) +
+# xc.yaml env_setup now sources it into server jobs. This re-runs ONLY wildguard's
+# 13 cells (11 harmful + 2 benign); qwen3guard + guardreasoner (26 cells) already
+# succeeded and are kept. SAME campaign (paper_c_reguard_ablation) so the ensemble
+# analysis joins all three guards on prompt id.
+#
+# In-run judge = wildguard (throwaway, free) — but on this run wildguard IS the guard
+# too, both from the same served endpoint; final ASR comes from the gpt-5-mini rejudge
+# of saved responses (as for the other 26).
+# SERVERS: qwen (target) + wildguard (guard) = 2 -> num_cluster_jobs = 3.
+# ============================================================
+
+num_main_job_threads: 2
+num_cluster_jobs: 3
+
+_rng: &rng [0, 99]
+
+_mcwg_rg: &mcwg_rg {guard_model: wildguard, decode_text: true, decode_style: recover, reguard_original: true}
+
+_harm: &harm {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: *rng, judge_method: wildguard, judge_model: wildguard, campaign: paper_c_reguard_ablation}
+_ben:  &ben  {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: *rng, benchmark: orbench_benign_hard, judge_method: orbench, judge_model: qwen2_5_vl_7b, campaign: paper_c_reguard_ablation}
+
+# attack renders (11) — identical to reguard_ablation.yaml
+_set: &set outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+_flog: &flog outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+_class: &class outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_ir_constant_20260710_002424_56524373/llm_classical_language
+_cipher: &cipher outputs/autoattack_defense/prompt_transform/harmbench/non_llm_cipher_20260718_183504_42666777/non_llm_cipher
+_code: &code outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+_figstep: &figstep outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+_fcflow: &fcflow outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+_lowcon: &lowcon outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast
+_occluded: &occluded outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded
+_mmtypo: &mmtypo outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo
+_distract: &distract outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid
+_orbimg: &orbimg outputs/autoattack_defense/prompt_transform/orbench_benign_hard/ir_plain_20260718_183504_7866920/ir_plain
+_orbtxt: &orbtxt outputs/autoattack_defense/prompt_transform/orbench_benign_hard/non_llm_baseline_20260718_183505_52485516/non_llm_baseline
+
+tasks:
+  # 11 harmful (wildguard mc+reguard)
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *set}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *flog}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *class}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *cipher}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *code}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *figstep}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *fcflow}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *lowcon}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *occluded}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *mmtypo}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *distract}
+  # 2 benign (wildguard mc+reguard) — over-refusal cost
+  - {<<: *ben, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: modality_complete, defense_config: *mcwg_rg, source_transform_subdir: *orbimg}

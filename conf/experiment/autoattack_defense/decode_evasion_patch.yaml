@@ -1,0 +1,38 @@
+# ============================================================
+# Paper C · RQ4 ADAPTIVE ATTACK — Step C: the HONEST-ARC PATCH (2026-07-20)
+# ============================================================
+# Tramer et al. 2020 discipline: don't just break the defense — try to patch it and
+# report whether the patch holds. The patch = `reguard_original` (modality_complete.py):
+# guard the FULL original text IN ADDITION to the lossy 1-2 sentence decode; block if
+# EITHER is flagged. Directly counters decode-evasion's compression exploit.
+#
+# ⚠️ GATED ON STEP B — only worth running if decode_evasion defeats plain `mc`
+# (decode_evasion_eval.yaml, AICR 169419). If the amplifier already holds, the patch is moot.
+#
+# Reads the SAME render (validated) as Step B. Same guards {wildguard, guardreasoner_vl_7b},
+# qwen target, n=100, WildGuard throwaway judge -> gpt-5-mini rejudge for final numbers.
+#
+# THREE outcomes, all publishable:
+#   patch blocks the attack  -> the defense is cheaply fixable (report the fix)
+#   patch fails              -> deeper flaw (the full text ALSO reads benign to the guard)
+#   patch blocks BUT the benign over-refusal cost spikes -> the RQ4 tension (measure benign next)
+#
+# COMPANION (not here yet): benign OR-Bench through mc-reguard vs mc, to quantify the
+# over-refusal cost the patch re-introduces (the fundamental safety-utility tension).
+# ============================================================
+
+num_main_job_threads: 3
+num_cluster_jobs: 4          # orchestrator + qwen(target) + wildguard(guard+judge) + guardreasoner_vl_7b(guard)
+
+_rng: &rng [0, 99]
+_de: &de outputs/autoattack_defense/prompt_transform/harmbench/decode_evasion_20260720_014855_98322846/llm_decode_evasion
+
+# mc + reguard_original PATCH configs
+_mcwg_rg:   &mcwg_rg   {guard_model: wildguard,           decode_text: true, decode_style: recover, reguard_original: true}
+_mcgrvl_rg: &mcgrvl_rg {guard_model: guardreasoner_vl_7b, decode_text: true, decode_style: recover, reguard_original: true}
+
+_harm: &harm {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: *rng, judge_method: wildguard, judge_model: wildguard, campaign: paper_c_rq4_decode_evasion_patch}
+
+tasks:
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg_rg,   source_transform_subdir: *de}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcgrvl_rg, source_transform_subdir: *de}

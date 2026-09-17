@@ -1,0 +1,4 @@
+# Defense configuration defaults
+# Used by the 'defense' task mode in experiment pipeline.
+#
+# Specific defense methods override these via conf/defense/<method>.yaml

@@ -1,0 +1,12 @@
+num_cluster_jobs: 1           # orchestrator only — gpt-5-mini is an API model
+num_main_job_threads: 2
+
+_r: &r
+  mode: rejudge
+  judge_model: gpt-5-mini
+  benchmark: harmbench
+  campaign: bestofn_attack_p4_rejudge
+
+tasks:
+  - {<<: *r, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_guard_baseline_variance_channel_bon_20260729_002035_89471694}
+  - {<<: *r, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_guard_baseline_code_attack_20260729_002035_740925}

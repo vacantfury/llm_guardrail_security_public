@@ -1,0 +1,65 @@
+# ============================================================
+# Paper C · guard_panel BENIGN re-run (over-refusal axis)  (2026-07-19)
+# ============================================================
+# Re-runs the 22 benign cells lost to the mid-run teardown race in the full
+# guard_panel matrix (job 167234): the qwen target was freed after the 110
+# harmful cells while the benign tail still needed it (target + ORBench judge).
+# Standalone benign-only run + DISABLE_MIDRUN_TEARDOWN=1 (submit with
+# --export=ALL,DISABLE_MIDRUN_TEARDOWN=1) so no server is freed until the end.
+#
+# Distinct campaign 'paper_c_guard_panel_benign' — the harmful axis stays
+# 'paper_c_guard_panel' (110 cells, valid); analysis/rejudge combine the two.
+# The 6 stale benign cells under paper_c_guard_panel are superseded.
+#
+# Cells: no_defense BASELINE + {gb, mc} × 5 guards, on image + text = 22.
+# Servers: qwen (target + ORBench judge) + 5 guards = 6 -> num_cluster_jobs 7.
+# In-run judges throwaway; gpt-5-mini rejudge over saved responses is the report.
+# ============================================================
+
+num_main_job_threads: 6
+num_cluster_jobs: 7
+
+_rng: &rng [0, 99]
+
+_gbwg:  &gbwg  {guard_model: wildguard}
+_gblg3:  &gblg3  {guard_model: llama_guard_3_8b}
+_gbq3g:  &gbq3g  {guard_model: qwen3guard_gen_8b}
+_gbtg:  &gbtg  {guard_model: thinkguard}
+_gbgrvl:  &gbgrvl  {guard_model: guardreasoner_vl_7b}
+_mcwg:  &mcwg  {guard_model: wildguard, decode_text: true, decode_style: recover}
+_mclg3:  &mclg3  {guard_model: llama_guard_3_8b, decode_text: true, decode_style: recover}
+_mcq3g:  &mcq3g  {guard_model: qwen3guard_gen_8b, decode_text: true, decode_style: recover}
+_mctg:  &mctg  {guard_model: thinkguard, decode_text: true, decode_style: recover}
+_mcgrvl:  &mcgrvl  {guard_model: guardreasoner_vl_7b, decode_text: true, decode_style: recover}
+
+_ben: &ben {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: *rng, benchmark: orbench_benign_hard, judge_method: orbench, judge_model: qwen2_5_vl_7b, campaign: paper_c_guard_panel_benign}
+
+_orbimg: &orbimg outputs/autoattack_defense/prompt_transform/orbench_benign_hard/ir_plain_20260718_183504_7866920/ir_plain
+_orbtxt: &orbtxt outputs/autoattack_defense/prompt_transform/orbench_benign_hard/non_llm_baseline_20260718_183505_52485516/non_llm_baseline
+
+tasks:
+  # ══ BENIGN image ══
+  - {<<: *ben, defense: no_defense, source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gbwg, source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: modality_complete, defense_config: *mcwg, source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gbq3g, source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: modality_complete, defense_config: *mcq3g, source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gbtg, source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: modality_complete, defense_config: *mctg, source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gbgrvl, source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: modality_complete, defense_config: *mcgrvl, source_transform_subdir: *orbimg}
+
+  # ══ BENIGN text ══
+  - {<<: *ben, defense: no_defense, source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gbwg, source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: modality_complete, defense_config: *mcwg, source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gbq3g, source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: modality_complete, defense_config: *mcq3g, source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gbtg, source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: modality_complete, defense_config: *mctg, source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gbgrvl, source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: modality_complete, defense_config: *mcgrvl, source_transform_subdir: *orbtxt}

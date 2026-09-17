@@ -1,0 +1,63 @@
+# bestofn_attack Paper-1 — FULL multi-target text-LLM published-defense round.
+# The reportable round: does BoN-wrapped CodeAttack survive published input-transformation
+# defenses (SAGE, SemanticSmooth) across THREE text-LLM targets, vs original BoN?
+# Run via the AICR wrapper (CLUSTER_PROFILE=aicr; all 3 targets bf16 on 96GB GPUs):
+#   sbatch scripts/run_experiment_aicr.sbatch bestofn_attack/text_targets_full
+#
+# Matrix = 3 targets x 3 defenses x 2 attacks = 18 cells. Each cell runs the FULL
+# BoN search: 100 HarmBench behaviors x 100 draws = 10,000 target queries (the stage-1
+# dirs carry the bon0..bon99 draws). Coverage (ASR@N=100), QtFS, the CodeAttack-N=1
+# baseline (=bon0 slice), and the ASR-vs-N curve all COMPUTE from these draws in a
+# later analyze pass — no extra runs.
+#
+# JUDGE = wildguard first-pass, FREE (cluster-served). This produces the diagnostic
+# numbers + the pre-filter for the reportable pass. The reportable gpt-5-mini rejudge
+# is a SEPARATE, GATED step over the SAVED responses (no re-query): full judge on the
+# 9 code cells, validated pre-filter on the 9 surface cells. Do NOT add any API model
+# here.
+#
+# SemanticSmooth API defaults (perturbation gemini, internal judge gpt-5-nano) are
+# OVERRIDDEN to perturbation_model=null (paraphrase with the target) + judge_model=
+# wildguard, so the whole matrix is free.
+num_main_job_threads: 18     # ALL 18 cells in flight at once, so all 3 target GPUs run in PARALLEL.
+                             # With the tasks ordered [llama x6, qwen x6, gemma x6], a smaller semaphore
+                             # (e.g. 6) would run only llama's 6 cells first, leaving qwen+gemma servers
+                             # IDLE -> targets serialize (~3x wall-clock, risks the 24h wall). 18 saturates
+                             # all 3 servers concurrently; each vLLM server batches its own target's load.
+num_cluster_jobs: 5          # orchestrator + llama-3.1-8b + qwen2.5-7b + gemma2-9b + wildguard (4 servers <= AICR budget 7)
+
+_e: &e
+  mode: defense+evaluate
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_p1_text_full
+  # prompt_range omitted -> all 10,000 rows (100 behaviors x 100 draws).
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+_SS: &ss {n_copies: 5, perturbation_model: null, judge_model: wildguard}   # null -> paraphrase with the target; free served vote
+
+tasks:
+  # ================= Llama-3.1-8B-Instruct =================
+  - {<<: *e, target_model: llama3_1_8b_cluster, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, target_model: llama3_1_8b_cluster, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *e, target_model: llama3_1_8b_cluster, source_transform_subdir: *code, defense: sage}
+  - {<<: *e, target_model: llama3_1_8b_cluster, source_transform_subdir: *surf, defense: sage}
+  - {<<: *e, target_model: llama3_1_8b_cluster, source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *e, target_model: llama3_1_8b_cluster, source_transform_subdir: *surf, defense: semantic_smooth, defense_config: *ss}
+  # ================= Qwen2.5-7B-Instruct =================
+  - {<<: *e, target_model: qwen2_5_7b_instruct, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, target_model: qwen2_5_7b_instruct, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *e, target_model: qwen2_5_7b_instruct, source_transform_subdir: *code, defense: sage}
+  - {<<: *e, target_model: qwen2_5_7b_instruct, source_transform_subdir: *surf, defense: sage}
+  - {<<: *e, target_model: qwen2_5_7b_instruct, source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *e, target_model: qwen2_5_7b_instruct, source_transform_subdir: *surf, defense: semantic_smooth, defense_config: *ss}
+  # ================= Gemma-2-9B-it =================
+  - {<<: *e, target_model: gemma2_9b_it, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, target_model: gemma2_9b_it, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *e, target_model: gemma2_9b_it, source_transform_subdir: *code, defense: sage}
+  - {<<: *e, target_model: gemma2_9b_it, source_transform_subdir: *surf, defense: sage}
+  - {<<: *e, target_model: gemma2_9b_it, source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *e, target_model: gemma2_9b_it, source_transform_subdir: *surf, defense: semantic_smooth, defense_config: *ss}

@@ -1,0 +1,52 @@
+# Paper D / R4 REFINEMENT — canonicalize_guard + unscramble (anagram + spell recovery).
+# Tests whether recovering the irreducible tail (word-scramble / ASCII noise) before
+# the guard drops the standard-BoN ASR from the ~64% floor the plain canonicalize_guard
+# left (proposal.md §9; R4 read 2026-07-16). Reuses the existing full/head/tail transforms.
+#
+# Compare against the plain-canonicalize_guard + no_defense arms from r4_gate:
+#   no_defense x FULL           -> undefended standard BoN
+#   canonicalize_guard x FULL   -> plain guard (tail survives -> ~64%)
+#   canonicalize_guard+unscramble x FULL  <== does recovery push it down? [THIS]
+# Judge = WildGuard (free). Head arm omitted (already 0% under plain canonicalize_guard).
+
+num_main_job_threads: 4
+
+tasks:
+  # ---------------- HarmBench ----------------
+  - mode: defense+evaluate            # cg+unscramble x FULL (standard BoN)
+    target_model: qwen2_5_vl_7b
+    defense: canonicalize_guard
+    defense_config: {guard_model: wildguard, unscramble: true}
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: harmbench
+    campaign: bestofn_r4_refine
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/harmbench/non_llm_best_of_n_20260716_213809_44307286/non_llm_best_of_n
+  - mode: defense+evaluate            # cg+unscramble x TAIL (adaptive)
+    target_model: qwen2_5_vl_7b
+    defense: canonicalize_guard
+    defense_config: {guard_model: wildguard, unscramble: true}
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: harmbench
+    campaign: bestofn_r4_refine
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/harmbench/non_llm_best_of_n_20260716_213809_76755369/non_llm_best_of_n
+  # ---------------- JailbreakBench ----------------
+  - mode: defense+evaluate            # cg+unscramble x FULL
+    target_model: qwen2_5_vl_7b
+    defense: canonicalize_guard
+    defense_config: {guard_model: wildguard, unscramble: true}
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: jailbreakbench
+    campaign: bestofn_r4_refine
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/jailbreakbench/non_llm_best_of_n_20260716_213810_6454052/non_llm_best_of_n
+  - mode: defense+evaluate            # cg+unscramble x TAIL
+    target_model: qwen2_5_vl_7b
+    defense: canonicalize_guard
+    defense_config: {guard_model: wildguard, unscramble: true}
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: jailbreakbench
+    campaign: bestofn_r4_refine
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/jailbreakbench/non_llm_best_of_n_20260716_213812_33544509/non_llm_best_of_n

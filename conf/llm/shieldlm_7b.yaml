@@ -1,0 +1,11 @@
+# ShieldLM-7B-internlm2 — bilingual (zh/en) response-safety guard (Round-J).
+# InternLM2 base -> trust_remote_code. Passthrough: caller sends the raw
+# [Answer]/[Analysis] instruction template as one message.
+model:
+  model: thu-coai/ShieldLM-7B-internlm2
+  max_tokens: 64
+cluster:
+  num_gpus: 1
+  mem_gb: 40
+  trust_remote_code: true
+  gpu_types_excluded: ["v100-pcie", "v100-sxm2", "t4", "p100"]

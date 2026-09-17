@@ -1,0 +1,14 @@
+# Unicode homoglyph encoder (non-LLM, rule-based).
+# Replaces ASCII letters with visually-identical Unicode confusables, reusing
+# the `homoglyphs` library (cite: Boucher et al. 2022, "Bad Characters").
+# The text reads the same to the model but differs byte-wise from what a safety
+# classifier matches — the "classifier-fooled / model-understands" decode gap.
+# TEXT-channel only — do NOT chain into the imaging stage (OCR would un-homoglyph it).
+encoder_type: non_llm_homoglyph
+
+ratio: 1.0                # fraction of eligible (ASCII-letter) chars to substitute
+deterministic: true       # reproducible left-to-right substitution
+
+# Output is read directly by the model — suppress the generic decode prefix.
+# (The encoder also force-empties this internally; set here for clarity.)
+target_prefix: ""

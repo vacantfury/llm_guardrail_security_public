@@ -1,0 +1,15 @@
+
+renderer_type: fc_flowchart
+
+# Flowchart-specific overrides
+layout: vertical
+dpi: 600
+wrap_width: 30
+font_name: "Times-Roman"
+font_size: "14"
+
+# Dynamic adaptation for long text (keeps aspect ratio within max_aspect_ratio)
+long_text_threshold: 500
+long_text_dpi: 300
+max_wrap_width: 100
+auto_layout_for_long: true

@@ -1,0 +1,27 @@
+num_cluster_jobs: 1
+num_main_job_threads: 6
+
+tasks:
+# ---- CONTROL: absorbs the answer-sampling channel; every other row is read net of it ----
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_no_defense_code_attack_20260808_235108_12766186   # T=1.0
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_no_defense_code_attack_20260808_235108_56208768   # T=0.0
+  judge_model: gpt-5-mini
+
+# ---- THE DECISIVE ARM: asks the TARGET, so its verdict is a SAMPLE ----
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_sage_code_attack_20260808_235108_99484437         # T=1.0
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_sage_code_attack_20260809_002224_77252306         # T=0.0
+  judge_model: gpt-5-mini
+
+# ---- separate greedy classifier gate — report as COUNTS, denominator is 6-10 ----
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_guard_baseline_code_attack_20260809_004256_28866476 # T=1.0
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_guard_baseline_code_attack_20260809_005304_92917415 # T=0.0
+  judge_model: gpt-5-mini

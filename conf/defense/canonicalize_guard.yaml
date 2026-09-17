@@ -1,0 +1,15 @@
+# CanonicalizeGuard (Paper D / R4) — canonicalize the input, then guard-screen it.
+# The GUARDED architecture the plain `canonicalize` defense lacks: collapse the
+# Best-of-N surface variants to one canonical form, then a guard blocks that form
+# (N-independent protection on the canonicalizable axes). See proposal.md §9.
+#
+# `guard_model` is REQUIRED and supplied inline via `defense_config`
+# (e.g. defense_config: {guard_model: wildguard}). The canonicalization toggles
+# below default ON, mirroring conf/defense/canonicalize.yaml.
+nfkc: true                 # Unicode NFKC — collapses homoglyph / compatibility variants
+strip_control: true        # remove control + zero-width / BOM / bidi chars
+case_fold: true            # collapse random capitalization (the canonicalizable head)
+normalize_whitespace: true # collapse whitespace runs to single spaces
+unscramble: false          # R4 refinement: anagram-unscramble + spell-recover the tail
+                           #   (word-scramble / ASCII-noise) so the guard reads harm
+                           #   through the noise. Needs pyspellchecker. Default OFF.

@@ -1,0 +1,41 @@
+# bestofn_attack Paper-D — P6, GEMMA-2-9B `selfdefend` CELL ONLY (re-run).
+# Read p6_selfcheck_llama.yaml's header for the round's design and predictions.
+#
+# WHY THIS FILE EXISTS. Job 96 ran gemma's three cells against only TWO target
+# replicas with `num_main_job_threads: 3`. Two cells took the endpoints; the
+# third — selfdefend — waited the full 10000 s `cluster_server_endpoint_timeout`
+# and died:
+#   "No endpoint available for google/gemma-2-9b-it within 10000s.
+#    Pool has 2 server(s), all busy or none started."
+# The round reported "Successful: 2 / Failed: 1", so the gemma row is missing
+# exactly one cell. `no_defense` (66.80%) and `llm_self_defense` (11.53%,
+# blocked 73.7%) are GOOD and are NOT re-run here — re-running them would burn
+# ~6h to reproduce numbers we already have.
+#
+# The parent preset is now `num_main_job_threads: 2`, so a full gemma re-run
+# would no longer starve; this single-cell file is purely the cheap repair.
+#
+# ONE CELL, TWO REPLICAS -> no contention possible.
+#
+#   sbatch scripts/run_experiment_xc.sbatch bestofn_attack/p6_selfcheck_gemma_selfdefend
+#
+# SIZING: the shadow screens all 10,000 prompts (~5 min, its own server), then
+# the target answers only the ~18% released (~1,830 prompts). Much cheaper than
+# a full cell — expect well under an hour of target work.
+num_main_job_threads: 1      # single cell
+num_cluster_jobs: 5          # orchestrator + 2 gemma + shadow + wildguard
+
+_e: &e
+  mode: defense+evaluate
+  target_model: gemma2_9b_it
+  # MUST match job 96's other two gemma cells exactly, or the row is not a row.
+  target_model_config: {temperature: 1.0, seed: 1337}
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_p6_selfcheck
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+
+tasks:
+  - {<<: *e, source_transform_subdir: *code, defense: selfdefend}

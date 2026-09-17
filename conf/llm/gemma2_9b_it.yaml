@@ -1,0 +1,59 @@
+# Gemma-2-9B-it (google) — Paper-1 (BoN-wrapped CodeAttack) text-LLM target.
+# Gemma-2's architectural ceiling is 8192 (sliding-window attention), so the
+# cluster default max_model_len=20480 would be rejected — cap it here. Prompts
+# that exceed 8192 tokens are excluded via is_correctly_processed (same as the
+# _defaults overflow handling), not a crash. 9B @ bf16 ≈ 18 GB fits one GPU on
+# the shared defaults (no fp8). Text-only target — no trust_remote_code / mm flags.
+#
+# max_tokens MUST be capped alongside max_model_len. vLLM rejects any request with
+# max_tokens > max_model_len (HTTP 400), and conf/llm/default.yaml sets max_tokens=16384
+# for the 20480-window targets. Without this override EVERY Gemma call 400s and the
+# judge scores the error string as "not harmful" -> a silent, fully-fake ASR 0.00
+# (this is exactly what happened to all 6 Gemma cells of round 174759, 2026-07-21..24).
+# 3072 is measured with Gemma's OWN tokenizer, not estimated. A first attempt used 4096
+# from a chars/3.7 heuristic; that heuristic underestimated the real max prompt by 26%
+# and 900/10000 draws per code cell still 400'd on
+#   "requested 4096 output tokens + prompt >= 4097 input tokens > 8192".
+# Measured budget (AutoTokenizer, google/gemma-2-9b-it, 2026-07-24):
+#   longest CodeAttack prompt      4568 tok   (p50 416, p95 4422)
+#   longest surface-BoN prompt     1506 tok
+#   worst defense wrapper           341 tok   (SemanticSmooth; SAGE 158)
+#   chat template                  ~ 20 tok
+#   => worst-case input 4929; 8192 - 4929 = 3263 headroom, so 3072 leaves ~191 spare.
+# CAVEAT for the paper: Gemma therefore gets a 3072-token generation budget vs 16384 for
+# Llama/Qwen (its 8192 context makes parity impossible). Median response is ~800 tok so
+# most are unaffected, and the long tail on Llama/Qwen is dominated by degenerate
+# repetition -- but the asymmetry is real and belongs in Limitations.
+# Retune (re-measure, do NOT estimate) if the attack suite gains longer prompts.
+model:
+  model: google/gemma-2-9b-it
+  max_tokens: 3072
+
+cluster:
+  max_model_len: 8192
+  # num_instances=4: load-balancing is PER-CELL (acquire_endpoint hands one cell an
+  # exclusive replica for its whole duration), so replicas parallelize DIFFERENT cells
+  # and can never speed up a single one. The 6-cell recovery round's makespan is set by
+  # its slowest single cell (SemanticSmooth+CodeAttack: 18.1h on Llama), so 4 replicas
+  # is the point of diminishing returns -- enough that no cell queues behind another for
+  # long, few enough to leave server slots free under AICR's budget of 7.
+  # 2 (was 4) for the P2 re-run, where Gemma shares a run with Qwen. Gemma's six cells sum
+  # to 19.3h and its longest single cell is 9.7h, so makespan is 9.7h at BOTH 2 and 4
+  # replicas (per-cell balancing means the longest cell is the floor) — the 2 freed slots
+  # go to Qwen, whose 45.4h total genuinely needs 3. Raise again if Gemma runs alone.
+  #
+  # 🔴 MEASURED THROUGHPUT, 2026-08-08 — DO NOT SIZE A GEMMA ROUND OFF QWEN'S RATE.
+  # R16's first attempt (xc job 222) was sized at ~900 responses/min/replica by analogy with
+  # qwen-7B and had to be cancelled 1h in: gemma-2-9B sustains only ~650 generation tokens/s
+  # per A100 replica at concurrency 64 — about **49 responses/min** at its ~800-token median,
+  # roughly 18x slower than the projection. The tell was `Running: 64, Waiting: 0` with GPU KV
+  # usage at 73-85%: unlike the R14a case, that is NOT a client-side throttle, the GPU is
+  # genuinely loaded, so raising max_concurrency does NOT help. Gemma-2 is architecturally
+  # slow in vLLM (sliding-window attention + logit softcapping + a 256k vocab making sampling
+  # expensive). Budget ~3.4h per 10,000-call cell per replica and split rounds accordingly.
+  #
+  # 3 (was 2) as of 2026-08-08: xc's budget of 6 fits gemma x3 plus the three screener/judge
+  # models (3+1+1+1 = 6, not > 6, so the floor-division allocator does not fire). On NURC's
+  # cap of 4 that same preset collapses every model to ONE replica — check the host's budget
+  # against the model count before assuming this number is live.
+  num_instances: 3

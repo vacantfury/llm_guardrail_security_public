@@ -1,0 +1,29 @@
+# bestofn_attack Paper-1 — RECOVERY of the 3 Llama cells lost in round 174759.
+# Round 174759 finished 15/18; Llama's no-defense-code cell FAILED (20h endpoint-wait
+# timeout) and both Llama SemanticSmooth cells were starved on the single Llama server by
+# SS's ~16h monopolization. This run recovers exactly those 3 cells with THREE Llama
+# replicas (conf/llm/llama3_1_8b_cluster.yaml num_instances=3) so each cell gets a
+# dedicated endpoint and the two SS cells run in PARALLEL (~6-8h instead of serialized).
+# Full N=100 (100 behaviors x 100 draws) so results stay consistent with the Gemma/Qwen
+# cells already saved. FREE (wildguard first-pass); the gpt-5-mini rejudge stays gated.
+#   sbatch scripts/run_experiment_aicr.sbatch bestofn_attack/text_targets_recover_llama
+num_main_job_threads: 3      # 3 cells, all in flight
+num_cluster_jobs: 5          # orchestrator + 3 llama replicas + wildguard (4 servers <= AICR budget 7)
+
+_e: &e
+  mode: defense+evaluate
+  target_model: llama3_1_8b_cluster
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_p1_text_full
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+_SS: &ss {n_copies: 5, perturbation_model: null, judge_model: wildguard}
+
+tasks:
+  - {<<: *e, source_transform_subdir: *code, defense: no_defense}                          # failed in 174759 (20h timeout)
+  - {<<: *e, source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss} # starved in 174759
+  - {<<: *e, source_transform_subdir: *surf, defense: semantic_smooth, defense_config: *ss} # starved in 174759

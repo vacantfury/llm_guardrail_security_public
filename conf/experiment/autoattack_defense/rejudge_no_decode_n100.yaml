@@ -1,0 +1,40 @@
+# ============================================================
+# Paper C · NO-DECODE n=100 — gpt-5-mini REJUDGE (2026-07-22)
+# ============================================================
+# Decoupled re-scoring of the free-judge n=100 run (campaign paper_c_no_decode_n100)
+# with the paper's headline judge gpt-5-mini. Reads each cell's saved raw_results.jsonl
+# (NO target re-query), re-judges harm (HarmBench rubric) / refusal (ORBench 3-class)
+# with gpt-5-mini, writes fresh dirs under outputs/autoattack_defense/rejudge/.
+# API judge only -> runs LOCALLY via ./run (keys injected); no cluster servers.
+# gpt-5-mini ~ $0.001/call * ~2000 rows ~ $1-2. Guard: check status/warnings + grep
+# insufficient_quota + sanity vs the free-judge numbers (dead account -> fake ASR 0).
+# ============================================================
+
+num_main_job_threads: 8
+num_cluster_jobs: 1
+
+_rj: &rj
+  mode: rejudge
+  judge_model: gpt-5-mini
+  campaign: paper_c_no_decode_n100_gpt5mini
+
+tasks:
+  # ── HARM (harmbench, gpt-5-mini HarmBench rubric) — no-decode vs full-decode ──
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_figstep_20260722_172625_92916287}          # figstep no-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_figstep_20260722_172625_80919172}          # figstep full-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_fc_flowchart_20260722_172625_79787749}      # fc_flowchart no-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_fc_flowchart_20260722_172625_19858226}      # fc_flowchart full-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_low_contrast_20260722_173233_68795787}      # low_contrast no-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_low_contrast_20260722_173239_84933019}      # low_contrast full-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_occluded_20260722_173302_16820351}          # occluded no-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_occluded_20260722_173350_65104584}          # occluded full-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_mm_typo_20260722_173411_17656797}           # mm_typo no-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_mm_typo_20260722_173509_25394466}           # mm_typo full-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_distraction_grid_20260722_173520_99661402}  # distraction no-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_distraction_grid_20260722_173529_28670556}  # distraction full-decode
+
+  # ── BENIGN (orbench_benign_hard, gpt-5-mini 3-class refusal) — floor + no-decode vs full-decode ──
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_no_defense_ir_plain_20260722_173659_87513435}          # no_defense floor
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_guard_baseline_ir_plain_20260722_173708_62760164}      # guard-only floor
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_modality_complete_ir_plain_20260722_173718_79840743}   # mc no-decode
+  - {<<: *rj, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_modality_complete_ir_plain_20260722_173834_16977118}   # mc full-decode

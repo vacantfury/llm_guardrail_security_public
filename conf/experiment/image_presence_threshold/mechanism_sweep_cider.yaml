@@ -1,0 +1,40 @@
+num_main_job_threads: 1
+num_cluster_jobs: 7          # 1 orchestrator + up to 6 vLLM servers
+
+_ca_text:  &ca_text  outputs/image_presence_threshold/prompt_transform/harmbench/code_attack_ir_constant_20260805_213025_3168031/code_attack
+_ca_decoy: &ca_decoy outputs/image_presence_threshold/prompt_transform/harmbench/code_attack_ir_constant_20260805_213025_3168031/ir_constant
+_sc_text:  &sc_text  outputs/image_presence_threshold/prompt_transform/harmbench/llm_semantic_camo_ir_constant_20260805_213349_39577158/llm_semantic_camo
+_sc_decoy: &sc_decoy outputs/image_presence_threshold/prompt_transform/harmbench/llm_semantic_camo_ir_constant_20260805_213349_39577158/ir_constant
+
+_b: &b
+  mode: defense+evaluate
+  benchmark: harmbench
+  prompt_range: [0, 99]
+  judge_model: gpt-5-mini
+  campaign: paper_b_mechanism_sweep_cider
+  defense: cider
+
+tasks:
+  # ---------------- code_attack: 5 targets x 2 arms (10) ----------------
+  - {<<: *b, target_model: qwen2_5_vl_7b,        source_transform_subdir: *ca_text}
+  - {<<: *b, target_model: qwen2_5_vl_7b,        source_transform_subdir: *ca_decoy}
+  - {<<: *b, target_model: internvl3_8b,         source_transform_subdir: *ca_text}
+  - {<<: *b, target_model: internvl3_8b,         source_transform_subdir: *ca_decoy}
+  - {<<: *b, target_model: pixtral_12b,          source_transform_subdir: *ca_text}
+  - {<<: *b, target_model: pixtral_12b,          source_transform_subdir: *ca_decoy}
+  - {<<: *b, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *ca_text}
+  - {<<: *b, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *ca_decoy}
+  - {<<: *b, target_model: llama3_2_11b_vision,  source_transform_subdir: *ca_text}
+  - {<<: *b, target_model: llama3_2_11b_vision,  source_transform_subdir: *ca_decoy}
+
+  # ---------------- semantic_camo: 5 targets x 2 arms (10) ----------------
+  - {<<: *b, target_model: qwen2_5_vl_7b,        source_transform_subdir: *sc_text}
+  - {<<: *b, target_model: qwen2_5_vl_7b,        source_transform_subdir: *sc_decoy}
+  - {<<: *b, target_model: internvl3_8b,         source_transform_subdir: *sc_text}
+  - {<<: *b, target_model: internvl3_8b,         source_transform_subdir: *sc_decoy}
+  - {<<: *b, target_model: pixtral_12b,          source_transform_subdir: *sc_text}
+  - {<<: *b, target_model: pixtral_12b,          source_transform_subdir: *sc_decoy}
+  - {<<: *b, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *sc_text}
+  - {<<: *b, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *sc_decoy}
+  - {<<: *b, target_model: llama3_2_11b_vision,  source_transform_subdir: *sc_text}
+  - {<<: *b, target_model: llama3_2_11b_vision,  source_transform_subdir: *sc_decoy}

@@ -1,0 +1,32 @@
+# Re-judge the remaining THREE guards' InternVL3 benign guard_baseline cells with
+# gpt-5-mini — 2026-07-29.
+#
+# Companion to gen2_internvl3_benign_gb_rest.yaml (job 234135, COMPLETED 1h22m).
+# Wave 1 (wildguard + llama_guard_3_8b + the no_defense floor) was rejudged by
+# rejudge_gen2_benign_gb_w1.yaml (job 234134); this finishes block B with
+# qwen3guard_gen_8b, thinkguard, guardreasoner_vl_7b x {text, image}.
+#
+# Same reason the earlier passes were needed: the run's internvl3_8b self-judge
+# fails outright on this benchmark (every judge call returns `Error code: 400 -
+# can only concatenate str (not "list") to str`), and the OR-Bench evaluator's
+# fallback parser then labels every row `direct_refusal` -> a confident-looking
+# 100.0% refusal_rate. All six cells here show exactly that (self-judge rr=100.0),
+# while the TARGET responses are intact, so they are fully recoverable.
+# The wave-1 rejudge came back with fallback_parse_count=0 and real three-class
+# distributions, confirming the recovery path.
+#
+# Completes the InternVL3 benign guard_baseline row, which is what makes the
+# model-side hedging measure (indirect refusals among prompts the model was
+# allowed to answer; gb -> mc delta) TWO-TARGET instead of Qwen-only.
+#
+# 6 cells x 1 judge = 6 rejudge tasks, ~600 judge calls, ~$0.60. No target calls,
+# no GPU: judging is an OpenAI API pass over stored responses.
+num_cluster_jobs: 2
+num_main_job_threads: 6
+tasks:
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_guard_baseline_non_llm_baseline_20260729_144444_67938872, judge_model: gpt-5-mini}   # qwen3guard_gen_8b  text
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_guard_baseline_ir_plain_20260729_144444_77126189, judge_model: gpt-5-mini}            # qwen3guard_gen_8b  image
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_guard_baseline_non_llm_baseline_20260729_144444_89819251, judge_model: gpt-5-mini}   # thinkguard         text
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_guard_baseline_ir_plain_20260729_144444_63749353, judge_model: gpt-5-mini}            # thinkguard         image
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_guard_baseline_non_llm_baseline_20260729_160345_17090289, judge_model: gpt-5-mini}   # guardreasoner_vl_7b text
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_guard_baseline_ir_plain_20260729_160345_65135701, judge_model: gpt-5-mini}            # guardreasoner_vl_7b image

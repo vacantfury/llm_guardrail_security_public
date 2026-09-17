@@ -1,0 +1,25 @@
+# bestofn_attack — BASELINE round, Stage 2: 2 transforms x {no_defense, canon->guard}.
+# 100 behaviors x 100 draws. qwen target + wildguard (guard). Judge = wildguard (FREE);
+# gpt-5-mini rejudge the code_attack cells afterward (wildguard FPs on code outputs — the
+# floor cells are plain-prose refusals, so wildguard is fine there).
+# Purpose: FLOOR (raw prompt) anchors "wrapper does something"; CODE_ATTACK-alone at N=100
+# is the single-best control vs the diverse bank (does it match the bank's 0.96/0.61?).
+num_main_job_threads: 8
+num_cluster_jobs: 3          # orchestrator + qwen target + wildguard (guard+judge)
+
+_e: &e
+  mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r4_baselines
+
+_FLOOR: &floor outputs/bestofn_attack/prompt_transform/harmbench/non_llm_baseline_20260718_213010_20072017/non_llm_baseline
+_CODE:  &code  outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+
+tasks:
+  - {<<: *e, source_transform_subdir: *floor, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *floor, defense: canonicalize_guard, defense_config: {guard_model: wildguard}}
+  - {<<: *e, source_transform_subdir: *code,  defense: no_defense}
+  - {<<: *e, source_transform_subdir: *code,  defense: canonicalize_guard, defense_config: {guard_model: wildguard}}

@@ -1,0 +1,41 @@
+num_cluster_jobs: 1
+num_main_job_threads: 10
+
+tasks:
+# ---- CONTROL: no verdict at all. Isolates answer-sampling from verdict-sampling. ----
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_no_defense_code_attack_20260807_185309_64302277   # T=1.0
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_no_defense_code_attack_20260807_185309_47115076   # T=0.0
+  judge_model: gpt-5-mini
+
+# ---- STOCHASTIC VERDICT (screens with the TARGET) -> predicted COLLAPSE at T=0 ----
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_sage_code_attack_20260807_185309_67229847         # T=1.0
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_sage_code_attack_20260807_190148_43257628         # T=0.0
+  judge_model: gpt-5-mini
+# ^ the two cells below are THE decisive pair: llm_self_defense is the arm the wildguard
+#   ceiling floor-limited, so its net-of-control collapse is what this whole rerun is for.
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_llm_self_defense_code_attack_20260807_190507_98790197  # T=1.0
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_llm_self_defense_code_attack_20260807_192712_88549717  # T=0.0
+  judge_model: gpt-5-mini
+
+# ---- SEPARATE + GREEDY screener -> predicted NULL at T=0 ----
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_selfdefend_code_attack_20260808_000507_67179049    # T=1.0
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_selfdefend_code_attack_20260808_000507_11467111    # T=0.0
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_guard_baseline_code_attack_20260808_003645_2195795 # T=1.0
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_guard_baseline_code_attack_20260808_003945_95300918 # T=0.0
+  judge_model: gpt-5-mini

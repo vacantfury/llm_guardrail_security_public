@@ -1,0 +1,48 @@
+# bestofn_attack Paper-D — P5 WRAPPER INTERVENTION, qwen + gemma half (6 cells).
+#
+# Companion to p5_wrapper_llama — see that preset's header for the full rationale,
+# the E1/E2 split, and the pre-registered prediction (also in conf/defense/sage.yaml).
+#
+# WHY THESE TARGETS MATTER TO THE TEST. They are the NULL half, and the prediction
+# is explicitly a dose-response, not a blanket effect:
+#   middle band: llama 63.6% | 70B 28.2% | qwen 2.4% | gemma 2.5%
+#   refusal:     llama 31.8% | 70B 68.7% | qwen 96.3% | gemma 97.3%
+# Qwen and gemma already refuse ~97% of the time with almost no band to close, so
+# borrowed strength predicts the wrapper barely moves them. A LARGE shift here would
+# falsify the account as sharply as a null on llama would — the mechanism claims the
+# effect tracks BAND SIZE, so these cells are what make the test cut both ways
+# rather than being a one-directional confirmation.
+#
+# ARM: code only, same reasoning as the llama preset.
+# JUDGE: wildguard = free first pass, NOT reportable; gpt-5-mini rejudge supplies
+# the reportable numbers (p5_rejudge_mini).
+#
+#   sbatch scripts/run_experiment_aicr.sbatch bestofn_attack/p5_wrapper_qwen_gemma
+#
+# SIZING: two models served concurrently, 2 replicas each. R7's SAGE+code cells on
+# these targets were well under llama's 8.9h (both refuse early, so responses are
+# short), so makespan is set by queueing rather than by any single cell; expect
+# ~6-10h against AICR's 24h wall.
+num_main_job_threads: 6      # all six cells in flight; 4 replicas serve them
+num_cluster_jobs: 6          # orchestrator + 2 qwen + 2 gemma replicas + wildguard
+
+_common: &common
+  mode: defense+evaluate
+  target_model_config: {temperature: 1.0, seed: 1337}   # same E1 seed as the llama half
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_p5_wrapper
+
+_q: &q {<<: *common, target_model: qwen2_5_7b_instruct}
+_g: &g {<<: *common, target_model: gemma2_9b_it}
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+
+tasks:
+  - {<<: *q, source_transform_subdir: *code, defense: sage, defense_config: {wrapper: published}}
+  - {<<: *q, source_transform_subdir: *code, defense: sage, defense_config: {wrapper: analysis_then_verdict}}
+  - {<<: *q, source_transform_subdir: *code, defense: sage, defense_config: {wrapper: verdict_only}}
+  - {<<: *g, source_transform_subdir: *code, defense: sage, defense_config: {wrapper: published}}
+  - {<<: *g, source_transform_subdir: *code, defense: sage, defense_config: {wrapper: analysis_then_verdict}}
+  - {<<: *g, source_transform_subdir: *code, defense: sage, defense_config: {wrapper: verdict_only}}

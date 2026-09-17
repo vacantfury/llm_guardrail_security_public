@@ -1,0 +1,18 @@
+
+num_main_job_threads: 4
+num_cluster_jobs: 4
+
+_fig: &fig outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260805_215649_72871103/ir_figstep
+
+_base: &base
+  mode: defense+evaluate
+  defense: modality_complete
+  source_transform_subdir: *fig
+  prompt_range: [0, 99]
+  judge_model: gpt-5-mini
+  campaign: paper_c_fidelity_rerun_nodecode
+  defense_config: {guard_model: wildguard, decode_text: false}
+
+tasks:
+  - {<<: *base, target_model: qwen2_5_vl_7b}
+  - {<<: *base, target_model: internvl3_8b}

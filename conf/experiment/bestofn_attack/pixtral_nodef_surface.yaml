@@ -1,0 +1,15 @@
+# bestofn_attack — the ONE remaining multi-target cell: pixtral no_defense surface
+# (vanilla BoN, undefended). Failed twice on endpoint contention; running it ALONE
+# (1 cell, 1 thread) removes contention. Judge=wildguard (surface is clean on it).
+num_main_job_threads: 1
+num_cluster_jobs: 2          # orchestrator + pixtral (+ wildguard judge)
+
+tasks:
+  - mode: defense+evaluate
+    target_model: pixtral_12b
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: harmbench
+    campaign: bestofn_attack_r5_multitarget
+    source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+    defense: no_defense

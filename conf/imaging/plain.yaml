@@ -1,0 +1,3 @@
+# Plain image renderer — clean baseline
+# Inherits everything from default.yaml — nothing to override.
+renderer_type: plain

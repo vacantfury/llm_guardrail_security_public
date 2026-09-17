@@ -1,0 +1,31 @@
+# Meta-Llama-3-8B-Instruct — SelfDefend's shadow (defense) model.
+#
+# This file exists for ONE reason: conf/clusters/_defaults.yaml sets a
+# cluster-wide `max_model_len: 20480`, and Llama-3 (NOT 3.1) has
+# max_position_embeddings = 8192. vLLM refuses to start at all:
+#
+#   ValidationError: User-specified max_model_len (20480) is greater than the
+#   derived max_model_len (max_position_embeddings=8192.0 ...)
+#
+# That killed the P6 pilot's shadow server (job 65 / vllm job 68, 2026-07-30).
+# Overriding VLLM_ALLOW_LONG_MAX_MODEL_LEN would be the WRONG fix — with RoPE,
+# positions past the derived limit produce nan.
+#
+# 8192 IS SUFFICIENT HERE, measured rather than assumed. Over all 10,000 draws
+# of the shared code_attack encoding this defense screens:
+#     chars   median 1,402 | p95 13,026 | max 13,459
+#     ~tokens median   401 | p95  3,722 | max  3,845
+# Plus SelfDefend's P_direct wrapper (~100 tokens) and a 256-token reply, the
+# worst case is ~4.2k — comfortably inside 8192.
+# (The "~17.5k overflow" that motivates the 20480 default belongs to the
+# ir_plain IMAGE arm, which this text-only shadow never sees.)
+#
+# If a future round points this shadow at a longer arm, re-measure before
+# reusing it; the right response is a longer-context shadow, not a bigger
+# max_model_len on an 8k model.
+
+model:
+  model: meta-llama/Meta-Llama-3-8B-Instruct
+
+cluster:
+  max_model_len: 8192

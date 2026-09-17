@@ -1,0 +1,47 @@
+# ============================================================
+# Paper C · RQ4 ADAPTIVE ATTACK — Step B: evaluate decode-evasion vs the amplifier (2026-07-20)
+# ============================================================
+# The adaptive-robustness matrix (Carlini 2019 discipline): does the recover+decode amplifier
+# still catch the attack when the attack is designed to defeat the decode step?
+#
+# Conditions (all n=100, target qwen2_5_vl_7b, HarmBench, in-run judge = WildGuard THROWAWAY/free):
+#   floor  = no_defense                          → is the attack even strong? (ceiling)
+#   gb     = guard_baseline    + guard            → the amplifier-advantage control (mc<gb is the amplifier's claim)
+#   mc     = modality_complete + guard + decode   → the attack's target: does mc still block it?
+# Guards: wildguard + guardreasoner_vl_7b (guardreasoner was the code_attack EXCEPTION — the
+#   reasoning guard; testing it tells us if "use a reasoning guard" is the robustness answer).
+#
+# NAIVE CONTRAST is NOT re-run — reuse the guard panel's set_theory {floor, gb, mc} for
+# {wildguard, guardreasoner_vl_7b} (campaign paper_c_guard_panel / paper_c_guard_panel_floor).
+# Headline: naive set_theory mc ≈ 5% (amplifier works) vs decode_evasion mc → ~floor (amplifier defeated).
+#
+# ⚠️ FILL `_de` below with the real render dir from Step A before running (outputs/ has a timestamp).
+# FINAL numbers: gpt-5-mini REJUDGE the saved responses afterward (API-gated), matching the panel judge.
+# ============================================================
+
+num_main_job_threads: 3
+num_cluster_jobs: 4          # orchestrator + qwen(target) + wildguard(guard+judge) + guardreasoner_vl_7b(guard)
+
+_rng: &rng [0, 99]
+
+# Render dir from decode_evasion_render.yaml (validated 2026-07-20: 100/100, no prefix, no refusals,
+# benign-at-gist + harm-preserving). NOTE: outputs/ is sync-excluded → scp this dir to the cluster.
+_de: &de outputs/autoattack_defense/prompt_transform/harmbench/decode_evasion_20260720_014855_98322846/llm_decode_evasion
+
+# guard-alone (gb) + amplifier (mc) configs — identical shapes to guard_panel.yaml
+_gbwg:   &gbwg   {guard_model: wildguard}
+_gbgrvl: &gbgrvl {guard_model: guardreasoner_vl_7b}
+_mcwg:   &mcwg   {guard_model: wildguard, decode_text: true, decode_style: recover}
+_mcgrvl: &mcgrvl {guard_model: guardreasoner_vl_7b, decode_text: true, decode_style: recover}
+
+_harm: &harm {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: *rng, judge_method: wildguard, judge_model: wildguard, campaign: paper_c_rq4_decode_evasion}
+
+tasks:
+  # floor — is the attack strong undefended?
+  - {<<: *harm, defense: no_defense, source_transform_subdir: *de}
+  # guard alone (gb) — the amplifier-advantage control
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,   source_transform_subdir: *de}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbgrvl, source_transform_subdir: *de}
+  # amplifier (mc) — does the decode step still block it?
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,   source_transform_subdir: *de}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcgrvl, source_transform_subdir: *de}

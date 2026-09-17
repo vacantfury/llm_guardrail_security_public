@@ -1,0 +1,64 @@
+[project]
+name = "llm_guardrail_security"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Haoyu Zhang"}
+]
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "datasets (>=4.5.0,<5.0.0)",
+    "pillow (>=12.1.0,<13.0.0)",
+    "colorlog (>=6.10.1,<7.0.0)",
+    "pydantic (>=2.12.5,<3.0.0)",
+    "openai (>=2.16.0,<3.0.0)",
+    # SDK floors are owned by llm_utils (the only thing in this repo that calls
+    # these directly); these bounds just avoid surprise majors. anthropic >=0.116
+    # is llm_utils v3.0.0's floor (messages.parse) — the old poetry caret cap
+    # <0.77 made v3.0.0 unresolvable, so it had to move. google-genai stays on
+    # the 1.x line deliberately: llm_utils needs only >=1.0, and every recorded
+    # Gemini result was produced on 1.x, so jumping the SDK major would add an
+    # uncontrolled variable to results comparisons for zero gain (2.x was
+    # spot-verified as API-compatible, but there is no reason to adopt it).
+    "anthropic (>=0.116,<1.0)",
+    "google-genai (>=1.60.0,<2.0.0)",
+    "dotenv (>=0.9.9,<0.10.0)",
+    "scikit-learn (>=1.8.0,<2.0.0)",
+    "json-repair (>=0.56.0,<0.57.0)",
+    "mlflow (>=3.10.0,<4.0.0)",
+    "transformers (>=4.51,<6)",
+    "numpy (>=2.0,<2.3)",
+    "graphviz (>=0.21,<0.22)",
+    "pyyaml (>=6.0.3,<7.0.0)",
+    "art (>=6.5,<7.0)",
+    "homoglyphs (>=2.0.4,<3.0.0)",
+    "pyspellchecker (>=0.9,<1.0)",
+    "boto3>=1.43.51",
+    "llm_utils @ git+https://github.com/vacantfury/llm_utils.git@v5.4.0",
+    "spacy>=3.8.14",
+    # Required by AMIA's masking encoder (openbmb/VisRAG-Ret). It is an INDIRECT
+    # dependency that nothing in this repo imports: VisRAG-Ret is a
+    # trust_remote_code model whose MiniCPM-V modeling file imports timm, and
+    # transformers' check_imports() raises ImportError before the weights are
+    # touched. So it cannot be discovered by grepping our own imports — it was
+    # found by tests/test_cider_amia_ready.py on 2026-08-05, which is why that
+    # check exists. Unpinned major: timm is a stable, widely-pinned-by-others
+    # vision-backbone package and VisRAG-Ret's file does not constrain a version.
+    "timm>=1.0,<2.0",
+]
+
+
+[tool.poetry]
+package-mode = false
+
+# uv equivalent of poetry's package-mode=false: this repo is a dependency
+# container run from the repo root (main.py imports src/ via cwd), not an
+# installable package. Lets `uv sync` / `uv pip install` set up the env without
+# trying to build the project. (Ignored by poetry/pip, so NURC's conda env is
+# unaffected.) Part of the staged poetry+conda -> uv migration (AICR first).
+[tool.uv]
+package = false
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

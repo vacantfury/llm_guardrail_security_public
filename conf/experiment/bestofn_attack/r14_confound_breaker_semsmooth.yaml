@@ -1,0 +1,17 @@
+num_main_job_threads: 2
+num_cluster_jobs: 6          # 5 servers (llama x4 + wildguard) + orchestrator
+
+_e: &e
+  mode: defense+evaluate
+  source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260805_212854_26701649/code_attack
+  prompt_range: [0, 2499]                 # 25 behaviours x 100 draws (behaviour-major)
+  target_model: llama3_1_8b_cluster
+  defense: semantic_smooth
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r14_confound
+
+tasks:
+  - {<<: *e, target_model_config: {temperature: 1.0}}
+  - {<<: *e, target_model_config: {temperature: 0.0}}

@@ -1,0 +1,17 @@
+num_main_job_threads: 2
+num_cluster_jobs: 6
+
+_e: &e
+  mode: defense+evaluate
+  target_model: llama3_1_8b_cluster
+  target_model_config: {temperature: 1.0, seed: 42, max_tokens: 16384}
+  defense: semantic_smooth
+  defense_config: {n_copies: 5, perturbation_model: null, judge_model: wildguard, query_source: encoded}
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r10_ss_deployable
+
+tasks:
+  - {<<: *e, source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack}
+  - {<<: *e, source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon}

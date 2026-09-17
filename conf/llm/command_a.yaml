@@ -1,0 +1,21 @@
+# Command-A (CohereLabs c4ai-command-a-03-2025) — Round-J open general-LLM
+# RUBRIC judge. Applies the HarmBench classifier rubric in chat mode (Cohere
+# ships a CONTEXTUAL/STRICT safety dial → steerable). Served for
+# judge_model_issue/cluster_judge_rejudge.py.
+#
+# 111B dense ≈ 222 GB @ bf16 → 2× H200-141GB (282 GB). gpu_constraint=cascadelake
+# targets the H200 nodes (see glm_4_5_air.yaml for the feature rationale).
+model:
+  model: CohereLabs/c4ai-command-a-03-2025
+  max_tokens: 512
+
+cluster:
+  num_gpus: 1
+  quantization: fp8           # 1 GPU/job cap (gpu PartitionQOS) → fit 111B on one H200 via fp8
+  time_limit: "01:00:00"      # short → SLURM can backfill this 1-GPU job into a gap
+  gpu_constraint: "cascadelake"
+  mem_gb: 200
+  max_model_len: 8192
+  gpu_memory_utilization: 0.92
+  dtype: bfloat16
+  gpu_types_excluded: ["v100-pcie", "v100-sxm2", "t4", "p100"]

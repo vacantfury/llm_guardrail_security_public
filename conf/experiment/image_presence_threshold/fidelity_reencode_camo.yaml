@@ -1,0 +1,13 @@
+
+num_main_job_threads: 2
+
+tasks:
+  - mode: prompt_transform
+    benchmark: harmbench
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 99]
+    campaign: paper_b_fidelity_reencode
+    transformation_list:
+      - {type: llm_semantic_camo, params: {model: gpt-4.1-mini}}
+      - {type: ir_constant,
+         params: {image_path: src/prompt_transformations/image/images/mountain.png}}

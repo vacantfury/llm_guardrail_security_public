@@ -1,0 +1,21 @@
+num_main_job_threads: 2      # 2 cells; must stay <= llama's 4 replicas
+num_cluster_jobs: 7          # 6 servers (llama x4 + wildguard + llama_guard_3_8b) + orchestrator
+
+_e: &e
+  mode: defense+evaluate
+  target_model: llama3_1_8b_cluster
+  target_model_config: {temperature: 1.0}
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r11_codefix     # SAME campaign as 2a — one round, one key.
+                                           # Never r8_factorial: the quarantined r8 cells
+                                           # share output naming and latest-wins is unsafe
+                                           # (project_cell_selection_latest_wins_is_unsafe).
+
+_CODE_FIXED:  &code_fixed  outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260805_212854_26701649/code_attack
+_CODE_VARIED: &code_varied outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_code_attack_20260805_212855_68111123/code_attack
+
+tasks:
+  - {<<: *e, source_transform_subdir: *code_fixed,  defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b}}
+  - {<<: *e, source_transform_subdir: *code_varied, defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b}}

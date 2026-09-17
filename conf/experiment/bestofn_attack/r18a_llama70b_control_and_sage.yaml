@@ -1,0 +1,19 @@
+num_main_job_threads: 3      # AICR: 3 replicas @ 1 GPU each (profiles.aicr), so cells run 3-up
+num_cluster_jobs: 5          # 4 servers (70B x3 replicas @1 GPU on AICR + wildguard) + orchestrator
+
+_e: &e
+  mode: defense+evaluate
+  source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260805_212854_26701649/code_attack
+  target_model: llama_3_3_70b_instruct
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r18_llama70b_temperature
+
+tasks:
+  # ---- CONTROL: no verdict at all — read this before interpreting sage ----
+  - {<<: *e, defense: no_defense, target_model_config: {temperature: 1.0, max_tokens: 16384, max_concurrency: 64}}
+  - {<<: *e, defense: no_defense, target_model_config: {temperature: 0.0, max_tokens: 16384, max_concurrency: 64}}
+  # ---- ASKS THE TARGET => sampled verdict => predict LARGE net collapse ----
+  - {<<: *e, defense: sage, target_model_config: {temperature: 1.0, max_tokens: 16384, max_concurrency: 64}}
+  - {<<: *e, defense: sage, target_model_config: {temperature: 0.0, max_tokens: 16384, max_concurrency: 64}}

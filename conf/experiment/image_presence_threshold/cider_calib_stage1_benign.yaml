@@ -1,0 +1,21 @@
+
+num_main_job_threads: 2
+
+# The exact decoy Paper B attacks with — same file, so the benign and attack
+# arms differ only in the TEXT, never in the image.
+_decoy: &decoy
+  type: ir_constant
+  params: {image_path: src/prompt_transformations/image/images/mountain.png}
+
+_base: &base
+  mode: prompt_transform
+  benchmark: jailbreakbench_benign
+  source_file: data/jbb_benign_prompts.jsonl
+  prompt_range: [0, 99]            # all 100 benign prompts
+  campaign: paper_b_cider_calibration
+
+tasks:
+  - {<<: *base, transformation_list: [{type: ir_plain}]}
+
+  # Benign text + the fixed decoy (Paper B's actual deployment condition).
+  - {<<: *base, transformation_list: [*decoy]}

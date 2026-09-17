@@ -1,0 +1,55 @@
+# ============================================================
+# Paper C · BENIGN-TEXT over-refusal diagnosis — pin the guard's true ceiling
+# and test whether the surface gate helps on its HOME channel (text)  (2026-07-17)
+# ============================================================
+# WHY (from job mj_8432505 / the RE-diagnosis): on the IMAGE benign channel the
+# over-refusal (70%) is driven by RECOVER surfacing borderline OR-Bench-Hard text
+# to WildGuard, NOT by decode (the surface gate decoded 0/20 and refusal stayed
+# 70%). Two open questions the image channel can't answer:
+#   (a) Does the surface gate restore the floor on the TEXT channel, where DECODE
+#       is the ONLY possible distortion (no recover — text has no image)?
+#   (b) What is WildGuard's HONEST over-refusal ceiling on OR-Bench-Hard as plain
+#       TEXT? (the image guard_baseline's 30% is ARTIFICIAL — it's blind to the
+#       image, not precise.)
+#
+# Same 20 benign OR-Bench-Hard prompts, delivered as PLAIN TEXT (non_llm_baseline
+# render — NO image, so RECOVER is a no-op; only DECODE can distort). 4 cells:
+#   - no_defense                 = target's own floor on text
+#   - guard_baseline[wg]         = WildGuard on the RAW text  -> (b) the ceiling
+#   - mc[surface-gate]           = gate sees plain text -> SKIP decode -> guard on
+#                                  raw text. Should ~= guard_baseline (clean no-op)
+#                                  and sit at the floor  -> (a) the gate's value
+#   - mc[full-decode]            = decode compresses the benign context away ->
+#                                  guard over-refuses (the earlier text driver)
+#
+# Reads (compare against the image-channel numbers in experiment_results.md):
+#   - If guard_baseline[wg] ~= 70  -> WildGuard genuinely over-refuses OR-Bench-Hard;
+#       the amplifier merely EXPOSES it (recover on image = faithful). Clean story:
+#       over-refusal is a GUARD-choice axis, off the amplifier's back.
+#   - If guard_baseline[wg] ~= 25  -> WildGuard does NOT over-refuse the raw text,
+#       so RECOVER itself distorts on the image channel (a fixable amplifier issue).
+#   - If mc[surface-gate] << mc[full-decode] (~= guard_baseline) -> the gate WORKS
+#       on the text channel it was built for (decode-driven over-refusal removed).
+#
+# Judges (cheap-first, FREE): benign -> qwen (ORBench 3-class). Guard = WildGuard.
+# Servers: qwen (target + benign-judge) + wildguard (guard) = 2 -> num_cluster_jobs = 3.
+# No API. n=20 (0-19). Reuses the existing text render — NO re-render.
+# ============================================================
+
+num_main_job_threads: 4
+num_cluster_jobs: 3
+
+_wg: &wg wildguard
+_sg:   &sg   {guard_model: wildguard, decode_text: true, decode_style: recover, gate_decode: true, gate_style: surface}
+_full: &full {guard_model: wildguard, decode_text: true, decode_style: recover}
+
+_ben: &ben {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: [0, 19], benchmark: orbench_benign_hard, judge_method: orbench, judge_model: qwen2_5_vl_7b, campaign: paper_c_benign_text_diag}
+
+# ── benign OR-Bench-Hard delivered as PLAIN TEXT (non_llm_baseline; NO image) ──
+_txt: &txt outputs/autoattack_defense/prompt_transform/orbench_benign_hard/non_llm_baseline_20260717_020703_61565174/non_llm_baseline
+
+tasks:
+  - {<<: *ben, defense: no_defense,                                            source_transform_subdir: *txt}
+  - {<<: *ben, defense: guard_baseline,    defense_config: {guard_model: *wg}, source_transform_subdir: *txt}
+  - {<<: *ben, defense: modality_complete, defense_config: *sg,                source_transform_subdir: *txt}
+  - {<<: *ben, defense: modality_complete, defense_config: *full,              source_transform_subdir: *txt}

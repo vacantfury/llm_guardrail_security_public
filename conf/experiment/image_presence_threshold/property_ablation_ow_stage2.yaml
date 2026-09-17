@@ -1,0 +1,44 @@
+
+num_main_job_threads: 4
+num_cluster_jobs: 2          # orchestrator + 1 vLLM server (one target).
+
+# Text channel: the sweep's canonical baseline, shared with the hosted rows.
+_text:   &text   outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260806_055851_77202176/non_llm_baseline
+
+# --- resolution axis (colour + aspect held at the reference) ---------------
+_b512:   &b512   outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260808_024745_46952977/ir_blank
+_b256:   &b256   outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260808_024745_58574532/ir_blank
+_b1536:  &b1536  outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260808_024745_86212350/ir_blank
+# --- aspect-ratio axis (1024x141 is matched to the mountain decoy) ---------
+_bWide:  &bWide  outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260808_024745_97466327/ir_blank
+_bTall:  &bTall  outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260808_024746_27351476/ir_blank
+# --- colour axis ----------------------------------------------------------
+_bBlack: &bBlack outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260808_024746_13337026/ir_blank
+_bGrey:  &bGrey  outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260808_024746_53429202/ir_blank
+# --- content / OCR-ability axis -------------------------------------------
+_mtnQ40: &mtnQ40 outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_constant_20260808_024746_39094265/ir_constant
+_mtn:    &mtn    outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_constant_20260808_024747_80505435/ir_constant
+_rabbit: &rabbit outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_constant_20260808_024747_83022186/ir_constant
+
+_b: &b
+  mode: defense+evaluate
+  defense: no_defense
+  target_model: qwen3_vl_8b_instruct
+  prompt_range: [0, 99]
+  benchmark: jailbreakbench_benign
+  judge_method: jbb_refusal
+  judge_model: gpt-5-mini
+  campaign: paper_b_property_ablation_ow
+
+tasks:
+  - {<<: *b, source_transform_subdir: *text}
+  - {<<: *b, source_transform_subdir: *b512}
+  - {<<: *b, source_transform_subdir: *b256}
+  - {<<: *b, source_transform_subdir: *b1536}
+  - {<<: *b, source_transform_subdir: *bWide}
+  - {<<: *b, source_transform_subdir: *bTall}
+  - {<<: *b, source_transform_subdir: *bBlack}
+  - {<<: *b, source_transform_subdir: *bGrey}
+  - {<<: *b, source_transform_subdir: *mtnQ40}
+  - {<<: *b, source_transform_subdir: *mtn}
+  - {<<: *b, source_transform_subdir: *rabbit}

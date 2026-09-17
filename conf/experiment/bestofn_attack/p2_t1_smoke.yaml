@@ -1,0 +1,38 @@
+# bestofn_attack Paper-D — P2 SMOKE: does temperature 1.0 actually restore the BoN
+# variation channel? Run this BEFORE p2_t1_llama / p2_t1_qwen_gemma (~34h of compute).
+#
+# Two things are new and unproven, and both sit on the critical path:
+#   1. `DefenseEvaluateTask.target_model_config` — a new field that must reach the vLLM
+#      request as a real sampling override, not be silently dropped.
+#   2. `draw_diversity_stats` — the guard that reports whether draws actually differ.
+#
+# THE PASS CRITERION IS A NUMBER, not "it ran". This cell is the SAME (llama, no_defense,
+# code_attack) cell whose R7 counterpart measured `draw_diversity_ratio` 0.15 — a median 15
+# distinct responses per 100 draws of one identical prompt, i.e. vLLM batching noise rather
+# than a search. prompt_range [0,99] is exactly behavior 0's 100 draws.
+#
+#   PASS  -> draw_diversity_ratio near 1.0 (~100 distinct responses / 100 draws)
+#   FAIL  -> ratio still ~0.15, meaning the override never reached the sampler.
+#            Do NOT launch the full runs; the 34h would reproduce the defect.
+#
+# Read it from the cell's results.json `metrics`, or from the LOW DRAW DIVERSITY warning
+# in the log (absence of the warning is the pass signal).
+#
+#   sbatch scripts/run_experiment_aicr.sbatch bestofn_attack/p2_t1_smoke
+#
+# FREE — served models only (llama target + wildguard judge). ~100 target calls, minutes of
+# compute once the server is up; the wall is dominated by vLLM start-up.
+num_main_job_threads: 1
+num_cluster_jobs: 3          # orchestrator + llama replica + wildguard
+
+tasks:
+  - mode: defense+evaluate
+    target_model: llama3_1_8b_cluster
+    target_model_config: {temperature: 1.0}
+    source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+    defense: no_defense
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: harmbench
+    prompt_range: [0, 99]     # behavior 0 x its 100 BoN draws
+    campaign: bestofn_attack_p2_t1_smoke

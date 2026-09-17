@@ -1,0 +1,27 @@
+num_main_job_threads: 6      # all 6 cells in flight; 4 replicas serve them, 2 queue briefly
+num_cluster_jobs: 6          # orchestrator + 4 llama replicas + wildguard (5 servers <= AICR budget 7)
+
+_e: &e
+  mode: defense+evaluate
+  target_model: llama3_1_8b_cluster
+  target_model_config: {temperature: 1.0}   # THE FIX — see header
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_p2_text_t1
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+_SS: &ss {n_copies: 5, perturbation_model: null, judge_model: wildguard}
+
+# ORDER MATTERS: heaviest first so the makespan drivers start at t=0 and the cheap cells
+# backfill as replicas free up (R7 measured: SS+code 18.1h, nodef+surf 12.3h, SAGE+code
+# 8.9h, SS+surf 7.5h, nodef+code 3.4h, SAGE+surf 0.8h).
+tasks:
+  - {<<: *e, source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *e, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *code, defense: sage}
+  - {<<: *e, source_transform_subdir: *surf, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *e, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *surf, defense: sage}

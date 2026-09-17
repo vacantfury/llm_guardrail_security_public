@@ -1,0 +1,21 @@
+# Shared LLM defaults — all presets inherit these
+
+# Model request params (maps to ModelConfig)
+model:
+  max_tokens: 16384
+  temperature: 0.0
+  top_p: 1.0
+  top_k: 0
+  frequency_penalty: 0.0
+  presence_penalty: 0.0
+  stop_sequences: []
+  seed: 42
+  n_completions: 1
+  stream: false
+
+  # Batch processing
+  max_concurrency: 20       # asyncio semaphore limit (OpenAI/vLLM)
+  max_retries: 5            # retry attempts on 429 / rate-limit
+  batch_poll_interval: 30   # seconds between polls (Claude/Google native batch)
+  batch_timeout: 3600       # max seconds to wait for native batch completion
+

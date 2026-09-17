@@ -1,0 +1,3 @@
+# Baseline encoder — passthrough, no transformation.
+encoder_type: non_llm_baseline
+target_prefix: ""  # no prefix for baseline — encoded must equal original

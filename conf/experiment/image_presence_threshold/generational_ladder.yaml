@@ -1,0 +1,30 @@
+
+num_main_job_threads: 4
+num_cluster_jobs: 4          # orchestrator + 3 vLLM servers (one per rung).
+
+# Shared with the five-model scan (xc job 215) — same canonical text, same
+# published 1024x768 blank.
+_text:  &text  outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260807_223202_80871327/non_llm_baseline
+_blank: &blank outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260807_223202_80871327/ir_blank
+
+_b: &b
+  mode: defense+evaluate
+  defense: no_defense
+  prompt_range: [0, 99]
+  benchmark: jailbreakbench_benign
+  judge_method: jbb_refusal
+  judge_model: gpt-5-mini
+  campaign: paper_b_generational_ladder
+
+tasks:
+  # ---- rung 1: oldest post-training ----------------------------------------
+  - {<<: *b, target_model: qwen2_vl_7b,          source_transform_subdir: *text}
+  - {<<: *b, target_model: qwen2_vl_7b,          source_transform_subdir: *blank}
+
+  # ---- rung 2 --------------------------------------------------------------
+  - {<<: *b, target_model: qwen2_5_vl_7b,        source_transform_subdir: *text}
+  - {<<: *b, target_model: qwen2_5_vl_7b,        source_transform_subdir: *blank}
+
+  # ---- rung 3: newest post-training ----------------------------------------
+  - {<<: *b, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *text}
+  - {<<: *b, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *blank}

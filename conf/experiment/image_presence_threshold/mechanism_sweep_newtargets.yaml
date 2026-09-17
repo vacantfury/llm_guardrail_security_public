@@ -1,0 +1,60 @@
+
+num_main_job_threads: 8
+num_cluster_jobs: 5          # 1 orchestrator + 2 target servers (+ headroom);
+                             # only 2 distinct models here, so the replica
+                             # allocator's floor division is not a hazard.
+
+_ca_text:  &ca_text  outputs/image_presence_threshold/prompt_transform/harmbench/code_attack_ir_constant_20260805_213025_3168031/code_attack
+_ca_decoy: &ca_decoy outputs/image_presence_threshold/prompt_transform/harmbench/code_attack_ir_constant_20260805_213025_3168031/ir_constant
+_sc_text:  &sc_text  outputs/image_presence_threshold/prompt_transform/harmbench/llm_semantic_camo_ir_constant_20260805_213349_39577158/llm_semantic_camo
+_sc_decoy: &sc_decoy outputs/image_presence_threshold/prompt_transform/harmbench/llm_semantic_camo_ir_constant_20260805_213349_39577158/ir_constant
+
+_b: &b
+  mode: defense+evaluate
+  benchmark: harmbench
+  prompt_range: [0, 99]
+  judge_model: gpt-5-mini
+  campaign: paper_b_mechanism_sweep_newtargets
+
+_ecso: &ecso
+  defense: ecso
+  defense_config: {query_source: encoded}   # deployable arm — no oracle read
+
+tasks:
+  # ============ Qwen3-VL-8B-Instruct: 4 defenses x 2 attacks x 2 arms (16) ============
+  - {<<: *b, defense: no_defense,       target_model: qwen3_vl_8b_instruct, source_transform_subdir: *ca_text}
+  - {<<: *b, defense: no_defense,       target_model: qwen3_vl_8b_instruct, source_transform_subdir: *ca_decoy}
+  - {<<: [*b, *ecso],                   target_model: qwen3_vl_8b_instruct, source_transform_subdir: *ca_text}
+  - {<<: [*b, *ecso],                   target_model: qwen3_vl_8b_instruct, source_transform_subdir: *ca_decoy}
+  - {<<: *b, defense: sage,             target_model: qwen3_vl_8b_instruct, source_transform_subdir: *ca_text}
+  - {<<: *b, defense: sage,             target_model: qwen3_vl_8b_instruct, source_transform_subdir: *ca_decoy}
+  - {<<: *b, defense: llm_self_defense, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *ca_text}
+  - {<<: *b, defense: llm_self_defense, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *ca_decoy}
+
+  - {<<: *b, defense: no_defense,       target_model: qwen3_vl_8b_instruct, source_transform_subdir: *sc_text}
+  - {<<: *b, defense: no_defense,       target_model: qwen3_vl_8b_instruct, source_transform_subdir: *sc_decoy}
+  - {<<: [*b, *ecso],                   target_model: qwen3_vl_8b_instruct, source_transform_subdir: *sc_text}
+  - {<<: [*b, *ecso],                   target_model: qwen3_vl_8b_instruct, source_transform_subdir: *sc_decoy}
+  - {<<: *b, defense: sage,             target_model: qwen3_vl_8b_instruct, source_transform_subdir: *sc_text}
+  - {<<: *b, defense: sage,             target_model: qwen3_vl_8b_instruct, source_transform_subdir: *sc_decoy}
+  - {<<: *b, defense: llm_self_defense, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *sc_text}
+  - {<<: *b, defense: llm_self_defense, target_model: qwen3_vl_8b_instruct, source_transform_subdir: *sc_decoy}
+
+  # ========= Llama-3.2-11B-Vision-Instruct: 4 defenses x 2 attacks x 2 arms (16) =========
+  - {<<: *b, defense: no_defense,       target_model: llama3_2_11b_vision, source_transform_subdir: *ca_text}
+  - {<<: *b, defense: no_defense,       target_model: llama3_2_11b_vision, source_transform_subdir: *ca_decoy}
+  - {<<: [*b, *ecso],                   target_model: llama3_2_11b_vision, source_transform_subdir: *ca_text}
+  - {<<: [*b, *ecso],                   target_model: llama3_2_11b_vision, source_transform_subdir: *ca_decoy}
+  - {<<: *b, defense: sage,             target_model: llama3_2_11b_vision, source_transform_subdir: *ca_text}
+  - {<<: *b, defense: sage,             target_model: llama3_2_11b_vision, source_transform_subdir: *ca_decoy}
+  - {<<: *b, defense: llm_self_defense, target_model: llama3_2_11b_vision, source_transform_subdir: *ca_text}
+  - {<<: *b, defense: llm_self_defense, target_model: llama3_2_11b_vision, source_transform_subdir: *ca_decoy}
+
+  - {<<: *b, defense: no_defense,       target_model: llama3_2_11b_vision, source_transform_subdir: *sc_text}
+  - {<<: *b, defense: no_defense,       target_model: llama3_2_11b_vision, source_transform_subdir: *sc_decoy}
+  - {<<: [*b, *ecso],                   target_model: llama3_2_11b_vision, source_transform_subdir: *sc_text}
+  - {<<: [*b, *ecso],                   target_model: llama3_2_11b_vision, source_transform_subdir: *sc_decoy}
+  - {<<: *b, defense: sage,             target_model: llama3_2_11b_vision, source_transform_subdir: *sc_text}
+  - {<<: *b, defense: sage,             target_model: llama3_2_11b_vision, source_transform_subdir: *sc_decoy}
+  - {<<: *b, defense: llm_self_defense, target_model: llama3_2_11b_vision, source_transform_subdir: *sc_text}
+  - {<<: *b, defense: llm_self_defense, target_model: llama3_2_11b_vision, source_transform_subdir: *sc_decoy}

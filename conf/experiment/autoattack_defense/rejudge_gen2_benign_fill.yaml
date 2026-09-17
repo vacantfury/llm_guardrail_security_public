@@ -1,0 +1,42 @@
+# Re-judge the 8 InternVL3 benign gap-fill cells with gpt-5-mini — 2026-07-29.
+#
+# Companion to gen2_internvl3_benign_fill.yaml. Same cheap-first pattern the
+# original gen2 benign cells used (see rejudge_gen2_benign.yaml): the run's own
+# internvl3_8b self-judge is THROWAWAY, and gpt-5-mini re-scores the stored
+# responses at zero target cost.
+#
+# In this run the self-judge did not merely disagree, it failed outright: every
+# judge call returned `Error code: 400 - can only concatenate str (not "list")
+# to str`, and the OR-Bench evaluator's fallback parser labelled all 800 rows
+# `direct_refusal` -> a confident-looking 100.0% refusal_rate in all 8 cells.
+# The TARGET responses are intact and varied (spot-checked: 45/100 guard blocks,
+# 55/100 real answers in one cell), so the cells are fully recoverable here.
+#
+# 8 cells x 1 judge = 8 rejudge tasks, ~800 judge calls, ~$0.80.
+num_cluster_jobs: 2
+num_main_job_threads: 8
+tasks:
+- mode: rejudge
+  responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_modality_complete_ir_plain_20260729_053611_48448541
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_modality_complete_ir_plain_20260729_053611_89837753
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_modality_complete_ir_plain_20260729_053846_28123014
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_modality_complete_ir_plain_20260729_053906_76437124
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_modality_complete_non_llm_baseline_20260729_053611_52931405
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_modality_complete_non_llm_baseline_20260729_053611_84927794
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_modality_complete_non_llm_baseline_20260729_053808_77377681
+  judge_model: gpt-5-mini
+- mode: rejudge
+  responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/internvl3_8b_modality_complete_non_llm_baseline_20260729_053830_88061583
+  judge_model: gpt-5-mini

@@ -1,0 +1,12 @@
+# Qwen3-VL-8B-Instruct — recency control, sibling of qwen2_5_vl_7b
+# TARGET VLM (not a guard). Same family/size class as Qwen2.5-VL-7B, one
+# generation newer — mirrors qwen2_5_vl_7b.yaml's serving profile.
+
+model:
+  model: Qwen/Qwen3-VL-8B-Instruct
+  max_tokens: 4096
+
+# Same VRAM class as Qwen2.5-VL-7B (~16-20GB) — exclude small/old GPUs
+# (also: Qwen3-VL is bf16-native; V100/T4 lack hardware bf16 support).
+cluster:
+  gpu_types_excluded: ["v100-pcie", "v100-sxm2", "t4"]

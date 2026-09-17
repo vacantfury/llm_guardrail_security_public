@@ -1,0 +1,36 @@
+# SAGE defense configuration
+# "Self-Aware Guard Enhancement" (Ding et al., ACL Findings 2025)
+#
+# `wrapper` selects which self-check prompt is used. DEFAULT IS `published` and
+# must stay so: every result reported in the paper was produced under it, and
+# changing the default would silently re-define the defense.
+#
+# The non-default variants exist for the WRAPPER-INTERVENTION experiment (E2),
+# which converts the borrowed-strength account from correlational to causal.
+#
+#   The account says: SAGE's efficacy is bounded by whether the target converts
+#   the self-check request into an EXPLICIT REFUSAL. The measured failure mode is
+#   the "middle band" -- responses that perform the analysis and never reach a
+#   verdict (63.6% of Llama-3.1-8B draws, 2.4-2.5% of Gemma/Qwen).
+#
+#   PREDICTION (pre-registered here, before the run):
+#     Both interventions shrink the band and RAISE explicit refusal, so both
+#     LOWER coverage; and the effect size tracks BAND SIZE -- large on
+#     Llama-3.1-8B, near-zero on Qwen2.5-7B and Gemma-2-9B, which are already
+#     at ~96-97% refusal with almost no band to close.
+#     If coverage does NOT move on Llama, the band is not the operative channel
+#     and the account is wrong in its causal direction.
+#
+#   The two variants bracket the mechanism:
+#     verdict_only          -- removes the analysis invitation entirely.
+#                              Tests whether ANALYSIS ITSELF is what licenses the
+#                              task-style reading of the wrapper.
+#     analysis_then_verdict -- keeps the analysis, but REQUIRES a terminal verdict.
+#                              Tests whether the missing VERDICT (not the analysis)
+#                              is what leaves the band open.
+#   Both must remain plausible defenses, not strawmen: each keeps SAGE's
+#   refuse-if-harmful/help-otherwise protocol intact.
+
+wrapper: published
+
+as_system: false

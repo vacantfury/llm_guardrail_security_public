@@ -1,0 +1,37 @@
+
+num_main_job_threads: 6
+num_cluster_jobs: 7          # 1 orchestrator + up to 6 servers; xc budget is 6
+
+# Built by AICR 285677 on the FIXED encoder, rsync'd AICR -> local -> xc.
+_text:  &text  outputs/image_presence_threshold/prompt_transform/harmbench/llm_semantic_camo_ir_constant_20260805_213349_39577158/llm_semantic_camo
+_decoy: &decoy outputs/image_presence_threshold/prompt_transform/harmbench/llm_semantic_camo_ir_constant_20260805_213349_39577158/ir_constant
+
+_base: &base
+  mode: defense+evaluate
+  benchmark: harmbench
+  prompt_range: [0, 99]
+  judge_model: gpt-5-mini
+  campaign: paper_b_fidelity_regrid_camo
+
+_ecso: &ecso
+  defense: ecso
+  defense_config: {query_source: encoded}   # deployable arm — no oracle read
+
+tasks:
+  # ---- qwen2_5_vl_7b ----
+  - {<<: *base, target_model: qwen2_5_vl_7b, defense: no_defense, source_transform_subdir: *text}
+  - {<<: [*base, *ecso], target_model: qwen2_5_vl_7b,           source_transform_subdir: *text}
+  - {<<: *base, target_model: qwen2_5_vl_7b, defense: no_defense, source_transform_subdir: *decoy}
+  - {<<: [*base, *ecso], target_model: qwen2_5_vl_7b,           source_transform_subdir: *decoy}
+
+  # ---- internvl3_8b ----
+  - {<<: *base, target_model: internvl3_8b, defense: no_defense, source_transform_subdir: *text}
+  - {<<: [*base, *ecso], target_model: internvl3_8b,           source_transform_subdir: *text}
+  - {<<: *base, target_model: internvl3_8b, defense: no_defense, source_transform_subdir: *decoy}
+  - {<<: [*base, *ecso], target_model: internvl3_8b,           source_transform_subdir: *decoy}
+
+  # ---- pixtral_12b ----
+  - {<<: *base, target_model: pixtral_12b, defense: no_defense, source_transform_subdir: *text}
+  - {<<: [*base, *ecso], target_model: pixtral_12b,           source_transform_subdir: *text}
+  - {<<: *base, target_model: pixtral_12b, defense: no_defense, source_transform_subdir: *decoy}
+  - {<<: [*base, *ecso], target_model: pixtral_12b,           source_transform_subdir: *decoy}

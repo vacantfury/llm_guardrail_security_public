@@ -1,0 +1,36 @@
+
+channel: strategy            # surface | paraphrase | strategy
+seed: 0
+
+model: gpt-4.1-mini
+
+# --- which-paraphrase knob -------------------------------------------------
+# Used as the pure channel (channel: paraphrase) and, when enabled, as a
+# pre-step for the strategy channel.
+paraphrase:
+  enabled: true
+  type: llm_paraphrase
+  params:
+    temperature: 1.0         # MUST be > 0 — stochastic diversity IS the channel
+
+# Paraphrase channel only: an optional single fixed attack applied AFTER the
+# paraphrase (type: null = paraphrase-only).
+single_attack:
+  type: null
+  params: {}
+
+# Surface channel only: vanilla Best-of-N encoder params (char/caps/ASCII noise).
+surface:
+  sigma: 0.4
+
+# --- which-attack knob (strategy channel) ----------------------------------
+# The attack-family bank. Any registered transformation type_name is a drop-in
+# member — no per-attack code. `weight` sets sampling frequency per draw.
+# Anti-correlated families = maximal effective-N / defense-survival.
+attack_bank:
+  - {type: llm_set_theory,    weight: 1.0, params: {}}
+  - {type: llm_formal_logic,  weight: 1.0, params: {}}
+  - {type: llm_semantic_camo, weight: 1.0, params: {}}
+  - {type: non_llm_cipher,    weight: 1.0, params: {cipher: base64}}
+  - {type: deep_inception,    weight: 1.0, params: {}}
+  - {type: code_attack,       weight: 1.0, params: {}}

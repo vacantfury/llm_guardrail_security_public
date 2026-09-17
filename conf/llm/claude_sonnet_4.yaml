@@ -1,0 +1,4 @@
+# Claude Sonnet 4 (Anthropic) — frontier target model, strong safety alignment
+
+model:
+  model: claude-sonnet-4-20250514

@@ -1,0 +1,39 @@
+
+num_main_job_threads: 5
+num_cluster_jobs: 2
+
+_harm: &harm
+  mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range: [0, 99]
+  benchmark: harmbench
+  judge_method: harmbench
+  judge_model: gpt-5-mini
+  defense: semantic_smooth
+  campaign: paper_c_oracle_rerun_semantic_smooth
+  defense_config: {query_source: encoded}
+
+_benign: &benign
+  mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range: [0, 99]
+  benchmark: orbench_benign_hard
+  judge_model: gpt-5-mini
+  defense: semantic_smooth
+  campaign: paper_c_oracle_rerun_semantic_smooth_benign
+  defense_config: {query_source: encoded}
+
+tasks:
+  # ---- the nine attacks still owed (code_attack + ir_figstep done in stage 4) ----
+  - {<<: *harm, source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory}
+  - {<<: *harm, source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic}
+  - {<<: *harm, source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_ir_constant_20260710_002424_56524373/llm_classical_language}
+  - {<<: *harm, source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/non_llm_cipher_20260718_183504_42666777/non_llm_cipher}
+  - {<<: *harm, source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart}
+  - {<<: *harm, source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast}
+  - {<<: *harm, source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded}
+  - {<<: *harm, source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo}
+  - {<<: *harm, source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid}
+
+  # ---- benign IMAGE channel; the text channel is the identity transform (see header) ----
+  - {<<: *benign, source_transform_subdir: outputs/autoattack_defense/prompt_transform/orbench_benign_hard/ir_plain_20260718_183504_7866920/ir_plain}

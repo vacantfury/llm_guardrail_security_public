@@ -1,0 +1,68 @@
+# ============================================================
+# Paper C · Decode-style ablation — does a NEUTRAL decode fix the over-refusal?  (2026-07-17)
+# ============================================================
+# The mitigation run showed the over-refusal is caused by the DECODE step, not
+# the guard: the suspicion-primed DECODE_PROMPT distorts borderline-benign
+# prompts into harmful-sounding restatements the guard then flags (OR-Bench-Hard:
+# mc[wildguard] 70% refusal vs no_defense 15%, same prompts). This ablation runs
+# mc[guard=wildguard] with recover-decode (current) vs neutral-decode (new,
+# no harm-priming) head-to-head. Reuses existing render dirs — NO re-render.
+#
+# Hypotheses:
+#   - OR-Bench refusal: mc[neutral] << mc[recover] (70%) -> toward no_defense (15%).
+#   - Harmful ASR: mc[neutral] stays low and still BEATS guard_baseline (the lift
+#     survives — normalizing the surface form is what helps the guard, not the
+#     harm-priming).
+#   - guard_baseline[wildguard] on OR-Bench = isolation control (wildguard on the
+#     RAW benign): if it refuses ~15-30% (<< mc[recover]'s 70%), that pins the
+#     over-refusal on the decode, not the guard.
+#
+# Judges (cheap-first): harmful -> wildguard; OR-Bench -> qwen (ORBench 3-class).
+# gpt-5-mini rejudge over saved responses for the final numbers.
+# Servers: qwen (target + orbench-judge) + wildguard (guard + harm-judge) = 2
+#   -> num_cluster_jobs = orchestrator + 2 = 3. No API in-run.
+# PILOT slice [0,19]; scale after the direction holds.
+# ============================================================
+
+num_main_job_threads: 4
+num_cluster_jobs: 3
+
+_wg: &wg wildguard
+_rec: &rec {guard_model: wildguard, decode_text: true, decode_style: recover}
+_neu: &neu {guard_model: wildguard, decode_text: true, decode_style: neutral}
+
+_harm: &harm {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: [0, 19], judge_method: wildguard, judge_model: wildguard, campaign: paper_c_decode_ablation}
+_ben:  &ben  {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: [0, 19], benchmark: orbench_benign_hard, judge_method: orbench, judge_model: qwen2_5_vl_7b, campaign: paper_c_decode_ablation}
+
+# ── existing render dirs (harmful ensemble from mj_8412009; OR-Bench from mj_8414208) ──
+_figstep:  &figstep  outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260716_194159_70433849/ir_figstep
+_fcflow:   &fcflow   outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260716_194159_69181110/ir_fc_flowchart
+_lowcon:   &lowcon   outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260716_194159_9379140/ir_low_contrast
+_occluded: &occluded outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260716_194159_10657917/ir_occluded
+_mmtypo:   &mmtypo   outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260716_194203_32634422/ir_mm_typo
+_distract: &distract outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260716_194203_7625970/ir_distraction_grid
+_camoimg:  &camoimg  outputs/autoattack_defense/prompt_transform/harmbench/semantic_camo_ir_plain_20260716_194205_29992788/ir_plain
+_orb_img:  &orb_img  outputs/autoattack_defense/prompt_transform/orbench_benign_hard/ir_plain_20260717_020703_54610685/ir_plain
+
+tasks:
+  # ── HARMFUL: recover-decode vs neutral-decode (does the lift survive?) ──
+  - {<<: *harm, defense: modality_complete, defense_config: *rec, source_transform_subdir: *figstep}
+  - {<<: *harm, defense: modality_complete, defense_config: *neu, source_transform_subdir: *figstep}
+  - {<<: *harm, defense: modality_complete, defense_config: *rec, source_transform_subdir: *fcflow}
+  - {<<: *harm, defense: modality_complete, defense_config: *neu, source_transform_subdir: *fcflow}
+  - {<<: *harm, defense: modality_complete, defense_config: *rec, source_transform_subdir: *lowcon}
+  - {<<: *harm, defense: modality_complete, defense_config: *neu, source_transform_subdir: *lowcon}
+  - {<<: *harm, defense: modality_complete, defense_config: *rec, source_transform_subdir: *occluded}
+  - {<<: *harm, defense: modality_complete, defense_config: *neu, source_transform_subdir: *occluded}
+  - {<<: *harm, defense: modality_complete, defense_config: *rec, source_transform_subdir: *mmtypo}
+  - {<<: *harm, defense: modality_complete, defense_config: *neu, source_transform_subdir: *mmtypo}
+  - {<<: *harm, defense: modality_complete, defense_config: *rec, source_transform_subdir: *distract}
+  - {<<: *harm, defense: modality_complete, defense_config: *neu, source_transform_subdir: *distract}
+  - {<<: *harm, defense: modality_complete, defense_config: *rec, source_transform_subdir: *camoimg}
+  - {<<: *harm, defense: modality_complete, defense_config: *neu, source_transform_subdir: *camoimg}
+
+  # ── OR-Bench over-refusal: floor, isolation control, and the two decode styles ──
+  - {<<: *ben, defense: no_defense,                                            source_transform_subdir: *orb_img}
+  - {<<: *ben, defense: guard_baseline,    defense_config: {guard_model: *wg}, source_transform_subdir: *orb_img}
+  - {<<: *ben, defense: modality_complete, defense_config: *rec,               source_transform_subdir: *orb_img}
+  - {<<: *ben, defense: modality_complete, defense_config: *neu,               source_transform_subdir: *orb_img}

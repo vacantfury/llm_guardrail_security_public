@@ -1,0 +1,49 @@
+
+num_main_job_threads: 4
+num_cluster_jobs: 3
+
+_mc: &mc {guard_model: wildguard, decode_text: true, decode_style: recover}
+
+_harm: &harm
+  mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range: [0, 99]
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_fidelity_rerun
+
+_ben: &ben
+  mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range: [0, 99]
+  benchmark: orbench_benign_hard
+  judge_method: orbench
+  judge_model: qwen2_5_vl_7b
+  campaign: paper_c_fidelity_rerun
+
+# ── Stage-1 sources (NURC job 8957825, 2026-08-05; mirrored to hub and xc) ──
+_code_h: &code_h outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260805_215649_22270770/code_attack
+_fig_h:  &fig_h  outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260805_215649_72871103/ir_figstep
+_code_b: &code_b outputs/autoattack_defense/prompt_transform/orbench_benign_hard/code_attack_20260805_215649_90917535/code_attack
+_fig_b:  &fig_b  outputs/autoattack_defense/prompt_transform/orbench_benign_hard/ir_figstep_20260805_215649_9632753/ir_figstep
+
+tasks:
+  # ── HARMFUL axis · CodeAttack (§1.1) ──
+  - {<<: *harm, defense: no_defense,        source_transform_subdir: *code_h}
+  - {<<: *harm, defense: guard_baseline,    source_transform_subdir: *code_h, defense_config: {guard_model: wildguard}}
+  - {<<: *harm, defense: modality_complete, source_transform_subdir: *code_h, defense_config: *mc}
+
+  # ── HARMFUL axis · FigStep (§1.3) ──
+  - {<<: *harm, defense: no_defense,        source_transform_subdir: *fig_h}
+  - {<<: *harm, defense: guard_baseline,    source_transform_subdir: *fig_h, defense_config: {guard_model: wildguard}}
+  - {<<: *harm, defense: modality_complete, source_transform_subdir: *fig_h, defense_config: *mc}
+
+  # ── BENIGN axis (over-refusal) · CodeAttack ──
+  - {<<: *ben, defense: no_defense,        source_transform_subdir: *code_b}
+  - {<<: *ben, defense: guard_baseline,    source_transform_subdir: *code_b, defense_config: {guard_model: wildguard}}
+  - {<<: *ben, defense: modality_complete, source_transform_subdir: *code_b, defense_config: *mc}
+
+  # ── BENIGN axis (over-refusal) · FigStep ──
+  - {<<: *ben, defense: no_defense,        source_transform_subdir: *fig_b}
+  - {<<: *ben, defense: guard_baseline,    source_transform_subdir: *fig_b, defense_config: {guard_model: wildguard}}
+  - {<<: *ben, defense: modality_complete, source_transform_subdir: *fig_b, defense_config: *mc}

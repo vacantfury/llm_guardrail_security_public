@@ -1,0 +1,37 @@
+num_main_job_threads: 12     # all 12 cells in flight across the two targets' replicas
+num_cluster_jobs: 7          # orchestrator + 3 qwen + 2 gemma + wildguard (6 servers <= AICR budget 7)
+
+_e: &e
+  mode: defense+evaluate
+  target_model_config: {temperature: 1.0}   # THE FIX — see p2_t1_llama.yaml header
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_p2_text_t1
+
+_q: &q {<<: *e, target_model: qwen2_5_7b_instruct}
+_g: &g {<<: *e, target_model: gemma2_9b_it}
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+_SS: &ss {n_copies: 5, perturbation_model: null, judge_model: wildguard}
+
+# ORDER MATTERS: each target's makespan drivers first, interleaved so both targets' servers
+# are saturated from t=0 rather than one target monopolising the semaphore.
+# R7 measured — qwen: SS+surf 16.0h, SS+code 12.9h, SAGE+code 6.9h, nodef+code 6.7h,
+# SAGE+surf 1.5h, nodef+surf 1.4h;  gemma: SS+code 9.7h, SS+surf 3.9h, nodef+code 4.0h,
+# nodef+surf 1.1h, SAGE+code 0.4h, SAGE+surf 0.3h.
+tasks:
+  - {<<: *q, source_transform_subdir: *surf, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *g, source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *q, source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *g, source_transform_subdir: *surf, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *q, source_transform_subdir: *code, defense: sage}
+  - {<<: *g, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *q, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *g, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *q, source_transform_subdir: *surf, defense: sage}
+  - {<<: *g, source_transform_subdir: *code, defense: sage}
+  - {<<: *q, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *g, source_transform_subdir: *surf, defense: sage}

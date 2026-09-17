@@ -1,0 +1,4 @@
+# GPT-5-nano (OpenAI)
+
+model:
+  model: gpt-5-nano

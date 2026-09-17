@@ -1,0 +1,4 @@
+# Conditional Probability encoder (non-LLM)
+# Formats prompt as conditional probability equation.
+encoder_type: non_llm_conditional_probability
+num_parts: 6

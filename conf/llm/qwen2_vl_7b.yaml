@@ -1,0 +1,28 @@
+# Qwen2-VL-7B-Instruct — OLDEST rung of the qwen-VL generational ladder.
+# TARGET VLM (not a guard). The ladder is
+#   qwen2_vl_7b  ->  qwen2_5_vl_7b  ->  qwen3_vl_8b_instruct
+# same family, same size class, increasing post-training recency. It exists to
+# turn a two-point contrast into a series: the benign threshold shift measured
+# +0pp on qwen2.5-vl and +32pp on qwen3-vl (xc job 215, 2026-08-07), and a
+# single pair cannot say whether that is a generational trend or one odd model.
+#
+# ⚠️ SERVING PROFILE IS DELIBERATELY MATCHED to qwen2_5_vl_7b.yaml and
+# qwen3_vl_8b_instruct.yaml. The ladder's whole value is that the three rungs
+# differ in the checkpoint and nothing else, so a per-rung serving tweak
+# (max_tokens, dtype, a GPU class only one rung is allowed) would put a
+# confound straight through the contrast. Do not tune one rung in isolation.
+#
+# Qwen2-VL's architectural context ceiling is 32K (vs 128K/256K on the newer
+# rungs), which is far above anything this paper sends — the prompts are single
+# benign instructions plus at most one image. Recorded in the registry
+# (`max_context_len=32_768`) so a future long-context consumer sees the limit.
+
+model:
+  model: Qwen/Qwen2-VL-7B-Instruct
+  max_tokens: 4096
+
+# Same VRAM class as the other two rungs (~16-20GB) — exclude small/old GPUs.
+# Qwen2-VL is bf16-native like its successors, so V100/T4 are out on hardware
+# support, not just capacity.
+cluster:
+  gpu_types_excluded: ["v100-pcie", "v100-sxm2", "t4"]

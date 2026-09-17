@@ -1,0 +1,24 @@
+num_main_job_threads: 8
+num_cluster_jobs: 4          # orchestrator + internvl3 + pixtral + wildguard(guard+judge)
+
+_e: &e
+  mode: defense+evaluate
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r5_multitarget
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+tasks:
+  # --- InternVL3-8B ---
+  - {<<: *e, target_model: internvl3_8b, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, target_model: internvl3_8b, source_transform_subdir: *code, defense: canonicalize_guard, defense_config: {guard_model: wildguard}}
+  - {<<: *e, target_model: internvl3_8b, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *e, target_model: internvl3_8b, source_transform_subdir: *surf, defense: canonicalize_guard, defense_config: {guard_model: wildguard}}
+  # --- Pixtral-12B ---
+  - {<<: *e, target_model: pixtral_12b, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, target_model: pixtral_12b, source_transform_subdir: *code, defense: canonicalize_guard, defense_config: {guard_model: wildguard}}
+  - {<<: *e, target_model: pixtral_12b, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *e, target_model: pixtral_12b, source_transform_subdir: *surf, defense: canonicalize_guard, defense_config: {guard_model: wildguard}}

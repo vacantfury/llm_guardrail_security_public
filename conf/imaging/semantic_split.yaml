@@ -1,0 +1,20 @@
+# semantic_cross_modal_split — OUR adaptive attack on the amplifier's UNION step
+# (Paper C; NOT established literature — see the module docstring for how it
+# differs from the established ir_mm_typo and from our positional cross_modal_split).
+#
+# One aux-LLM call rewrites a behavior into two individually-benign, individually
+# FLUENT halves: a carrier sentence with no request scaffold (text channel) and the
+# directive + operand (rendered into the image).
+renderer_type: plain
+
+# Attack-construction (encoder) model — same default as every other panel attack
+# (conf/text_encoding/default.yaml), so naive-vs-adaptive stays a single-encoder
+# comparison.
+model: gpt-4.1-mini
+
+# The image half is a sentence, not a short phrase, so use body-text sizing rather
+# than mm_typo's poster-sized font.
+font_size: 40
+width: 1024
+
+# split_prompt: |   # optional override; the default lives in code

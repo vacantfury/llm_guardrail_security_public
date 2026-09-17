@@ -1,0 +1,154 @@
+num_main_job_threads: 8
+tasks:
+  # internvl3_8b|code_attack|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_ecso_code_attack_ir_constant_20260710_020734_34091007
+    judge_model: gpt-5-mini
+  # internvl3_8b|code_attack|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_ecso_code_attack_20260710_020501_19330751
+    judge_model: gpt-5-mini
+  # internvl3_8b|code_attack|no_defense|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_no_defense_code_attack_ir_constant_20260710_020730_93077717
+    judge_model: gpt-5-mini
+  # internvl3_8b|code_attack|no_defense|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_no_defense_code_attack_20260712_060708_80193653
+    judge_model: gpt-5-mini
+  # internvl3_8b|llm_classical_language|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_ecso_llm_classical_language_ir_constant_20260710_050717_99181554
+    judge_model: gpt-5-mini
+  # internvl3_8b|llm_classical_language|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_ecso_llm_classical_language_20260710_050653_42779156
+    judge_model: gpt-5-mini
+  # internvl3_8b|llm_formal_logic|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_ecso_llm_formal_logic_ir_constant_20260710_020751_28059164
+    judge_model: gpt-5-mini
+  # internvl3_8b|llm_formal_logic|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_ecso_llm_formal_logic_20260710_020647_21443427
+    judge_model: gpt-5-mini
+  # internvl3_8b|llm_formal_logic|no_defense|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_no_defense_llm_formal_logic_ir_constant_20260710_020750_51679964
+    judge_model: gpt-5-mini
+  # internvl3_8b|llm_formal_logic|no_defense|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_no_defense_llm_formal_logic_20260710_020546_21566512
+    judge_model: gpt-5-mini
+  # internvl3_8b|llm_semantic_camo|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_ecso_llm_semantic_camo_ir_constant_20260710_050751_64072962
+    judge_model: gpt-5-mini
+  # internvl3_8b|llm_semantic_camo|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/internvl3_8b_ecso_llm_semantic_camo_20260710_050732_87312782
+    judge_model: gpt-5-mini
+  # pixtral_12b|code_attack|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_ecso_code_attack_ir_constant_20260710_021139_93064304
+    judge_model: gpt-5-mini
+  # pixtral_12b|code_attack|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_ecso_code_attack_20260710_020821_34966184
+    judge_model: gpt-5-mini
+  # pixtral_12b|code_attack|no_defense|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_no_defense_code_attack_ir_constant_20260710_021123_71416892
+    judge_model: gpt-5-mini
+  # pixtral_12b|code_attack|no_defense|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_no_defense_code_attack_20260710_020811_71667580
+    judge_model: gpt-5-mini
+  # pixtral_12b|llm_classical_language|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_ecso_llm_classical_language_ir_constant_20260710_050906_3132468
+    judge_model: gpt-5-mini
+  # pixtral_12b|llm_classical_language|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_ecso_llm_classical_language_20260710_050832_95492710
+    judge_model: gpt-5-mini
+  # pixtral_12b|llm_formal_logic|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_ecso_llm_formal_logic_ir_constant_20260710_021207_83749710
+    judge_model: gpt-5-mini
+  # pixtral_12b|llm_formal_logic|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_ecso_llm_formal_logic_20260710_021035_29327710
+    judge_model: gpt-5-mini
+  # pixtral_12b|llm_formal_logic|no_defense|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_no_defense_llm_formal_logic_ir_constant_20260710_021154_25398012
+    judge_model: gpt-5-mini
+  # pixtral_12b|llm_formal_logic|no_defense|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_no_defense_llm_formal_logic_20260710_020928_95431510
+    judge_model: gpt-5-mini
+  # pixtral_12b|llm_semantic_camo|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_ecso_llm_semantic_camo_ir_constant_20260710_051007_64990369
+    judge_model: gpt-5-mini
+  # pixtral_12b|llm_semantic_camo|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/pixtral_12b_ecso_llm_semantic_camo_20260710_050932_89849447
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|code_attack|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_ecso_code_attack_ir_constant_20260710_015049_55871261
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|code_attack|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_ecso_code_attack_20260710_015049_91508322
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|code_attack|no_defense|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_no_defense_code_attack_ir_constant_20260710_015049_37319532
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|code_attack|no_defense|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_no_defense_code_attack_20260710_015049_76092497
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|llm_classical_language|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_ecso_llm_classical_language_ir_constant_20260710_045740_49695548
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|llm_classical_language|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_ecso_llm_classical_language_20260710_045740_44676600
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|llm_formal_logic|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_ecso_llm_formal_logic_ir_constant_20260710_020327_22787078
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|llm_formal_logic|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_ecso_llm_formal_logic_20260710_015049_79382828
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|llm_formal_logic|no_defense|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_no_defense_llm_formal_logic_ir_constant_20260710_020229_21996543
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|llm_formal_logic|no_defense|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_no_defense_llm_formal_logic_20260710_015049_52401498
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|llm_semantic_camo|ecso|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_ecso_llm_semantic_camo_ir_constant_20260710_050613_31467934
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|llm_semantic_camo|ecso|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_ecso_llm_semantic_camo_20260710_045740_59098821
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|llm_semantic_camo|no_defense|decoy
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_no_defense_llm_semantic_camo_ir_constant_20260710_050555_60868911
+    judge_model: gpt-5-mini
+  # qwen2_5_vl_7b|llm_semantic_camo|no_defense|text
+  - mode: rejudge
+    responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_no_defense_llm_semantic_camo_20260710_045740_75996990
+    judge_model: gpt-5-mini

@@ -1,0 +1,4 @@
+# Symbol Injection encoder (non-LLM)
+# Injects mathematical symbols randomly into the prompt.
+encoder_type: non_llm_symbol_injection
+num_symbols: 10

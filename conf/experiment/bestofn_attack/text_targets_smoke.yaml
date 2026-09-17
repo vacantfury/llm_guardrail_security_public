@@ -1,0 +1,39 @@
+# bestofn_attack Paper-1 — TEXT-TARGET serve smoke (validate + de-risk).
+# Confirms the 2 NEW text LLMs SERVE on vLLM and that no_defense / SAGE /
+# SemanticSmooth run on them, BEFORE the full multi-target text round:
+#   - Qwen2.5-7B-Instruct (Alibaba)  — 32K ctx, rides the 20480 default.
+#   - Gemma-2-9B-it (Google)         — 8K ctx + sliding-window attention (the main
+#                                      serve risk); conf/llm/gemma2_9b_it.yaml caps
+#                                      max_model_len=8192.
+# (Llama-3.1-8B is a low-risk standard serve — validated directly in the full round.)
+# ~2 behaviors (prompt_range [0,199]). FREE — served models only: SemanticSmooth's
+# API defaults (perturbation gemini, internal judge gpt-5-nano) OVERRIDDEN to
+# perturbation_model=null (paraphrase with the target) + judge_model=wildguard;
+# ASR judge = wildguard first-pass. The gpt-5-mini rejudge is a SEPARATE gated step.
+num_main_job_threads: 2
+num_cluster_jobs: 4          # orchestrator + qwen2.5-7b + gemma2-9b + wildguard (3 GPU servers)
+
+_e: &e
+  mode: defense+evaluate
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  prompt_range: [0, 199]
+  campaign: bestofn_attack_p1_text_smoke
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+_SS: &ss {n_copies: 5, perturbation_model: null, judge_model: wildguard}   # null -> paraphrase with the target; free served vote
+
+tasks:
+  # --- serve check: no_defense on both new targets (code + original BoN) ---
+  - {<<: *e, target_model: qwen2_5_7b_instruct, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, target_model: qwen2_5_7b_instruct, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *e, target_model: gemma2_9b_it,        source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, target_model: gemma2_9b_it,        source_transform_subdir: *surf, defense: no_defense}
+  # --- defense check: SAGE + SemanticSmooth run on each new target (code channel) ---
+  - {<<: *e, target_model: qwen2_5_7b_instruct, source_transform_subdir: *code, defense: sage}
+  - {<<: *e, target_model: qwen2_5_7b_instruct, source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *e, target_model: gemma2_9b_it,        source_transform_subdir: *code, defense: sage}
+  - {<<: *e, target_model: gemma2_9b_it,        source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}

@@ -1,0 +1,17 @@
+# MM-SafetyBench (TYPO variant) — query-relevant typographic attack.
+# Reference: other_repos/MM-SafetyBench (Liu et al., ECCV 2024).
+#
+# One aux-LLM call extracts the harmful key phrase and rewrites the question to
+# point at "the phrase at the bottom of the image"; the key phrase is rendered
+# as typography (harm lives in the image), the rephrased question stays in text.
+# SD / SD+TYPO variants are omitted (need Stable-Diffusion generation).
+renderer_type: plain
+
+# Attack-construction (encoder) model — matches the text-encoder default.
+model: gpt-4.1-mini
+
+# Typography of the key phrase (short → large font, MM-SafetyBench style)
+font_size: 90
+width: 1024
+
+# extraction_prompt: |   # optional override; sensible default lives in code

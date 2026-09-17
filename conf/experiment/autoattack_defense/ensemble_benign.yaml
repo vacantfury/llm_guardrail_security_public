@@ -1,0 +1,43 @@
+# ============================================================
+# Paper C · Benign-refusal pilot — Stage 2: over-refusal matrix  (2026-07-17)
+# ============================================================
+# Pairs with the harmful ensemble pilot (mj_8412009) for the safety-utility plane.
+# Reports REFUSAL RATE on benign prompts (lower = more usable). The headline
+# question: is modality_complete's 0% ASR real safety, or over-refusal?
+#
+# Refusal judge = qwen2_5_vl_7b (FREE — cheap-first; refusal detection is a simple
+# classification, and Fix-1 lets judge_model reuse the already-served target, so
+# no API and no extra server). Final run rejudges with gpt-5-nano (the validated
+# benign judge) over the saved responses.
+#
+# >>> BEFORE RUNNING <<<  run ensemble_benign_render.yaml first, then fill the
+# _* source anchors below with its output dirs (they carry timestamps).
+#
+# num_cluster_jobs = orchestrator(1) + qwen(1, target AND refusal-judge) = 2.
+# ============================================================
+
+num_main_job_threads: 4
+num_cluster_jobs: 2
+
+_qwen: &qwen
+  mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range: [0, 19]
+  benchmark: jailbreakbench_benign
+  judge_method: refusal
+  judge_model: qwen2_5_vl_7b        # free; served once (= target)
+  campaign: paper_c_ensemble_benign_pilot
+
+# ── Stage-1 sources — FILLED from ensemble_benign_render.yaml (job mj_8413087) ──
+_ben_img:  &ben_img  outputs/autoattack_defense/prompt_transform/jailbreakbench_benign/ir_plain_20260717_011251_92087856/ir_plain
+_ben_txt:  &ben_txt  outputs/autoattack_defense/prompt_transform/jailbreakbench_benign/non_llm_baseline_20260717_011251_18926002/non_llm_baseline
+
+tasks:
+  # benign IMAGE (ir_plain) × 4 defenses — the over-refusal test
+  - {<<: *qwen, defense: no_defense,        source_transform_subdir: *ben_img}
+  - {<<: *qwen, defense: sage,              source_transform_subdir: *ben_img}
+  - {<<: *qwen, defense: ecso,              source_transform_subdir: *ben_img}
+  - {<<: *qwen, defense: modality_complete, source_transform_subdir: *ben_img}
+  # benign TEXT baseline — no_defense + the guard (modality contrast)
+  - {<<: *qwen, defense: no_defense,        source_transform_subdir: *ben_txt}
+  - {<<: *qwen, defense: modality_complete, source_transform_subdir: *ben_txt}

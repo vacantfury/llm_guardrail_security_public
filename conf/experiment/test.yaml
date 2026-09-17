@@ -1,0 +1,26 @@
+# ============================================================
+# Smoke test: end-to-end destroyer pipeline on 2 prompts.
+# ============================================================
+# Usage: python main.py test
+#
+# Validates stage 1 (prompt_transform chain). Stage 2 (defense+evaluate)
+# requires the subdir path produced by stage 1, which has a per-run
+# timestamp — so this preset only runs stage 1. After it succeeds, copy
+# the produced subdir path into a follow-up defense+evaluate task.
+#
+# Cost: ~$0.01 (2 prompts × set_theory encoder LLM, no target query yet).
+
+num_main_job_threads: 1
+
+tasks:
+  # Stage 1: chain of [set_theory text encoder] + [ir_plain image renderer].
+  # Produces subfolders under outputs/autoattack_defense/prompt_transform/harmbench/<...>/:
+  #   llm_set_theory/  → encoded text + cumulative results.json
+  #   ir_plain/        → encoded text-rendered images + cumulative results.json
+  #                      (is_multimodal=true after this step)
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 1]
+    transformation_list:
+      - type: set_theory          # alias → llm_set_theory
+      - type: ir_plain            # image-only delivery (text replaced with stock instruction)

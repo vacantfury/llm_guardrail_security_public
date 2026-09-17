@@ -1,0 +1,34 @@
+# ============================================================
+# Paper C · RQ4 ADAPTIVE ATTACK — Step A: render the decode-evasion attack (2026-07-20)
+# ============================================================
+# Generates the `llm_decode_evasion` attack (honest-decode-failure construction): rewrite
+# each HarmBench behavior so a 1-2 sentence restatement reads benign but the full answer
+# still yields the harmful specifics. Encoder LLM = gpt-4.1-mini (the DEFAULT text-encoder
+# model, conf/text_encoding/default.yaml — the SAME model set_theory / semantic_camo and the
+# whole guard panel were rendered with, so the naive-vs-adaptive comparison uses one encoder).
+#
+# ⚠️ API-GATE: this step uses an API encoder (gpt-4.1-mini). Reason it's warranted:
+#   (1) attack quality — decode-evasion is a sophisticated semantic rewrite; a weak cluster
+#       model would produce weak rewrites and make the adaptive test uninformative;
+#   (2) consistency — every panel attack was rendered with gpt-4.1-mini; using the same keeps
+#       naive (set_theory, reused from the panel) vs adaptive a fair, single-encoder compare;
+#   (3) cost trivial — 100 prompts x 1 rewrite call ≈ a few cents.
+# The downstream eval (Step B) is ALL FREE (cluster target + guards + WildGuard judge).
+#
+# METHOD-CHECK GATE after this runs: READ a sample of the rewrites before Step B — confirm each
+# is (a) benign-sounding at gist level AND (b) still carries the harmful specifics. A weak/over-
+# sanitized rewrite = a broken attack, not a result.
+#
+# Output: outputs/autoattack_defense/prompt_transform/harmbench/decode_evasion_<ts>/llm_decode_evasion
+# ============================================================
+
+num_main_job_threads: 1
+num_cluster_jobs: 1          # API encoder — no GPU server; orchestrator only
+
+tasks:
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 99]
+    benchmark: harmbench
+    transformation_list:
+      - type: decode_evasion   # alias → llm_decode_evasion; encoder = gpt-4.1-mini (default)

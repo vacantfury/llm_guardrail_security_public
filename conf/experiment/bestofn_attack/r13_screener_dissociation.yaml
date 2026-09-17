@@ -1,0 +1,22 @@
+num_main_job_threads: 4
+num_cluster_jobs: 7          # 6 servers (llama3_1 x4 + llama3_8b shadow + wildguard) + orchestrator
+
+_e: &e
+  mode: defense+evaluate
+  target_model: llama3_1_8b_cluster
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r13_screener          # NEW campaign; never reuse p6_selfcheck,
+                                                 # whose cells are quarantined and share
+                                                 # output naming (latest-wins is unsafe).
+
+_CODE_FIXED: &code_fixed outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260805_212854_26701649/code_attack
+
+tasks:
+  # ---- CLASS A: verdict rides on the TARGET's sampling -> predict COLLAPSE ----
+  - {<<: *e, source_transform_subdir: *code_fixed, defense: llm_self_defense, target_model_config: {temperature: 1.0}}
+  - {<<: *e, source_transform_subdir: *code_fixed, defense: llm_self_defense, target_model_config: {temperature: 0.0}}
+  # ---- CLASS B: verdict rides on a SEPARATE greedy shadow -> predict NULL -----
+  - {<<: *e, source_transform_subdir: *code_fixed, defense: selfdefend, target_model_config: {temperature: 1.0}}
+  - {<<: *e, source_transform_subdir: *code_fixed, defense: selfdefend, target_model_config: {temperature: 0.0}}

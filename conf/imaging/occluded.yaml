@@ -1,0 +1,15 @@
+# Occluded-Text attack (Adversarial Smuggling — "Perceptual Blindness" pathway).
+# Reference: other_repos/smugglebench (Li et al., ACL 2026).
+#
+# Renders the payload, then overlays regular occluding bars ("venetian blinds").
+# A human reads through the gaps; an OCR/decode check loses covered characters.
+renderer_type: occluded
+
+font_size: 30
+
+# Occlusion overlay (see OccludedImageRenderer)
+occlusion_orientation: horizontal
+occlusion_opacity: 0.85     # 1.0 = bars fully hide the covered band
+bar_thickness: 12           # occluded band height (px)
+bar_gap: 16                 # clear readable band between bars (px)
+# occlusion_color: defaults to bg_color (bars subtract text rather than add ink)

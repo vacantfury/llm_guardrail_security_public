@@ -1,0 +1,38 @@
+# bestofn_attack Paper-1 — AICR TEXT-TARGET serve smoke (de-risk the AICR home).
+# Validates that ALL THREE text-LLM targets SERVE on AICR (bf16, 96GB RTX PRO 6000)
+# and that no_defense / SAGE / SemanticSmooth run on them, BEFORE the full AICR round.
+# Run via the AICR wrapper (CLUSTER_PROFILE=aicr):
+#   sbatch scripts/run_experiment_aicr.sbatch bestofn_attack/text_targets_smoke_aicr
+#   - Llama-3.1-8B-Instruct (meta)   — standard serve, low risk.
+#   - Qwen2.5-7B-Instruct (Alibaba)  — standard serve, low risk.
+#   - Gemma-2-9B-it (google)         — OOM'd on NURC's 32GB (256K-vocab activation
+#                                      spike); fits trivially on AICR's 96GB at bf16
+#                                      (the whole reason we moved the round to AICR).
+# ~2 behaviors (prompt_range [0,99]). FREE — served models only: SemanticSmooth's API
+# defaults (perturbation gemini, internal judge gpt-5-nano) OVERRIDDEN to
+# perturbation_model=null (paraphrase with the target) + judge_model=wildguard;
+# ASR judge = wildguard first-pass. The gpt-5-mini rejudge is a SEPARATE gated step.
+num_main_job_threads: 3
+num_cluster_jobs: 5          # orchestrator + llama-3.1-8b + qwen2.5-7b + gemma2-9b + wildguard
+
+_e: &e
+  mode: defense+evaluate
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  prompt_range: [0, 99]
+  campaign: bestofn_attack_p1_text_smoke_aicr
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+_SS: &ss {n_copies: 5, perturbation_model: null, judge_model: wildguard}   # null -> paraphrase with the target; free served vote
+
+tasks:
+  # --- serve check: no_defense on ALL THREE targets (code channel) ---
+  - {<<: *e, target_model: llama3_1_8b_cluster,  source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, target_model: qwen2_5_7b_instruct,   source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, target_model: gemma2_9b_it,          source_transform_subdir: *code, defense: no_defense}
+  # --- defense check: SAGE + SemanticSmooth run on the trickiest target (gemma) ---
+  - {<<: *e, target_model: gemma2_9b_it,          source_transform_subdir: *code, defense: sage}
+  - {<<: *e, target_model: gemma2_9b_it,          source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}

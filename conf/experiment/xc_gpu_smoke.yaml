@@ -1,0 +1,9 @@
+
+num_main_job_threads: 1
+
+tasks:
+  - mode: defense+evaluate
+    source_transform_subdir: outputs/prompt_transform/harmbench/set_theory_20260718_190108_43951839/llm_set_theory
+    target_model: qwen2_5_vl_7b          # served on xc via SLURM (--gres=gpu:1, partition main)
+    defense: no_defense
+    judge_model: qwen3_vl_8b_instruct    # 2nd non-gated served model → exercises the 2-server path

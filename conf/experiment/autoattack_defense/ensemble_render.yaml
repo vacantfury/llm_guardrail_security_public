@@ -1,0 +1,77 @@
+# ============================================================
+# Paper C · Stage 1 — render the ESTABLISHED MULTIMODAL-ATTACK ENSEMBLE  (2026-07-16)
+# ============================================================
+# DRAFT for review. Produces the attacked prompt dirs the defense matrix
+# (ensemble.yaml) consumes via `source_transform_subdir`.
+#
+# Each task renders ONE established multimodal attack from raw HarmBench prompts.
+# Direct-render image attacks use keep_text:false (harm lives in the IMAGE, text
+# channel is a benign "check the image" stub) so they genuinely test the image
+# surface. The two aux-LLM attacks (ir_mm_typo, ir_distraction_grid) set their own
+# text channel in apply(); their construction model (gpt-4.1-mini) comes from
+# conf/imaging/{mm_typo,distraction_grid}.yaml.
+#
+# PILOT slice: prompt_range [0,19] (~20 prompts, aux-LLM cost ≈ <$0.5).
+#   -> bump to [0,99] for the full run.
+# NOTE: the CAMO cells (set_theory/formal_logic -> ir_plain) already exist from
+#   earlier rounds and are NOT re-rendered here — this preset is the NEW ensemble.
+# Stage 1 only: no target queries, no judging.
+# ============================================================
+
+num_main_job_threads: 4
+
+tasks:
+  # ── FigStep (typographic numbered list) ──
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 19]
+    transformation_list:
+      - type: ir_figstep
+        params: {keep_text: false}
+
+  # ── FC-Attack (flowchart structure) ──
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 19]
+    transformation_list:
+      - type: ir_fc_flowchart
+        params: {keep_text: false}
+
+  # ── Adversarial Smuggling: Low-Contrast (perceptual blindness) ──
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 19]
+    transformation_list:
+      - type: ir_low_contrast
+        params: {keep_text: false}
+
+  # ── Adversarial Smuggling: Occluded-Text (perceptual blindness) ──
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 19]
+    transformation_list:
+      - type: ir_occluded
+        params: {keep_text: false}
+
+  # ── MM-SafetyBench TYPO (aux-LLM key-phrase → typography) ──
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 19]
+    transformation_list:
+      - type: ir_mm_typo          # model=gpt-4.1-mini from conf/imaging/mm_typo.yaml
+
+  # ── Text-DJ / CS-DJ distraction (aux-LLM decompose → numbered grid) ──
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 19]
+    transformation_list:
+      - type: ir_distraction_grid  # model from conf/imaging/distraction_grid.yaml
+
+  # ── Semantic-camouflage-in-image (chain: camouflage text → render) ──
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 19]
+    transformation_list:
+      - type: semantic_camo        # alias → llm_semantic_camo
+      - type: ir_plain
+        params: {keep_text: false}

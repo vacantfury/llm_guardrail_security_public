@@ -1,0 +1,19 @@
+# Hermes-4-70B (NousResearch) — Round-J open general-LLM RUBRIC judge.
+# Applies the HarmBench classifier rubric in chat mode (steerable, low refusal
+# by design). Served for judge_model_issue/cluster_judge_rejudge.py.
+#
+# Llama-3.1-70B base ≈ 140 GB @ bf16 → 2× A100-80GB (TP=2), like Llama-3.3-70B.
+model:
+  model: NousResearch/Hermes-4-70B
+  max_tokens: 512
+
+cluster:
+  num_gpus: 1
+  quantization: fp8           # 1 GPU/job cap (gpu PartitionQOS) → fit 70B on one H200 via fp8
+  time_limit: "01:00:00"      # short → SLURM can backfill this 1-GPU job into a gap
+  gpu_constraint: "cascadelake"   # H200 nodes (A100-80GB nodes are drained); no OR — sbatch chokes on `|`
+  mem_gb: 128
+  max_model_len: 8192
+  gpu_memory_utilization: 0.92
+  dtype: bfloat16
+  gpu_types_excluded: ["v100-pcie", "v100-sxm2", "t4", "p100"]

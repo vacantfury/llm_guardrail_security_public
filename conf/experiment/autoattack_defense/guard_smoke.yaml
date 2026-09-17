@@ -1,0 +1,39 @@
+# ============================================================
+# Paper C · SERVE-SMOKE for the 3 new-to-matrix guards  (2026-07-18)
+# ============================================================
+# Before the 132-cell guard_panel matrix, confirm the guards that have NEVER been
+# served in this pipeline actually (a) SERVE on AICR and (b) emit PARSEABLE
+# verdicts (not all-fail-closed). Scope: qwen3guard_gen_8b + thinkguard (newly
+# wired in guard_utils.py) + guardreasoner_vl_7b (wired earlier, never served
+# here). guard_baseline (gb) only — the DIRECT guard->parser path.
+# Channels: set_theory (TEXT — guards see real encoded harm) + ir_figstep (IMAGE
+# — text-only guards get the stub, guardreasoner_vl sees the image). n=5.
+# Servers: qwen (target) + 3 guards + wildguard (throwaway harm judge) = 5
+#   -> num_cluster_jobs = 6 (fits AICR budget 7).
+# PASS criteria (from logs/results): each guard returns a mix of safe/unsafe on
+#   the 5 prompts, NOT 5/5 fail-closed-unsafe (which would mean unparseable output).
+# ============================================================
+
+num_main_job_threads: 4
+num_cluster_jobs: 6
+
+_rng: &rng [0, 4]
+
+_gbq3g:  &gbq3g  {guard_model: qwen3guard_gen_8b}
+_gbtg:   &gbtg   {guard_model: thinkguard}
+_gbgrvl: &gbgrvl {guard_model: guardreasoner_vl_7b}
+
+_harm: &harm {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: *rng, judge_method: wildguard, judge_model: wildguard, campaign: paper_c_guard_smoke}
+
+_set:     &set     outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+_figstep: &figstep outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+
+tasks:
+  # TEXT channel (set_theory) — the real parser test
+  - {<<: *harm, defense: guard_baseline, defense_config: *gbq3g,  source_transform_subdir: *set}
+  - {<<: *harm, defense: guard_baseline, defense_config: *gbtg,   source_transform_subdir: *set}
+  - {<<: *harm, defense: guard_baseline, defense_config: *gbgrvl, source_transform_subdir: *set}
+  # IMAGE channel (figstep) — multimodal path for guardreasoner_vl
+  - {<<: *harm, defense: guard_baseline, defense_config: *gbq3g,  source_transform_subdir: *figstep}
+  - {<<: *harm, defense: guard_baseline, defense_config: *gbtg,   source_transform_subdir: *figstep}
+  - {<<: *harm, defense: guard_baseline, defense_config: *gbgrvl, source_transform_subdir: *figstep}

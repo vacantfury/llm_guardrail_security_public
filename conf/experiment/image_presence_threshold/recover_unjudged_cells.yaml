@@ -1,0 +1,27 @@
+
+num_main_job_threads: 4
+num_cluster_jobs: 1          # orchestrator only -- rejudge never serves a model.
+
+_j: &j
+  mode: rejudge
+  judge_model: gpt-5-mini    # pinned: the paper's headline judge
+
+tasks:
+  # --- THE ONE THAT CARRIES A PAPER CLAIM -------------------------------------
+  # pixtral-12b, blank arm: the missing half of the 48 -> 83% sign inversion.
+  - <<: *j
+    responses_from: outputs/image_presence_threshold/defense+evaluate/harmbench/pixtral_12b_no_defense_non_llm_baseline_ir_blank_20260807_043819_60229939
+    judge_method: harmbench
+
+  # --- the other three from the same failed judging pass -----------------------
+  - <<: *j
+    responses_from: outputs/image_presence_threshold/defense+evaluate/harmbench/internvl3_8b_no_defense_non_llm_baseline_20260807_043819_77802907
+    judge_method: harmbench
+
+  - <<: *j
+    responses_from: outputs/image_presence_threshold/defense+evaluate/jailbreakbench_benign/internvl3_8b_no_defense_non_llm_baseline_20260807_043819_87100406
+    judge_method: jbb_refusal
+
+  - <<: *j
+    responses_from: outputs/image_presence_threshold/defense+evaluate/jailbreakbench_benign/qwen2_5_vl_7b_no_defense_non_llm_baseline_ir_blank_20260807_084227_74119019
+    judge_method: jbb_refusal

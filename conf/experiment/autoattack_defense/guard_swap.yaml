@@ -1,0 +1,94 @@
+
+num_main_job_threads: 4
+num_cluster_jobs: 4
+
+# ── guards (swap _lg3 -> qwen3guard_gen_8b if Meta license unavailable) ──
+_wg:  &wg  wildguard
+_lg3: &lg3 llama_guard_3_8b
+
+# ── amplifier config held CONSTANT across guards: recover + full-decode ──
+_mcwg:  &mcwg  {guard_model: wildguard,         decode_text: true, decode_style: recover}
+_mclg3: &mclg3 {guard_model: llama_guard_3_8b,  decode_text: true, decode_style: recover}
+_gbwg:  &gbwg  {guard_model: wildguard}
+_gblg3: &gblg3 {guard_model: llama_guard_3_8b}
+
+# in-run judges are THROWAWAY (we gpt-5-mini rejudge the saved responses)
+_harm: &harm {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: [0, 19], judge_method: wildguard, judge_model: wildguard, campaign: paper_c_guard_swap}
+_ben:  &ben  {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: [0, 19], benchmark: orbench_benign_hard, judge_method: orbench, judge_model: qwen2_5_vl_7b, campaign: paper_c_guard_swap}
+
+# ── attack render dirs (11 established attacks; reuse ensemble_full's, n=20) ──
+_set:      &set      outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260717_121526_20614086/llm_set_theory
+_flog:     &flog     outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+_class:    &class    outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_20260717_121526_53374039/llm_classical_language
+_cipher:   &cipher   outputs/autoattack_defense/prompt_transform/harmbench/cipher_20260717_121526_49330419/non_llm_cipher
+_code:     &code     outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+_figstep:  &figstep  outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260716_194159_70433849/ir_figstep
+_fcflow:   &fcflow   outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260716_194159_69181110/ir_fc_flowchart
+_lowcon:   &lowcon   outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260716_194159_9379140/ir_low_contrast
+_occluded: &occluded outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260716_194159_10657917/ir_occluded
+_mmtypo:   &mmtypo   outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260716_194203_32634422/ir_mm_typo
+_distract: &distract outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260716_194203_7625970/ir_distraction_grid
+# ── benign render dirs: image + text ──
+_orbimg: &orbimg outputs/autoattack_defense/prompt_transform/orbench_benign_hard/ir_plain_20260717_020703_54610685/ir_plain
+_orbtxt: &orbtxt outputs/autoattack_defense/prompt_transform/orbench_benign_hard/non_llm_baseline_20260717_020703_61565174/non_llm_baseline
+
+tasks:
+  # ══ HARMFUL: 11 attacks × {gb[wg], mc[wg], gb[lg3], mc[lg3]} ══
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,  source_transform_subdir: *set}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,  source_transform_subdir: *set}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *set}
+  - {<<: *harm, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *set}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,  source_transform_subdir: *flog}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,  source_transform_subdir: *flog}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *flog}
+  - {<<: *harm, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *flog}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,  source_transform_subdir: *class}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,  source_transform_subdir: *class}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *class}
+  - {<<: *harm, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *class}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,  source_transform_subdir: *cipher}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,  source_transform_subdir: *cipher}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *cipher}
+  - {<<: *harm, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *cipher}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,  source_transform_subdir: *code}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,  source_transform_subdir: *code}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *code}
+  - {<<: *harm, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *code}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,  source_transform_subdir: *figstep}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,  source_transform_subdir: *figstep}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *figstep}
+  - {<<: *harm, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *figstep}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,  source_transform_subdir: *fcflow}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,  source_transform_subdir: *fcflow}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *fcflow}
+  - {<<: *harm, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *fcflow}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,  source_transform_subdir: *lowcon}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,  source_transform_subdir: *lowcon}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *lowcon}
+  - {<<: *harm, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *lowcon}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,  source_transform_subdir: *occluded}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,  source_transform_subdir: *occluded}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *occluded}
+  - {<<: *harm, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *occluded}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,  source_transform_subdir: *mmtypo}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,  source_transform_subdir: *mmtypo}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *mmtypo}
+  - {<<: *harm, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *mmtypo}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gbwg,  source_transform_subdir: *distract}
+  - {<<: *harm, defense: modality_complete, defense_config: *mcwg,  source_transform_subdir: *distract}
+  - {<<: *harm, defense: guard_baseline,    defense_config: *gblg3, source_transform_subdir: *distract}
+  - {<<: *harm, defense: modality_complete, defense_config: *mclg3, source_transform_subdir: *distract}
+
+  # ══ BENIGN image: no_defense BASELINE + {gb[wg], mc[wg], gb[lg3], mc[lg3]} ══
+  - {<<: *ben, defense: no_defense,                                 source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gbwg,   source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: modality_complete, defense_config: *mcwg,   source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gblg3,  source_transform_subdir: *orbimg}
+  - {<<: *ben, defense: modality_complete, defense_config: *mclg3,  source_transform_subdir: *orbimg}
+
+  # ══ BENIGN text: no_defense BASELINE + {gb[wg], mc[wg], gb[lg3], mc[lg3]} ══
+  - {<<: *ben, defense: no_defense,                                 source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gbwg,   source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: modality_complete, defense_config: *mcwg,   source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: guard_baseline,    defense_config: *gblg3,  source_transform_subdir: *orbtxt}
+  - {<<: *ben, defense: modality_complete, defense_config: *mclg3,  source_transform_subdir: *orbtxt}

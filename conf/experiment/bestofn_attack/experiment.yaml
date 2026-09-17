@@ -1,0 +1,66 @@
+
+num_main_job_threads: 8
+num_cluster_jobs: 4          # orchestrator + 3 servers (qwen target, wildguard judge, vicuna helper)
+
+_common: &common
+  source_file: data/harmbench_bon_r4.jsonl
+  prompt_range: [0, 499]     # 5 behaviors × 100 draws (pilot slice; [0,19] for the smoke)
+
+_eval: &eval
+  mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_pilot
+
+tasks:
+  - <<: *common
+    mode: prompt_transform
+    transformation_list:
+      - type: variance_channel_bon
+        params: {channel: surface, seed: 0}
+
+  - <<: *common
+    mode: prompt_transform
+    transformation_list:
+      - type: variance_channel_bon
+        params:
+          channel: paraphrase
+          seed: 0
+          model: vicuna_13b_cluster          # free, permissive paraphraser
+          paraphrase: {enabled: true, type: llm_paraphrase, params: {temperature: 1.0}}
+
+  - <<: *common
+    mode: prompt_transform
+    transformation_list:
+      - type: variance_channel_bon
+        params:
+          channel: strategy
+          seed: 0
+          model: vicuna_13b_cluster          # helper for the LLM attacks in the bank
+          # attack_bank defaults from conf/text_encoding/variance_channel.yaml
+          # (set_theory / formal_logic / semantic_camo / cipher / deep_inception / code_attack)
+
+  # ===================== Stage 2 — fill <ts> from Stage 1, then submit =========
+  # surface
+  - <<: *eval
+    source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/CHAIN_TS_SURFACE/variance_channel_bon
+    defense: no_defense
+  - <<: *eval
+    source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/CHAIN_TS_SURFACE/variance_channel_bon
+    defense: canonicalize
+  # paraphrase
+  - <<: *eval
+    source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/CHAIN_TS_PARA/variance_channel_bon
+    defense: no_defense
+  - <<: *eval
+    source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/CHAIN_TS_PARA/variance_channel_bon
+    defense: canonicalize
+  # strategy
+  - <<: *eval
+    source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/CHAIN_TS_STRAT/variance_channel_bon
+    defense: no_defense
+  - <<: *eval
+    source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/CHAIN_TS_STRAT/variance_channel_bon
+    defense: canonicalize

@@ -1,0 +1,10 @@
+
+num_main_job_threads: 2
+num_cluster_jobs: 2
+
+tasks:
+  - {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: [0, 99],
+     benchmark: harmbench, judge_model: gpt-5-mini, judge_method: harmbench,
+     defense: semantic_smooth, defense_config: {query_source: encoded, n_copies: 10},
+     campaign: paper_c_semsm_n10,
+     source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid}

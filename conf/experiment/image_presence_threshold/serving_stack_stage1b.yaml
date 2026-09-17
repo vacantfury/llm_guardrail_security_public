@@ -1,0 +1,28 @@
+
+num_main_job_threads: 2
+
+# Stage 1a = xc job 204, 2026-08-07. Text channel hash-verified against the
+# published AICR arm (see header).
+_src: &src outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260807_223202_80871327/non_llm_baseline
+
+_base: &base
+  mode: prompt_transform
+  source_transform_subdir: *src
+  benchmark: jailbreakbench_benign
+  prompt_range: [0, 99]
+  campaign: paper_b_serving_stack
+
+tasks:
+  # --- size-matched blank, NO readable text (pairs with the mountain below) ---
+  - <<: *base
+    transformation_list:
+      - type: ir_blank
+        params: {width: 1024, height: 141, bg_color: "#FFFFFF", keep_text: true}
+
+  # --- same size, OCR-able: the caption rendered as an image ------------------
+  - <<: *base
+    transformation_list:
+      - type: ir_constant
+        params:
+          keep_text: true
+          image_path: src/prompt_transformations/image/images/mountain.png

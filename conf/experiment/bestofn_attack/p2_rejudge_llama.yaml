@@ -1,0 +1,52 @@
+# bestofn_attack Paper-D — P2 run A (llama, T=1.0) REJUDGE with gpt-5-mini.
+#
+# WHY: wildguard is INVALID as an ASR judge for this paper — it over-flags encoding and
+# code attacks (41-68% false positives, see the R3 judge-robustness finding), so every
+# reportable ASR number must come from gpt-5-mini. Run A was judged by wildguard as a
+# free first pass; this pass produces the numbers that go in the paper.
+#
+# INPUT: the six run-A cells (job 210765, COMPLETE + clean, all count=10000 judged=10000,
+# draw_diversity_ratio 0.98-1.00). Rejudge re-scores the STORED responses — the target is
+# never re-queried, so this costs GPU time zero and changes no response.
+#
+# COST — MEASURED, not estimated (pilot 2026-07-26, scripts/rejudge_cost_pilot.py):
+#   510 calls stratified 85/cell against production settings -> $0.00090/call, 0 errors.
+#   Breakdown: 1033 input tok/call, 320 output tok/call of which 249 are HIDDEN REASONING
+#   tokens (~80% of the output bill). Cost tracks input length: the code arm runs ~2x the
+#   surface arm per call.
+#   6 cells x 10,000 draws = 60,000 calls -> ~$54.
+#   (An a-priori estimate put this at $43 with a $25-73 band; the pilot cost $0.46 and
+#   collapsed the band. Guessing reasoning-token counts is not good enough for a spend
+#   decision -- measure the rate on a few hundred calls first, always.)
+#
+# RUNS ON THE CPU PARTITION — gpt-5-mini is an API model, so the orchestrator submits ZERO
+# vLLM servers and does not touch the GPU budget. Safe to run alongside a live GPU round.
+#
+#   sbatch scripts/run_experiment_aicr.sbatch bestofn_attack/p2_rejudge_llama
+#
+# WATCH FOR (the silent-failure mode): the HarmBench evaluator scores a FAILED API call as
+# "safe", so a dead account or a quota trip reads as a beautifully low ASR instead of an
+# error. After the run, grep the log for `insufficient_quota` / error counts and confirm
+# each cell reports judged == count == 10000 before believing any number.
+num_cluster_jobs: 1          # orchestrator only; no servers needed for an API judge
+num_main_job_threads: 6      # all six cells judged concurrently
+
+_r: &r
+  mode: rejudge
+  judge_model: gpt-5-mini
+  campaign: bestofn_attack_p2_rejudge_llama
+
+tasks:
+  # heaviest first (longest responses -> most judge tokens), so the tail is short
+  - <<: *r
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_no_defense_code_attack_20260726_065206_38318961
+  - <<: *r
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_semantic_smooth_code_attack_20260726_065206_92558478
+  - <<: *r
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_sage_code_attack_20260726_065206_86803810
+  - <<: *r
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_no_defense_variance_channel_bon_20260726_065205_5344686
+  - <<: *r
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_semantic_smooth_variance_channel_bon_20260726_065205_92904192
+  - <<: *r
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_sage_variance_channel_bon_20260726_065205_74151894

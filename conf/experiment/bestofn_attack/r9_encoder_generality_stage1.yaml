@@ -1,0 +1,21 @@
+num_main_job_threads: 2
+num_cluster_jobs: 1          # orchestrator only -- nothing is served at this stage
+
+tasks:
+  - mode: prompt_transform
+    source_file: data/harmbench_set_theory_fixed_100.jsonl
+    prompt_range: [0, 9999]
+    benchmark: harmbench
+    campaign: bestofn_attack_r9_encgen
+    transformation_list:
+      - type: non_llm_baseline
+        params: {}
+
+  - mode: prompt_transform
+    source_file: data/harmbench_formal_logic_fixed_100.jsonl
+    prompt_range: [0, 9999]
+    benchmark: harmbench
+    campaign: bestofn_attack_r9_encgen
+    transformation_list:
+      - type: non_llm_baseline
+        params: {}

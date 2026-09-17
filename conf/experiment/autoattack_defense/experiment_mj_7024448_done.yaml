@@ -1,0 +1,153 @@
+# ⚠️ HISTORICAL (audit 2026-07-24) — 2026-07-13-era preset superseded by later
+# rounds; may reference frozen/removed output dirs. Kept for provenance; do not run as-is.
+# ============================================================
+# YAML B' — full amplifier-paper matrix, all Stage 2 (63 tasks)
+# ============================================================
+# Combines original YAML B (code_attack M4 + benign for 3 anchor models)
+# with YAML C (2 additional models on full attack + benign set).
+#
+# All Stage 1 chains referenced here are ON DISK from prior jobs
+# (mj_7016491, mj_7021597, mj_7023558). NO Stage 1 tasks needed —
+# Stage 1 outputs are target-model-agnostic, so claude-sonnet-4-6 and
+# gemini-2.0-flash consume the same chains as the other models.
+#
+# Models (5 — covers Gemini family + GPT-4 family + Claude family):
+#   gemini-2.5-flash-lite  (anchor, has formal_logic harmful done)
+#   gemini-2.5-flash       (sibling)
+#   gpt-4o-mini            (OpenAI family, demonstrated P3a headroom)
+#   gemini-2.0-flash       (older Gemini, P3a shows ~64-70% text_enc no_def)
+#   claude-sonnet-4-6      (Anthropic family — different alignment style)
+#
+# Attacks: formal_logic, code_attack
+# IR variant: M4 (ir_constant + mountain decoy)
+# Defenses: no_defense, sage, ecso
+# Benchmarks: HarmBench (harmful) + jailbreakbench_benign (utility)
+#
+# Result: per (model, attack) Pareto plot — 5 models × 2 attacks = 10 plots,
+# plus per-model utility plot. The headline 2D figure: ASR-harmful vs
+# refusal-benign for each model under {no_def, SAGE, ECSO} × {M0, M4}.
+#
+# Cost: ~$25-55 (Claude-sonnet-4-6 dominates at $3/$15 per M).
+# Wall: ~3-4h (all 63 tasks run concurrently up to num_main_job_threads).
+#
+# Usage: sbatch scripts/run_experiment.sbatch experiment
+# ============================================================
+
+num_main_job_threads: 4
+
+# ── Chain anchors (all from prior jobs, on disk) ─────────────
+_chains:
+  # Canonical formal_logic (from mj_7016491)
+  fl_M0:    &fl_M0    outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_ir_plain_20260525_010219_56487445/llm_formal_logic
+  # formal_logic M4 chain (from mj_7021597 — chained ir_constant on canonical fl text)
+  fl_M4:    &fl_M4    outputs/autoattack_defense/prompt_transform/harmbench/llm_formal_logic_ir_constant_20260525_123232_57196183/ir_constant
+
+  # code_attack canonical (deterministic — any of the 4 May-24 dirs has identical code_attack/ subdir)
+  ca_M0:    &ca_M0    outputs/autoattack_defense/prompt_transform/harmbench/code_attack_ir_plain_20260524_085040_58051887/code_attack
+  # code_attack M4 chain (from mj_7023558 — chained ir_constant on canonical ca text)
+  ca_M4:    &ca_M4    outputs/autoattack_defense/prompt_transform/harmbench/code_attack_ir_constant_20260525_152826_16800423/ir_constant
+
+  # Benign chains (from mj_7023558)
+  ben_M0:   &ben_M0   outputs/autoattack_defense/prompt_transform/jailbreakbench_benign/non_llm_baseline_20260525_152826_22612579/non_llm_baseline
+  ben_M4:   &ben_M4   outputs/autoattack_defense/prompt_transform/jailbreakbench_benign/ir_constant_20260525_152826_56888007/ir_constant
+
+# ── Per-model task templates ─────────────────────────────────
+_lite:  &lite   {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, prompt_range: [0, 99]}
+_flash: &flash  {mode: defense+evaluate, target_model: gemini-2.5-flash,      prompt_range: [0, 99]}
+_gpt:   &gpt    {mode: defense+evaluate, target_model: gpt-4o-mini,           prompt_range: [0, 99]}
+_g20:   &g20    {mode: defense+evaluate, target_model: gemini-2.0-flash,      prompt_range: [0, 99]}
+_clds:  &clds   {mode: defense+evaluate, target_model: claude-sonnet-4-6,     prompt_range: [0, 99]}
+
+tasks:
+  # ══════════════════════════════════════════════════════════════
+  # PART A — 3 anchor models (flash-lite, flash, gpt-4o-mini)
+  # formal_logic and code_attack-M0 already done in prior jobs.
+  # Remaining cells: code_attack M4 + benign (M0, M4).
+  # ══════════════════════════════════════════════════════════════
+
+  # ── code_attack M4 × 3 anchor models × 3 defenses (9) ────────
+  - {<<: *lite,  defense: no_defense, source_transform_subdir: *ca_M4}
+  - {<<: *lite,  defense: sage,       source_transform_subdir: *ca_M4}
+  - {<<: *lite,  defense: ecso,       source_transform_subdir: *ca_M4}
+  - {<<: *flash, defense: no_defense, source_transform_subdir: *ca_M4}
+  - {<<: *flash, defense: sage,       source_transform_subdir: *ca_M4}
+  - {<<: *flash, defense: ecso,       source_transform_subdir: *ca_M4}
+  - {<<: *gpt,   defense: no_defense, source_transform_subdir: *ca_M4}
+  - {<<: *gpt,   defense: sage,       source_transform_subdir: *ca_M4}
+  - {<<: *gpt,   defense: ecso,       source_transform_subdir: *ca_M4}
+
+  # ── benign M0 × 3 anchor models × 3 defenses (9) ─────────────
+  - {<<: *lite,  defense: no_defense, source_transform_subdir: *ben_M0}
+  - {<<: *lite,  defense: sage,       source_transform_subdir: *ben_M0}
+  - {<<: *lite,  defense: ecso,       source_transform_subdir: *ben_M0}
+  - {<<: *flash, defense: no_defense, source_transform_subdir: *ben_M0}
+  - {<<: *flash, defense: sage,       source_transform_subdir: *ben_M0}
+  - {<<: *flash, defense: ecso,       source_transform_subdir: *ben_M0}
+  - {<<: *gpt,   defense: no_defense, source_transform_subdir: *ben_M0}
+  - {<<: *gpt,   defense: sage,       source_transform_subdir: *ben_M0}
+  - {<<: *gpt,   defense: ecso,       source_transform_subdir: *ben_M0}
+
+  # ── benign M4 × 3 anchor models × 3 defenses (9) ─────────────
+  - {<<: *lite,  defense: no_defense, source_transform_subdir: *ben_M4}
+  - {<<: *lite,  defense: sage,       source_transform_subdir: *ben_M4}
+  - {<<: *lite,  defense: ecso,       source_transform_subdir: *ben_M4}
+  - {<<: *flash, defense: no_defense, source_transform_subdir: *ben_M4}
+  - {<<: *flash, defense: sage,       source_transform_subdir: *ben_M4}
+  - {<<: *flash, defense: ecso,       source_transform_subdir: *ben_M4}
+  - {<<: *gpt,   defense: no_defense, source_transform_subdir: *ben_M4}
+  - {<<: *gpt,   defense: sage,       source_transform_subdir: *ben_M4}
+  - {<<: *gpt,   defense: ecso,       source_transform_subdir: *ben_M4}
+
+  # ══════════════════════════════════════════════════════════════
+  # PART B — 2 new models (gemini-2.0-flash, claude-sonnet-4-6)
+  # Nothing exists yet → run the full set: formal_logic + code_attack + benign,
+  # both M0 and M4, all 3 defenses.
+  # ══════════════════════════════════════════════════════════════
+
+  # ── gemini-2.0-flash × formal_logic × M0+M4 × 3 defenses (6) ─
+  - {<<: *g20, defense: no_defense, source_transform_subdir: *fl_M0}
+  - {<<: *g20, defense: sage,       source_transform_subdir: *fl_M0}
+  - {<<: *g20, defense: ecso,       source_transform_subdir: *fl_M0}
+  - {<<: *g20, defense: no_defense, source_transform_subdir: *fl_M4}
+  - {<<: *g20, defense: sage,       source_transform_subdir: *fl_M4}
+  - {<<: *g20, defense: ecso,       source_transform_subdir: *fl_M4}
+
+  # ── gemini-2.0-flash × code_attack × M0+M4 × 3 defenses (6) ──
+  - {<<: *g20, defense: no_defense, source_transform_subdir: *ca_M0}
+  - {<<: *g20, defense: sage,       source_transform_subdir: *ca_M0}
+  - {<<: *g20, defense: ecso,       source_transform_subdir: *ca_M0}
+  - {<<: *g20, defense: no_defense, source_transform_subdir: *ca_M4}
+  - {<<: *g20, defense: sage,       source_transform_subdir: *ca_M4}
+  - {<<: *g20, defense: ecso,       source_transform_subdir: *ca_M4}
+
+  # ── gemini-2.0-flash × benign × M0+M4 × 3 defenses (6) ───────
+  - {<<: *g20, defense: no_defense, source_transform_subdir: *ben_M0}
+  - {<<: *g20, defense: sage,       source_transform_subdir: *ben_M0}
+  - {<<: *g20, defense: ecso,       source_transform_subdir: *ben_M0}
+  - {<<: *g20, defense: no_defense, source_transform_subdir: *ben_M4}
+  - {<<: *g20, defense: sage,       source_transform_subdir: *ben_M4}
+  - {<<: *g20, defense: ecso,       source_transform_subdir: *ben_M4}
+
+  # ── claude-sonnet-4-6 × formal_logic × M0+M4 × 3 defenses (6)
+  - {<<: *clds, defense: no_defense, source_transform_subdir: *fl_M0}
+  - {<<: *clds, defense: sage,       source_transform_subdir: *fl_M0}
+  - {<<: *clds, defense: ecso,       source_transform_subdir: *fl_M0}
+  - {<<: *clds, defense: no_defense, source_transform_subdir: *fl_M4}
+  - {<<: *clds, defense: sage,       source_transform_subdir: *fl_M4}
+  - {<<: *clds, defense: ecso,       source_transform_subdir: *fl_M4}
+
+  # ── claude-sonnet-4-6 × code_attack × M0+M4 × 3 defenses (6) ─
+  - {<<: *clds, defense: no_defense, source_transform_subdir: *ca_M0}
+  - {<<: *clds, defense: sage,       source_transform_subdir: *ca_M0}
+  - {<<: *clds, defense: ecso,       source_transform_subdir: *ca_M0}
+  - {<<: *clds, defense: no_defense, source_transform_subdir: *ca_M4}
+  - {<<: *clds, defense: sage,       source_transform_subdir: *ca_M4}
+  - {<<: *clds, defense: ecso,       source_transform_subdir: *ca_M4}
+
+  # ── claude-sonnet-4-6 × benign × M0+M4 × 3 defenses (6) ──────
+  - {<<: *clds, defense: no_defense, source_transform_subdir: *ben_M0}
+  - {<<: *clds, defense: sage,       source_transform_subdir: *ben_M0}
+  - {<<: *clds, defense: ecso,       source_transform_subdir: *ben_M0}
+  - {<<: *clds, defense: no_defense, source_transform_subdir: *ben_M4}
+  - {<<: *clds, defense: sage,       source_transform_subdir: *ben_M4}
+  - {<<: *clds, defense: ecso,       source_transform_subdir: *ben_M4}

@@ -1,0 +1,38 @@
+
+encoder_model: llava-hf/llava-1.5-7b-hf
+
+# The authors' headline denoiser. Their threshold_selection.py uses
+# generate_denoised_img(model="diffusion", cps=8) with step=50, i.e.
+# range(50, 400, 50) => the seven checkpoints below.
+denoiser: diffusion
+denoise_steps: 350
+denoise_every: 50
+
+# ~2GB, NOT in the repo (too large, and not ours to redistribute). Download once
+# per machine:
+#   curl -L -o ~/models/cider_256x256_diffusion_uncond.pt \
+#     https://openaipublic.blob.core.windows.net/diffusion/jul-2021/256x256_diffusion_uncond.pt
+diffusion_checkpoint: ~/models/cider_256x256_diffusion_uncond.pt
+
+# The authors ship these weights at code/models/DnCNN/checkpoint.pth.tar. other_repos/
+# is gitignored, so the file is copied to each cluster by hand and this path points at
+# the copy. A mismatched checkpoint raises rather than running a random denoiser.
+dncnn_checkpoint: ~/models/cider_dncnn_checkpoint.pth.tar
+
+# DETECTION THRESHOLD. null = CALIBRATION PASS: score every image, block nothing,
+# write the deltas. Their defender.py picks tau as a percentile of the delta
+# distribution measured on CLEAN images at a conservative ratio, i.e. tau is a
+# benign false-positive budget:
+#     tau = numpy.percentile(clean_deltas, (1 - fpr_ratio) * 100)
+# TUNING PATH: `cider_threshold_calibration` — run the benign text+image channels
+# with threshold: null, then src/analysis/paper_c_cider_threshold.py emits tau for
+# each fpr_ratio in the sweep. Never hand-pick this number.
+threshold: null
+fpr_ratio: 0.95        # tolerated benign false-positive rate used to read tau off the sweep
+
+device: cuda
+batch_size: 16
+# One delta trace per upstream attack/channel (deltas depend only on the
+# (text, image) pair), written to its own tree — never into the shared
+# prompt_transform artifact dirs that concurrent cells read.
+trace_dir: outputs/autoattack_defense/cider_deltas

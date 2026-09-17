@@ -1,0 +1,21 @@
+num_main_job_threads: 3
+num_cluster_jobs: 5          # 4 servers (qwen x3 + wildguard) + orchestrator
+
+_e: &e
+  mode: defense+evaluate
+  source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260805_212854_26701649/code_attack
+  target_model: qwen2_5_7b_instruct
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r15_qwen_mechanism
+
+tasks:
+  # ---- CONTROL: no verdict at all — isolates answer-sampling from verdict-sampling ----
+  - {<<: *e, defense: no_defense, target_model_config: {temperature: 1.0, max_concurrency: 64}}
+  - {<<: *e, defense: no_defense, target_model_config: {temperature: 0.0, max_concurrency: 64}}
+  # ---- STOCHASTIC VERDICT (screens with the TARGET) -> predict COLLAPSE at T=0 ----
+  - {<<: *e, defense: sage, target_model_config: {temperature: 1.0, max_concurrency: 64}}
+  - {<<: *e, defense: sage, target_model_config: {temperature: 0.0, max_concurrency: 64}}
+  - {<<: *e, defense: llm_self_defense, target_model_config: {temperature: 1.0, max_concurrency: 64}}
+  - {<<: *e, defense: llm_self_defense, target_model_config: {temperature: 0.0, max_concurrency: 64}}

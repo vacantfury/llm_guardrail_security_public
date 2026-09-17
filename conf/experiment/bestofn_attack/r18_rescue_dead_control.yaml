@@ -1,0 +1,8 @@
+num_cluster_jobs: 2          # 1 server (wildguard) + orchestrator
+num_main_job_threads: 1
+
+tasks:
+- mode: rejudge
+  responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama_3_3_70b_instruct_no_defense_code_attack_20260809_013101_83687448
+  judge_model: wildguard
+  judge_method: wildguard

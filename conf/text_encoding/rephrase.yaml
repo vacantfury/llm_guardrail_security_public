@@ -1,0 +1,4 @@
+# Rephrase encoder
+# LLM-based rephrasing to avoid keywords while maintaining intent.
+encoder_type: llm_rephrase
+use_few_shot: true

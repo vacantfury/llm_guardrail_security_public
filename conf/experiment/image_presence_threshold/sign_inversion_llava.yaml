@@ -1,0 +1,47 @@
+
+num_main_job_threads: 4
+num_cluster_jobs: 2          # orchestrator + 1 vLLM server (single target model,
+                             # so the floor-division replica allocator cannot
+                             # collapse it — see the replica-allocator note in
+                             # conf/experiment/.../threshold_shift_ow_*.yaml.
+
+# ---- borderline-benign (OR-Bench hard) — same renders as every other OW arm ----
+_r2_text:  &r2_text  outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260806_055851_77202176/non_llm_baseline
+_r2_blank: &r2_blank outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260806_055851_77202176/ir_blank
+# ---- harmful counterpart (OR-Bench harmful — constructed sibling of rung 2) ----
+_h_text:   &h_text   outputs/image_presence_threshold/prompt_transform/harmbench/non_llm_baseline_ir_blank_20260806_151849_37565903/non_llm_baseline
+_h_blank:  &h_blank  outputs/image_presence_threshold/prompt_transform/harmbench/non_llm_baseline_ir_blank_20260806_151849_37565903/ir_blank
+
+# Benign base: refusal-rate reporting path, JBB-refusal rubric.
+_ben: &ben
+  mode: defense+evaluate
+  defense: no_defense
+  target_model: llava_7b
+  prompt_range: [0, 99]
+  benchmark: jailbreakbench_benign
+  judge_method: jbb_refusal
+  judge_model: gpt-5-mini
+  campaign: paper_b_sign_inversion
+
+# Harmful base: ASR reporting path, HarmBench rubric. `judge_method` is pinned
+# explicitly because an unset method falls back to the BENCHMARK's evaluator
+# (src/experiment/task.py:574) — which would silently report a refusal rate here,
+# the wrong quantity entirely.
+_harm: &harm
+  mode: defense+evaluate
+  defense: no_defense
+  target_model: llava_7b
+  prompt_range: [0, 99]
+  benchmark: harmbench
+  judge_method: harmbench
+  judge_model: gpt-5-mini
+  campaign: paper_b_sign_inversion
+
+tasks:
+  # ---- the headline pair: does a blank canvas raise ASR, as JRS predicts? ----
+  - {<<: *harm, source_transform_subdir: *h_text}
+  - {<<: *harm, source_transform_subdir: *h_blank}
+
+  # ---- benign borderline, for the row to sit beside the other OW models -----
+  - {<<: *ben,  source_transform_subdir: *r2_text}
+  - {<<: *ben,  source_transform_subdir: *r2_blank}

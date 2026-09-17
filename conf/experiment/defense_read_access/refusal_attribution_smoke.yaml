@@ -1,0 +1,11 @@
+num_cluster_jobs: 0
+num_main_job_threads: 2
+tasks:
+- mode: rejudge
+  responses_from: outputs/defense_read_access/defense+evaluate/harmbench/internvl3_8b_ecso_code_attack_ir_constant_20260808_044434_45536669
+  judge_model: gpt-5-mini
+  judge_method: refusal
+- mode: rejudge
+  responses_from: outputs/defense_read_access/defense+evaluate/harmbench/internvl3_8b_ecso_llm_formal_logic_ir_constant_20260808_045104_79855832
+  judge_model: gpt-5-mini
+  judge_method: refusal

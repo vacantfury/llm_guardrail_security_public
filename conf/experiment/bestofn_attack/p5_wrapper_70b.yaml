@@ -1,0 +1,44 @@
+# bestofn_attack Paper-D — P5 WRAPPER INTERVENTION, llama-3.3-70B (3 cells).
+#
+# Companion to p5_wrapper_llama — see that header for the E1/E2 rationale and the
+# pre-registered prediction (also in conf/defense/sage.yaml).
+#
+# WHY THE 70B IS THE INTERESTING CELL. It is the target that BROKE the graded form
+# of borrowed strength: its refusal disposition is intermediate (68.7%, between
+# llama's 31.8% and qwen's 96.3%) yet its coverage saturates at 22 — Qwen's value,
+# not an interpolated one. The paper withdrew the point-prediction claim and kept
+# only the ordering claim because of this cell.
+#
+# The wrapper intervention is the cleanest available probe of WHY. Its middle band
+# is intermediate too (28.2%), so if coverage tracks band size the 70B should show
+# an intermediate shift; if it instead behaves like the saturated targets, the
+# saturation has a cause other than the band, and that is worth reporting as a
+# bound on the account rather than papered over.
+#
+# ARM: code only. JUDGE: wildguard free first pass, NOT reportable — gpt-5-mini
+# rejudge (p5_rejudge_mini) supplies the reportable numbers.
+#
+#   sbatch scripts/run_experiment_aicr.sbatch bestofn_attack/p5_wrapper_70b
+#
+# SIZING: mirrors p3_review1_70b, which ran four 70B cells on 3 replicas inside the
+# AICR budget. max_tokens 16384 is carried over from that round — the 70B does not
+# reliably emit EOS on this arm and truncating it mid-response would corrupt the
+# judge's completion call, which is exactly the failure p3 hit before the cap was raised.
+num_main_job_threads: 3      # all three cells in flight across the replicas
+num_cluster_jobs: 5          # orchestrator + 3x 70B replicas + wildguard judge
+
+_e: &e
+  mode: defense+evaluate
+  target_model: llama_3_3_70b_instruct
+  target_model_config: {temperature: 1.0, max_tokens: 16384, seed: 1337}
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_p5_wrapper
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+
+tasks:
+  - {<<: *e, source_transform_subdir: *code, defense: sage, defense_config: {wrapper: published}}
+  - {<<: *e, source_transform_subdir: *code, defense: sage, defense_config: {wrapper: analysis_then_verdict}}
+  - {<<: *e, source_transform_subdir: *code, defense: sage, defense_config: {wrapper: verdict_only}}

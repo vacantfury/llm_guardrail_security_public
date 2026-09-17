@@ -1,0 +1,25 @@
+num_main_job_threads: 4
+num_cluster_jobs: 7          # 6 servers (llama x4 + wildguard + llama_guard_3_8b) + orchestrator
+
+_e: &e
+  mode: defense+evaluate
+  target_model: llama3_1_8b_cluster
+  target_model_config: {temperature: 0.0}    # <-- THE INTERVENTION. R11 ran 1.0.
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r12_variance_source   # NEW campaign — never reuse r11_codefix;
+                                                 # these cells share output naming with the
+                                                 # T=1.0 half and campaign is the only safe
+                                                 # discriminator (latest-wins is unsafe).
+
+_CODE_FIXED:  &code_fixed  outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260805_212854_26701649/code_attack
+_CODE_VARIED: &code_varied outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_code_attack_20260805_212855_68111123/code_attack
+
+tasks:
+  # ---- SAGE (stochastic self-check) at T=0 -> channel (B) switched OFF ------
+  - {<<: *e, source_transform_subdir: *code_fixed,  defense: sage}
+  - {<<: *e, source_transform_subdir: *code_varied, defense: sage}
+  # ---- gate (already greedy) at T=0 -> control, should barely move ----------
+  - {<<: *e, source_transform_subdir: *code_fixed,  defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b}}
+  - {<<: *e, source_transform_subdir: *code_varied, defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b}}

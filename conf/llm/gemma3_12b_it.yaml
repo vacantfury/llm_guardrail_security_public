@@ -1,0 +1,16 @@
+
+model:
+  model: google/gemma-3-12b-it
+  max_tokens: 4096          # matches the VLM panel (conf/llm/qwen2_5_vl_7b.yaml)
+
+cluster:
+  # Gemma-3 is multimodal and its tokenizer ships a chat template that handles
+  # image parts, so NO chat_template override. Contrast the classifier models,
+  # which need `passthrough` because their training prompts are pre-formatted.
+  #
+  # NOTE the contrast with Gemma-2 (conf/llm/gemma2_9b_it.yaml): that model's
+  # 8192 sliding-window ceiling forced a measured 3072-token cap. Gemma-3 has a
+  # 128k context, so the repo-default max_model_len (20480) sits far below the
+  # architectural ceiling and needs no cap.
+  gpu_types_excluded: ["v100-pcie", "v100-sxm2", "t4"]   # 12B bf16 needs >24 GB
+  time_limit: "04:00:00"    # backfill-friendly; this round needs well under 1h

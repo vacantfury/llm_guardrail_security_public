@@ -1,0 +1,41 @@
+# ============================================================
+# Reference: the `analyze` mode — portfolio ("best-of-all") ASR.
+# ============================================================
+# Per the active-preset convention, only `experiment.yaml` is actually run.
+# This file is a copy-paste template: drop an `analyze` task into
+# `experiment.yaml` AFTER the defense+evaluate matrix has produced its dirs.
+#
+# `analyze` does NO model/judge queries — it OR-reduces the per-prompt `asr`
+# verdicts already stored in each source dir's raw_results.jsonl, joined on the
+# stable prompt `id`. Output: outputs/autoattack_defense/analyze/<benchmark>/<...>/results.json
+# (per-(model,defense) portfolio_asr, best_fixed_attack_asr, complementarity_gap,
+# per_attack_asr) + portfolio_rows.jsonl (per-id attribution = the coverage map).
+
+num_main_job_threads: 1
+
+tasks:
+  - mode: analyze
+    analysis: portfolio_asr
+
+    # Source dirs: explicit paths or globs (expanded; only dirs with a
+    # results.json are kept). Here: every defense+evaluate cell on HarmBench.
+    source_dirs:
+      - outputs/autoattack_defense/defense+evaluate/harmbench/*
+
+    # OR-reduce the per-id verdicts WITHIN each (model, defense); across the
+    # distinct attack variants in that group. These are results.json field names.
+    group_by: [target_model, defense]
+
+    # full_source_set (default): denom = union of ids in the group, so a prompt
+    # excluded under every attack counts as not-broken (deployment-realistic).
+    # evaluated_union: denom = ids evaluated by >= 1 attack.
+    denominator_policy: full_source_set
+
+    # Optional: restrict the best-of to a subset of attack labels for free
+    # re-slicing (e.g. text-only vs text+image suite). Labels are the chain
+    # join, e.g. "llm_set_theory", "llm_code_attack+ir_plain",
+    # "llm_formal_logic+ir_constant[mountain]". Omit to use all variants present.
+    # attack_subset:
+    #   - llm_set_theory
+    #   - llm_formal_logic
+    #   - llm_code_attack

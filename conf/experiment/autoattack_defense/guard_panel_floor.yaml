@@ -1,0 +1,44 @@
+# ============================================================
+# Paper C · no_defense FLOOR @ n=100 — fills the DATA_NEEDED floor row of the
+# 5-guard panel harmful table (experiment_results.md §5-Guard Panel).
+# no_defense on the SAME 11 attack renders the panel's gb/mc consumed; target
+# qwen2_5_vl_7b, HarmBench, n=100. In-run judge = wildguard (THROWAWAY, free);
+# gpt-5-mini REJUDGE the saved responses afterward — the sole API step, matching
+# the panel's headline judge (build_rejudge_preset.py --campaigns paper_c_guard_panel_floor).
+# SERVERS: qwen (target) + wildguard (judge) = 2  ->  num_cluster_jobs = 3.
+# CLUSTER: AICR (NURC busy with Paper D's Pixtral rerun). campaign: paper_c_guard_panel_floor
+# ============================================================
+
+num_main_job_threads: 3
+num_cluster_jobs: 3
+
+_rng: &rng [0, 99]
+
+# no_defense floor cell — in-run judge wildguard is throwaway (gpt-5-mini rejudge later)
+_floor: &floor {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: *rng, defense: no_defense, judge_method: wildguard, judge_model: wildguard, campaign: paper_c_guard_panel_floor}
+
+# ── 11 attack render dirs (n=100) — identical anchors to guard_panel.yaml ──
+_set: &set outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+_flog: &flog outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+_class: &class outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_ir_constant_20260710_002424_56524373/llm_classical_language
+_cipher: &cipher outputs/autoattack_defense/prompt_transform/harmbench/non_llm_cipher_20260718_183504_42666777/non_llm_cipher
+_code: &code outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+_figstep: &figstep outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+_fcflow: &fcflow outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+_lowcon: &lowcon outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast
+_occluded: &occluded outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded
+_mmtypo: &mmtypo outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo
+_distract: &distract outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid
+
+tasks:
+  - {<<: *floor, source_transform_subdir: *set}
+  - {<<: *floor, source_transform_subdir: *flog}
+  - {<<: *floor, source_transform_subdir: *class}
+  - {<<: *floor, source_transform_subdir: *cipher}
+  - {<<: *floor, source_transform_subdir: *code}
+  - {<<: *floor, source_transform_subdir: *figstep}
+  - {<<: *floor, source_transform_subdir: *fcflow}
+  - {<<: *floor, source_transform_subdir: *lowcon}
+  - {<<: *floor, source_transform_subdir: *occluded}
+  - {<<: *floor, source_transform_subdir: *mmtypo}
+  - {<<: *floor, source_transform_subdir: *distract}

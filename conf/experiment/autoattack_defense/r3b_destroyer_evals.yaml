@@ -1,0 +1,62 @@
+# ⚠️ HISTORICAL (audit 2026-07-24) — 2026-07-13-era preset superseded by later
+# rounds; may reference frozen/removed output dirs. Kept for provenance; do not run as-is.
+# ============================================================
+# R3b: Stage 2 — destroyer-mode × model × defense evaluation
+# ============================================================
+# 4 modes × 2 models × 3 defenses = 24 tasks.
+#
+# Models:   gpt-5.4-nano, gemini-2.5-flash-lite (most defense-leaky for formal_logic)
+# Defenses: no_defense, sage, semantic_smooth
+#
+# Text-only baselines (no IR) already in P2 — no need to re-run:
+#   gpt-5.4-nano × formal_logic   : text_enc/no_def=38, +sage=1, +ss=4
+#   gemini-flash-lite × formal_logic: text_enc/no_def=57, +sage=28, +ss=10
+#
+# Cost: ~$10–15.
+#
+# PRE-REQ: run r3a_destroyer_chains first, then update M1..M4 below with the
+# 4 chain output dirs (look in outputs/autoattack_defense/prompt_transform/harmbench/llm_formal_logic_ir_plain_<TS>/ir_plain).
+#
+# Usage: sbatch scripts/run_experiment.sbatch r3b_destroyer_evals
+# ============================================================
+
+num_main_job_threads: 4
+
+_chains:
+  M1: &M1 outputs/autoattack_defense/prompt_transform/harmbench/llm_formal_logic_ir_plain_FILL_ME/ir_plain  # ir_only
+  M2: &M2 outputs/autoattack_defense/prompt_transform/harmbench/llm_formal_logic_ir_plain_FILL_ME/ir_plain  # text+ir
+  M3: &M3 outputs/autoattack_defense/prompt_transform/harmbench/llm_formal_logic_ir_plain_FILL_ME/ir_plain  # text+blank
+  M4: &M4 outputs/autoattack_defense/prompt_transform/harmbench/llm_formal_logic_ir_plain_FILL_ME/ir_plain  # text+unrelated
+
+tasks:
+  # ── M1: ir_only ────────────────────────────────────────────
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: no_defense,      source_transform_subdir: *M1, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: sage,            source_transform_subdir: *M1, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: semantic_smooth, source_transform_subdir: *M1, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: no_defense,      source_transform_subdir: *M1, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: sage,            source_transform_subdir: *M1, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: semantic_smooth, source_transform_subdir: *M1, prompt_range: [0, 99]}
+
+  # ── M2: text+ir ────────────────────────────────────────────
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: no_defense,      source_transform_subdir: *M2, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: sage,            source_transform_subdir: *M2, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: semantic_smooth, source_transform_subdir: *M2, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: no_defense,      source_transform_subdir: *M2, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: sage,            source_transform_subdir: *M2, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: semantic_smooth, source_transform_subdir: *M2, prompt_range: [0, 99]}
+
+  # ── M3: text+blank ─────────────────────────────────────────
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: no_defense,      source_transform_subdir: *M3, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: sage,            source_transform_subdir: *M3, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: semantic_smooth, source_transform_subdir: *M3, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: no_defense,      source_transform_subdir: *M3, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: sage,            source_transform_subdir: *M3, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: semantic_smooth, source_transform_subdir: *M3, prompt_range: [0, 99]}
+
+  # ── M4: text+unrelated ─────────────────────────────────────
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: no_defense,      source_transform_subdir: *M4, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: sage,            source_transform_subdir: *M4, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gpt-5.4-nano,          defense: semantic_smooth, source_transform_subdir: *M4, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: no_defense,      source_transform_subdir: *M4, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: sage,            source_transform_subdir: *M4, prompt_range: [0, 99]}
+  - {mode: defense+evaluate, target_model: gemini-2.5-flash-lite, defense: semantic_smooth, source_transform_subdir: *M4, prompt_range: [0, 99]}

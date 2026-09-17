@@ -1,0 +1,101 @@
+# Paper B / Line A · THE EXCHANGE RATE ON AN INSPECTABLE CHECKPOINT
+#
+# THE GAP THIS CLOSES. The paper's most distinctive quantity — image presence
+# buys one prevented harmful completion per 2.8-6.8 benign refusals — exists
+# ONLY on hosted commercial APIs. Nobody outside a vendor can reproduce it, and
+# we cannot inspect any model it was measured on. `qwen3-vl-8b` changed that: it
+# carries a +28/+32pp benign cost (xc jobs 215, 238) on weights we hold. But we
+# have never measured what that cost BUYS on this model, so the open checkpoint
+# currently contributes only the numerator of a ratio.
+#
+# WHY THE ANSWER IS NOT PREDICTABLE. The harmful side is where the open-weight
+# models have been least like the hosted ones. `pixtral-12b` REVERSES: the same
+# content-free canvas raises its ASR 48->83% (p=3.1e-8), stripping safety
+# hedging rather than adding caution. So on this axis the sign is live, and a
+# hosted-model prior is worth nothing.
+#
+# READ-OUT, RECORDED BEFORE THE RUN:
+#   * harmful ASR drops materially (hosted-like, -5 to -18pp)
+#       -> the exchange rate reproduces on an inspectable, reproducible model.
+#          The paper's headline quantity stops being a hosted-only artifact and
+#          becomes something any reader can re-derive. Best case.
+#   * harmful ASR flat
+#       -> on this checkpoint image presence is PURE COST: 28 points of benign
+#          refusal bought nothing. That is a SHARPER indictment than any hosted
+#          exchange rate, not a weaker result — a safety cue with a measurable
+#          price and no measurable benefit. Report it as the headline for the
+#          open half.
+#   * harmful ASR RISES (pixtral's direction)
+#       -> the same manipulation costs benign users AND helps attackers on one
+#          model. That is the strongest form of "uncontrolled variable" in the
+#          paper, and it would make qwen3-vl the central example rather than a
+#          supporting one.
+# All three outcomes are publishable and they say different things. Do not
+# narrate whichever lands as "as expected".
+#
+# ONE JOB, THREE RUNGS PLUS THE HARMFUL SIDE. Rungs 1 (neutral, alpaca) and 2
+# (borderline, orbench-hard) plus the matched harmful set (orbench-harmful),
+# all chained off the same canonical `non_llm_baseline` steps the hosted ladder
+# and symmetry test used. Measuring all four contrasts in ONE job is what makes
+# the ratio internally valid: this target is nondeterministic (its text arm has
+# read 51/53/54% across three jobs), so a numerator and denominator taken from
+# different jobs would carry run drift into the ratio itself.
+#
+# ⚠️ TWO JUDGES ON PURPOSE, AND THEY MUST NOT BE SWAPPED. Benign rungs use
+# `jbb_refusal` (refusal rate); the harmful arm uses `harmbench` (harm rubric ->
+# ASR). Both on gpt-5-mini. Judging the harmful arm with the refusal rubric
+# would silently measure a different quantity and the ratio would be garbage.
+#
+# COST: 6 cells x 100 prompts. Target self-served on our own GPUs = FREE.
+# Judge only: ~600 gpt-5-mini calls, ~$0.6. An ESTIMATE.
+#
+# SUBMIT (xc):
+#   ssh xc 'cd ~/projects/llm_guardrail_security && \
+#     sbatch scripts/run_experiment_xc.sbatch image_presence_threshold/exchange_rate_openweight'
+
+num_main_job_threads: 4
+num_cluster_jobs: 2          # orchestrator + 1 vLLM server (single target).
+
+# Rung 1 — genuinely neutral instructions (alpaca). The control that makes the
+# effect a THRESHOLD shift rather than blanket caution.
+_r1_text:  &r1_text  outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260806_055851_6183277/non_llm_baseline
+_r1_blank: &r1_blank outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260806_055851_6183277/ir_blank
+# Rung 2 — borderline-benign (orbench hard). Where the cost lands.
+_r2_text:  &r2_text  outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260806_055851_77202176/non_llm_baseline
+_r2_blank: &r2_blank outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260806_055851_77202176/ir_blank
+# Harmful — matched set, same pipeline as rung 2 (orbench harmful).
+_h_text:   &h_text   outputs/image_presence_threshold/prompt_transform/harmbench/non_llm_baseline_ir_blank_20260806_151849_37565903/non_llm_baseline
+_h_blank:  &h_blank  outputs/image_presence_threshold/prompt_transform/harmbench/non_llm_baseline_ir_blank_20260806_151849_37565903/ir_blank
+
+_ben: &ben
+  mode: defense+evaluate
+  defense: no_defense
+  target_model: qwen3_vl_8b_instruct
+  prompt_range: [0, 99]
+  benchmark: jailbreakbench_benign
+  judge_method: jbb_refusal
+  judge_model: gpt-5-mini
+  campaign: paper_b_exchange_rate_ow
+
+_harm: &harm
+  mode: defense+evaluate
+  defense: no_defense
+  target_model: qwen3_vl_8b_instruct
+  prompt_range: [0, 99]
+  benchmark: harmbench
+  judge_method: harmbench      # harm rubric -> ASR. NOT the refusal rubric.
+  judge_model: gpt-5-mini
+  campaign: paper_b_exchange_rate_ow
+
+tasks:
+  # ---- rung 1: neutral (expect ~flat; this is the specificity control) ------
+  - {<<: *ben,  source_transform_subdir: *r1_text}
+  - {<<: *ben,  source_transform_subdir: *r1_blank}
+
+  # ---- rung 2: borderline-benign (the cost — expect ~+28pp) ----------------
+  - {<<: *ben,  source_transform_subdir: *r2_text}
+  - {<<: *ben,  source_transform_subdir: *r2_blank}
+
+  # ---- harmful: what the cost BUYS (the unknown this round exists for) -----
+  - {<<: *harm, source_transform_subdir: *h_text}
+  - {<<: *harm, source_transform_subdir: *h_blank}

@@ -1,0 +1,23 @@
+num_main_job_threads: 2
+num_cluster_jobs: 1          # orchestrator only -- no model is served at this stage
+
+tasks:
+  # ---- ARM A: plain x fixed (the floor, and the P4 story-killer test) -------
+  - mode: prompt_transform
+    source_file: data/harmbench_bon_100.jsonl
+    prompt_range: [0, 9999]
+    benchmark: harmbench
+    campaign: bestofn_attack_r8_factorial
+    transformation_list:
+      - type: non_llm_baseline
+        params: {}
+
+  # ---- ARM B: code x varied (paraphrase -> code) ---------------------------
+  - mode: prompt_transform
+    source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050204_64308095/variance_channel_bon
+    prompt_range: [0, 9999]
+    benchmark: harmbench
+    campaign: bestofn_attack_r8_factorial
+    transformation_list:
+      - type: code_attack
+        params: {}

@@ -1,0 +1,73 @@
+# ⚠️ TEMPLATE/HISTORICAL (audit 2026-07-24) — example matrix with FILL_ME
+# placeholders from the early 'destroyer' framing; not a runnable preset.
+# ============================================================
+# Defense-destroyer matrix — example layout for a single (attack, model).
+# ============================================================
+# Shows how the new 2-mode pipeline expresses the destroyer headline
+# experiment: a single chain produces (pure encoded attack, `ir_plain`-wrapped
+# encoded attack), and stage 2 runs four defense+evaluate tasks per:
+#   no_defense   — pure-attack baseline
+#   sage         — text-side discrimination
+#   ecso         — caption-then-check (response-coupled)
+#   semantic_smooth — paraphrase + vote
+#
+# Filled in with placeholder paths because the prompt_transform output dir
+# (with timestamp) only exists after stage 1 has run. In practice, run
+# stage 1 first, then update the source_transform_subdir paths below.
+
+num_main_job_threads: 4
+
+tasks:
+  # ============================================================
+  # Stage 1: one chain producing (encoded text, ir_plain image-only)
+  # ============================================================
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 99]
+    transformation_list:
+      - type: set_theory
+      - type: ir_plain
+
+  # ============================================================
+  # Stage 2: 4 defenses × 2 sources (pure text from set_theory subfolder,
+  # IR-wrapped from ir_plain subfolder) = 8 runs.
+  # ============================================================
+
+  # ── Pure-attack baselines ──
+  - mode: defense+evaluate
+    source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/CHAIN_TIMESTAMP/llm_set_theory
+    target_model: gpt-5.4
+    defense: no_defense
+
+  - mode: defense+evaluate
+    source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/CHAIN_TIMESTAMP/ir_plain
+    target_model: gpt-5.4
+    defense: no_defense
+
+  # ── SAGE on both delivery modes ──
+  - mode: defense+evaluate
+    source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/CHAIN_TIMESTAMP/llm_set_theory
+    target_model: gpt-5.4
+    defense: sage
+
+  - mode: defense+evaluate
+    source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/CHAIN_TIMESTAMP/ir_plain
+    target_model: gpt-5.4
+    defense: sage
+
+  # ── ECSO on both (text degrades to no-defense automatically) ──
+  - mode: defense+evaluate
+    source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/CHAIN_TIMESTAMP/llm_set_theory
+    target_model: gpt-5.4
+    defense: ecso
+
+  - mode: defense+evaluate
+    source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/CHAIN_TIMESTAMP/ir_plain
+    target_model: gpt-5.4
+    defense: ecso
+
+  # ── SemanticSmooth on text only (multimodal not supported) ──
+  - mode: defense+evaluate
+    source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/CHAIN_TIMESTAMP/llm_set_theory
+    target_model: gpt-5.4
+    defense: semantic_smooth

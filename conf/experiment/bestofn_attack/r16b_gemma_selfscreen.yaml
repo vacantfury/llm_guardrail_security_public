@@ -1,0 +1,16 @@
+num_main_job_threads: 2      # only 2 cells; a 3rd thread would idle on acquire_endpoint
+num_cluster_jobs: 5          # 4 servers (gemma x3 + wildguard) + orchestrator
+
+_e: &e
+  mode: defense+evaluate
+  source_transform_subdir: outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260805_212854_26701649/code_attack
+  target_model: gemma2_9b_it
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r16_gemma_mechanism
+
+tasks:
+  # ---- STOCHASTIC VERDICT (screens with the TARGET) -> taxonomy predicts COLLAPSE at T=0 ----
+  - {<<: *e, defense: llm_self_defense, target_model_config: {temperature: 1.0, max_concurrency: 64}}
+  - {<<: *e, defense: llm_self_defense, target_model_config: {temperature: 0.0, max_concurrency: 64}}

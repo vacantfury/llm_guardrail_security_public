@@ -1,0 +1,29 @@
+num_cluster_jobs: 1          # orchestrator only; API judge needs no servers
+num_main_job_threads: 8
+
+_r: &r
+  mode: rejudge
+  judge_model: gpt-5-mini
+
+_D: &D outputs/bestofn_attack/defense+evaluate/harmbench
+
+tasks:
+  # ── run B: qwen ────────────────────────────────────────────────────────────
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_no_defense_code_attack_20260727_000812_36776484}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_no_defense_variance_channel_bon_20260727_000811_19304969}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_sage_code_attack_20260727_000813_67168944}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_sage_variance_channel_bon_20260727_000811_96574218}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_semantic_smooth_code_attack_20260727_000812_78766997}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_semantic_smooth_variance_channel_bon_20260727_000811_32043748}
+  # ── run B: gemma ───────────────────────────────────────────────────────────
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_no_defense_code_attack_20260727_000813_5925191}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_no_defense_variance_channel_bon_20260727_000811_917828}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_sage_code_attack_20260727_000813_34632562}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_sage_variance_channel_bon_20260727_000811_89808964}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_semantic_smooth_code_attack_20260727_000812_35345914}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_rest, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_semantic_smooth_variance_channel_bon_20260727_000811_5774993}
+  # ── run C: probe count (llama) ─────────────────────────────────────────────
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_probe, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_canonicalize_code_attack_20260727_114940_97950623}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_probe, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_canonicalize_variance_channel_bon_20260727_114939_90553095}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_probe, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_canonicalize_guard_code_attack_20260727_114940_24730944}
+  - {<<: *r, campaign: bestofn_attack_p2_rejudge_probe, responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_canonicalize_guard_variance_channel_bon_20260727_114939_94881649}

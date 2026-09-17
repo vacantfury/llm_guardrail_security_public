@@ -1,0 +1,29 @@
+
+num_main_job_threads: 6
+
+# Same fixed encoding every other re-collection cell consumed (AICR 285658).
+_text:  &text  outputs/image_presence_threshold/prompt_transform/harmbench/code_attack_ir_constant_20260805_213025_3168031/code_attack
+_decoy: &decoy outputs/image_presence_threshold/prompt_transform/harmbench/code_attack_ir_constant_20260805_213025_3168031/ir_constant
+
+_base: &base
+  mode: defense+evaluate
+  benchmark: harmbench
+  prompt_range: [0, 99]
+  judge_model: gpt-5-mini
+  campaign: paper_b_fidelity_regrid_sage
+
+tasks:
+  # ---- SAGE, text arm ----
+  - {<<: *base, defense: sage, target_model: gemini-2.5-flash,      source_transform_subdir: *text}
+  - {<<: *base, defense: sage, target_model: gemini-2.5-flash-lite, source_transform_subdir: *text}
+  - {<<: *base, defense: sage, target_model: gpt-4o-mini,           source_transform_subdir: *text}
+
+  # ---- SAGE + decoy ----
+  - {<<: *base, defense: sage, target_model: gemini-2.5-flash,      source_transform_subdir: *decoy}
+  - {<<: *base, defense: sage, target_model: gemini-2.5-flash-lite, source_transform_subdir: *decoy}
+  - {<<: *base, defense: sage, target_model: gpt-4o-mini,           source_transform_subdir: *decoy}
+
+  # ---- no_defense, TEXT arm (measured baseline, not inferred) ----
+  - {<<: *base, defense: no_defense, target_model: gemini-2.5-flash,      source_transform_subdir: *text}
+  - {<<: *base, defense: no_defense, target_model: gemini-2.5-flash-lite, source_transform_subdir: *text}
+  - {<<: *base, defense: no_defense, target_model: gpt-4o-mini,           source_transform_subdir: *text}

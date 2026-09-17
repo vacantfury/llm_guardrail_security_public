@@ -1,0 +1,59 @@
+# ============================================================
+# Paper C · NO-DECODE test — n=100 SCALE-UP of ensemble_no_decode (2026-07-22)
+# ============================================================
+# The n=20 pilot (campaign paper_c_no_decode, mj_180304) validated the direction:
+#   - HARM: no-decode >= full-decode on all 6 image attacks (decode-to-prose can
+#     LOSE signal; e.g. distraction 0 vs 25, fc_flowchart 5 vs 20).
+#   - BENIGN: dropping decode does NOT fix over-refusal (mc no-decode 30% direct-
+#     answer vs guard-alone 80% floor). Raw-verified: the over-refusal is RECOVER
+#     exposing borderline-benign text to the guard, which over-flags it -- a guard-
+#     calibration property, NOT the decode step. Sharpens the ceiling.
+#
+# This preset re-runs the SAME 16-cell matrix at n=100 (prompt_range [0,99]) on the
+# 100-prompt renders (2026-07-18 render round) to lock paper-final magnitudes.
+# Generation judges stay FREE (wildguard harm / qwen orbench refusal) -- cheap-first;
+# a gpt-5-mini REJUDGE pass over the saved responses produces the paper numbers.
+#
+# Servers: qwen (target + orbench-judge) + wildguard (guard + harm-judge) = 2
+#   -> num_cluster_jobs = orchestrator + 2 = 3. No API in-run (rejudge is separate).
+# ============================================================
+
+num_main_job_threads: 4
+num_cluster_jobs: 3
+
+_wg: &wg wildguard
+_nodec: &nodec {guard_model: wildguard, decode_text: false}
+_full:  &full  {guard_model: wildguard, decode_text: true, decode_style: recover}
+
+_harm: &harm {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: [0, 99], judge_method: wildguard, judge_model: wildguard, campaign: paper_c_no_decode_n100}
+_ben:  &ben  {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: [0, 99], benchmark: orbench_benign_hard, judge_method: orbench, judge_model: qwen2_5_vl_7b, campaign: paper_c_no_decode_n100}
+
+# ── 100-prompt render dirs (2026-07-18 render round) ──
+_figstep:  &figstep  outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+_fcflow:   &fcflow   outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+_lowcon:   &lowcon   outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast
+_occluded: &occluded outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded
+_mmtypo:   &mmtypo   outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo
+_distract: &distract outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid
+_orb_img:  &orb_img  outputs/autoattack_defense/prompt_transform/orbench_benign_hard/ir_plain_20260718_183504_7866920/ir_plain
+
+tasks:
+  # ── HARMFUL: no-decode vs full-decode on the 6 established image attacks ──
+  - {<<: *harm, defense: modality_complete, defense_config: *nodec, source_transform_subdir: *figstep}
+  - {<<: *harm, defense: modality_complete, defense_config: *full,  source_transform_subdir: *figstep}
+  - {<<: *harm, defense: modality_complete, defense_config: *nodec, source_transform_subdir: *fcflow}
+  - {<<: *harm, defense: modality_complete, defense_config: *full,  source_transform_subdir: *fcflow}
+  - {<<: *harm, defense: modality_complete, defense_config: *nodec, source_transform_subdir: *lowcon}
+  - {<<: *harm, defense: modality_complete, defense_config: *full,  source_transform_subdir: *lowcon}
+  - {<<: *harm, defense: modality_complete, defense_config: *nodec, source_transform_subdir: *occluded}
+  - {<<: *harm, defense: modality_complete, defense_config: *full,  source_transform_subdir: *occluded}
+  - {<<: *harm, defense: modality_complete, defense_config: *nodec, source_transform_subdir: *mmtypo}
+  - {<<: *harm, defense: modality_complete, defense_config: *full,  source_transform_subdir: *mmtypo}
+  - {<<: *harm, defense: modality_complete, defense_config: *nodec, source_transform_subdir: *distract}
+  - {<<: *harm, defense: modality_complete, defense_config: *full,  source_transform_subdir: *distract}
+
+  # ── BENIGN over-refusal: floor, isolation control, no-decode vs full-decode ──
+  - {<<: *ben, defense: no_defense,                                            source_transform_subdir: *orb_img}
+  - {<<: *ben, defense: guard_baseline,    defense_config: {guard_model: *wg}, source_transform_subdir: *orb_img}
+  - {<<: *ben, defense: modality_complete, defense_config: *nodec,             source_transform_subdir: *orb_img}
+  - {<<: *ben, defense: modality_complete, defense_config: *full,              source_transform_subdir: *orb_img}

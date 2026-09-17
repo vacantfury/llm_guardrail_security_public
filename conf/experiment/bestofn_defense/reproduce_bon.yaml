@@ -1,0 +1,33 @@
+
+num_main_job_threads: 8
+
+tasks:
+  # Stage 1 — apply the BoN text augmentation to each variant row.
+  - mode: prompt_transform
+    source_file: data/harmbench_bon_pilot.jsonl
+    transformation_list:
+      - type: non_llm_best_of_n
+        params: {sigma: 0.4, seed: 0}
+
+  # Stage 2 — query the target, judge each variant with WildGuard (free).
+  # no_defense = raw BoN ASR. Success per behavior = ANY __bonK variant flagged
+  # (computed downstream by OR-reducing on the base id via src/analysis/bon_asr.py).
+  - mode: defense+evaluate
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/harmbench/CHAIN_TIMESTAMP/non_llm_best_of_n
+    target_model: qwen2_5_vl_7b      # smallest served VLM target; swap per run
+    defense: no_defense
+    judge_model: wildguard           # free intermediate judge; gpt-5-mini reserved for final (API gate)
+    judge_method: wildguard
+    benchmark: harmbench
+    campaign: bestofn_pilot
+
+  # Stage 2b — SAME variants, canonicalization defense: the effective-N gate.
+  # Run bon_asr on both output dirs and compare ASR(N): no_defense vs canonicalize.
+  - mode: defense+evaluate
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/harmbench/CHAIN_TIMESTAMP/non_llm_best_of_n
+    target_model: qwen2_5_vl_7b
+    defense: canonicalize
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: harmbench
+    campaign: bestofn_pilot

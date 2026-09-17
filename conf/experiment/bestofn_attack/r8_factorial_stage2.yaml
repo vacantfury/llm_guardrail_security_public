@@ -1,0 +1,48 @@
+num_main_job_threads: 6      # all 6 cells in flight
+# num_cluster_jobs=7 is LOAD-BEARING, not a round number. The allocator
+# (Experiment._prepare_cluster_servers) computes servers_wanted = N-1, then caps
+# ONLY IF total_requested > available_slots, using FLOOR division
+# `available_slots // n_models` and never promoting above the YAML request.
+# This round serves 3 distinct models -- llama3_1_8b_cluster (target, YAML asks
+# num_instances: 4), wildguard (judge, 1), llama_guard_3_8b (gate, 1) = 6
+# requested. So:
+#   N=5 -> 4 slots  -> 6 > 4  -> cap = 4//3 = 1 -> LLAMA COLLAPSES 4 -> 1 and,
+#          because load-balancing is PER-CELL, all six cells serialize onto one
+#          endpoint (~22h projected against a 24h wall -- the round 174759
+#          failure mode).
+#   N=7 -> 6 slots  -> 6 > 6 is FALSE -> no capping at all -> llama keeps 4.
+# 6 servers + orchestrator = 7 jobs, inside MAX_SUBMIT_JOBS_PER_USER=8 and well
+# inside AICR's max_gpu_jobs=12 (verified 0 GPU jobs running at submit time).
+num_cluster_jobs: 7
+
+_e: &e
+  mode: defense+evaluate
+  target_model: llama3_1_8b_cluster
+  target_model_config: {temperature: 1.0}
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r8_factorial
+
+# ✅ FILLED 2026-08-03 from Stage-1 (AICR job 256948, COMPLETED 31s, $0).
+# GATE CHECK PASSED before filling -- distinct `encoded` values per behavior:
+#   ARM A -> 1 for all 100 behaviors                       (required: 1)
+#   ARM B -> 100 for 66 beh., 99 for 18, 98 for 4          (required: ~100)
+# ARM B's 99/98 tail is INHERITED: the upstream paraphrase arm has the identical
+# histogram (100/99/98 -> 66/18/4), i.e. the paraphraser occasionally repeats
+# itself. code_attack did not collapse anything. For contrast, measured in the
+# same pass: the EXISTING code arm = 1 distinct, the surface arm = 100 distinct
+# -- the confound this round exists to break, re-confirmed.
+_PLAIN_FIXED: &plain_fixed outputs/bestofn_attack/prompt_transform/harmbench/non_llm_baseline_20260803_033658_62709884/non_llm_baseline
+_CODE_VARIED: &code_varied outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_code_attack_20260803_033658_17867502/code_attack
+
+tasks:
+  # ---- ARM A: plain x fixed ------------------------------------------------
+  - {<<: *e, source_transform_subdir: *plain_fixed, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *plain_fixed, defense: sage}
+  - {<<: *e, source_transform_subdir: *plain_fixed, defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b}}
+
+  # ---- ARM B: code x varied ------------------------------------------------
+  - {<<: *e, source_transform_subdir: *code_varied, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *code_varied, defense: sage}
+  - {<<: *e, source_transform_subdir: *code_varied, defense: guard_baseline, defense_config: {guard_model: llama_guard_3_8b}}

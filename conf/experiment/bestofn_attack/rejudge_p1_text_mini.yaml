@@ -1,0 +1,76 @@
+num_cluster_jobs: 2          # orchestrator only (gpt-5-mini is API; no vLLM servers)
+num_main_job_threads: 6      # 6 cells in flight; 18 cells => 3 waves, keeps OpenAI rate-limit headroom
+
+tasks:
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_no_defense_code_attack_20260724_234322_38272941
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_no_defense_variance_channel_bon_20260724_234321_44012297
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_sage_code_attack_20260724_234322_54590867
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_sage_variance_channel_bon_20260724_234321_16207029
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_semantic_smooth_code_attack_20260724_234322_25605369
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/gemma2_9b_it_semantic_smooth_variance_channel_bon_20260724_234321_79304365
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_no_defense_code_attack_20260723_140429_4154043
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_no_defense_variance_channel_bon_20260721_215736_11417757
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_sage_code_attack_20260721_215738_61347108
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_sage_variance_channel_bon_20260721_215736_42845228
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_semantic_smooth_code_attack_20260723_140429_81506272
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/llama3_1_8b_cluster_semantic_smooth_variance_channel_bon_20260723_140428_624958
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_no_defense_code_attack_20260721_215738_81217695
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_no_defense_variance_channel_bon_20260721_215737_89671063
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_sage_code_attack_20260721_215737_69755062
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_sage_variance_channel_bon_20260721_215737_40848037
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_semantic_smooth_code_attack_20260721_215739_97310058
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini
+  - mode: rejudge
+    responses_from: outputs/bestofn_attack/defense+evaluate/harmbench/qwen2_5_7b_instruct_semantic_smooth_variance_channel_bon_20260721_215736_17620558
+    judge_model: gpt-5-mini
+    campaign: bestofn_attack_p1_text_full_mini

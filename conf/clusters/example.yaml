@@ -1,0 +1,33 @@
+# Placeholder profile. Select with CLUSTER_PROFILE=example after configuration.
+# Replace account, partition, cache location, and wrapper for your environment.
+cluster:
+  account: YOUR_ACCOUNT
+  partition: YOUR_GPU_PARTITION
+  hf_home: ~/model-cache
+  sbatch: scripts/run_experiment.sbatch
+  budget: 2
+  max_submit: 8
+  num_gpus: 1
+  num_instances: 1
+  cpus_per_task: 4
+  mem_gb: 32
+  port: 8000
+  gpu_memory_utilization: 0.9
+  max_model_len: 20480
+  time_limit: '01:00:00'
+  dtype: null
+  chat_template: null
+  trust_remote_code: false
+  gpu_types_excluded: []
+  gpu_request_style: gres
+  hf_offline: false
+  server_start_timeout: 3600
+  endpoint_wait_timeout: 30
+  cluster_server_endpoint_timeout: 10000
+  monitor_poll_interval: 10
+  health_check_timeout: 5
+  slurm_cmd_timeout: 15
+  env_setup:
+    - source .venv/bin/activate
+  bedrock: false
+  api_keys: true

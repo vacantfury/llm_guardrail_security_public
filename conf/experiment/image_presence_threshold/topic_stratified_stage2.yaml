@@ -1,0 +1,23 @@
+
+num_main_job_threads: 6
+num_cluster_jobs: 1          # API targets + API judge — no vLLM server needed.
+
+_text:  &text  outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260809_014849_30839437/non_llm_baseline
+_blank: &blank outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260809_014849_30839437/ir_blank
+
+_b: &b
+  mode: defense+evaluate
+  defense: no_defense
+  prompt_range: [0, 299]
+  benchmark: jailbreakbench_benign   # pinned: hold the reporting path constant
+  judge_method: jbb_refusal          # pinned: hold the INSTRUMENT constant
+  judge_model: gpt-5-mini
+  campaign: paper_b_topic_stratified
+
+tasks:
+  - {<<: *b, target_model: claude-sonnet-4-6,     source_transform_subdir: *text}
+  - {<<: *b, target_model: claude-sonnet-4-6,     source_transform_subdir: *blank}
+  - {<<: *b, target_model: gemini-2.5-flash-lite, source_transform_subdir: *text}
+  - {<<: *b, target_model: gemini-2.5-flash-lite, source_transform_subdir: *blank}
+  - {<<: *b, target_model: gpt-4o-mini,           source_transform_subdir: *text}
+  - {<<: *b, target_model: gpt-4o-mini,           source_transform_subdir: *blank}

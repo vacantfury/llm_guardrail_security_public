@@ -1,0 +1,81 @@
+
+num_main_job_threads: 4
+
+# Reused, NOT regenerated — the sweep's canonical text channel, already on xc.
+_source: &src outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/non_llm_baseline_ir_blank_20260806_055851_77202176/non_llm_baseline
+
+_base: &base
+  mode: prompt_transform
+  source_transform_subdir: *src
+  benchmark: jailbreakbench_benign
+  prompt_range: [0, 99]
+  campaign: paper_b_property_ablation_ow
+
+tasks:
+  # --- 2. reference canvas for THIS sweep -------------------------------
+  #     ⚠️ NOT the published presence-control blank. The published arm passed
+  #     only `keep_text`, so it rendered at BlankImageRenderer's DEFAULTS —
+  #     1024x768, not 512x512. This arm is a deliberate 512x512; it anchors the
+  #     resolution axis below and is paired against the text arm INSIDE the
+  #     stage-2 job. Do not compare it across jobs.
+  - <<: *base
+    transformation_list:
+      - type: ir_blank
+        params: {width: 512, height: 512, bg_color: "#FFFFFF", keep_text: true}
+
+  # --- 3-4. RESOLUTION, colour and aspect held at the reference ---------
+  - <<: *base
+    transformation_list:
+      - type: ir_blank
+        params: {width: 256, height: 256, bg_color: "#FFFFFF", keep_text: true}
+  - <<: *base
+    transformation_list:
+      - type: ir_blank
+        params: {width: 1536, height: 1536, bg_color: "#FFFFFF", keep_text: true}
+
+  # --- 5. ASPECT RATIO matched to the mountain decoy, NO readable text ---
+  #     Pairs with condition 10. This is the OCR-ability contrast.
+  - <<: *base
+    transformation_list:
+      - type: ir_blank
+        params: {width: 1024, height: 141, bg_color: "#FFFFFF", keep_text: true}
+
+  # --- 6. transposed aspect ratio, same pixel count as #5 ---------------
+  - <<: *base
+    transformation_list:
+      - type: ir_blank
+        params: {width: 141, height: 1024, bg_color: "#FFFFFF", keep_text: true}
+
+  # --- 7-8. COLOUR, resolution and aspect held at the reference ---------
+  - <<: *base
+    transformation_list:
+      - type: ir_blank
+        params: {width: 512, height: 512, bg_color: "#000000", keep_text: true}
+  - <<: *base
+    transformation_list:
+      - type: ir_blank
+        params: {width: 512, height: 512, bg_color: "#808080", keep_text: true}
+
+  - <<: *base
+    transformation_list:
+      - type: ir_constant
+        params:
+          keep_text: true
+          image_path: src/prompt_transformations/image/images/mountain.png
+          jpeg_quality: 40
+
+  # --- 10. OCR-ABLE: the mountain decoy (caption rendered as an image) ---
+  - <<: *base
+    transformation_list:
+      - type: ir_constant
+        params:
+          keep_text: true
+          image_path: src/prompt_transformations/image/images/mountain.png
+
+  # --- 11. drawn content, non-OCR-able: the line drawing ----------------
+  - <<: *base
+    transformation_list:
+      - type: ir_constant
+        params:
+          keep_text: true
+          image_path: src/prompt_transformations/image/images/rabit.jpeg

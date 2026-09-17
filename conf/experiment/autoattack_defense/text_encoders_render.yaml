@@ -1,0 +1,28 @@
+
+num_main_job_threads: 4
+
+tasks:
+  # ── set_theory (symbolic set/logic notation) ──
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 19]
+    transformation_list:
+      - type: set_theory                     # alias → llm_set_theory (default.yaml merged)
+
+  # ── classical Chinese (文言文, low-resource-language attack) ──
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 19]
+    transformation_list:
+      - type: classical_chinese_simplified   # autoresolve → llm_classical_language
+        params:
+          model: gpt-4.1-mini                # explicit — default.yaml not merged for this path
+
+  # ── cipher (base64, deterministic / free) ──
+  - mode: prompt_transform
+    source_file: data/harmbench_prompts.jsonl
+    prompt_range: [0, 19]
+    transformation_list:
+      - type: cipher                         # alias → non_llm_cipher
+        params:
+          cipher: base64

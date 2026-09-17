@@ -1,0 +1,32 @@
+# SemanticSmooth defense configuration
+# Ji et al., "Defending LLMs against Jailbreak Attacks via Semantic
+# Smoothing" (AACL-IJCNLP 2025).
+#
+# Our implementation follows the `BaselineDefensesParaphrase` variant
+# (perturbations.py:14-19 in the original repo): a separate cheap LLM
+# does the paraphrasing rather than the target model. We use
+# `gemini-2.5-flash-lite` for cost realism — paper used GPT-3.5-turbo.
+
+n_copies: 5                          # paper default
+perturbation_model: gemini-2.5-flash-lite
+judge_model: gpt-5-nano              # internal vote judge ONLY (defense-internal
+                                     # paraphrase vote, cheap on purpose). NOT the
+                                     # project ASR judge — that is gpt-5-mini since
+                                     # 2026-07-15; this internal vote never feeds ASR.
+
+# Sampling params for the paraphrase step ONLY (target queries + harm
+# judge use the project's default temp=0.0, which gives reproducible
+# behavior). Values below match the paper's BaselineDefensesParaphrase
+# variant (`other_repos/SemanticSmooth/config/defense/paraphrasedefense.yaml`):
+#   perturbation_temperature: 0.7
+#   perturbation_top_p: 1.0
+#   perturbation_max_num_tokens: 2048
+# Paper does not configure top_k → project default top_k=0 (disabled,
+# sample from full distribution) is consistent. The high temperature is
+# essential — at temp=0 the N paraphrases would be identical, breaking
+# the vote.
+perturbation_temperature: 0.7
+perturbation_top_p: 1.0
+perturbation_max_tokens: 2048
+
+query_source: original

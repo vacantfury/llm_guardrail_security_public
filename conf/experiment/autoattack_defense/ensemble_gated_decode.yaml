@@ -1,0 +1,77 @@
+# ============================================================
+# Paper C · GATED-decode pilot — does gating the decode fix the over-refusal
+# WITHOUT losing the harmful catch?  (2026-07-17)
+# ============================================================
+# The decode-ablation (campaign paper_c_decode_ablation) proved the over-refusal
+# is the DECODE step itself: OR-Bench-Hard prompts are PLAIN benign text with
+# nothing to decode, yet the amplifier decodes them unconditionally into a lossy,
+# toxic-sounding paraphrase the guard then flags (65-75% benign refusal vs a 25%
+# raw-guard floor); de-priming the decode prompt did NOT help.
+#
+# The fix under test: gate_decode=True. An obfuscation-gate LLM call decides per
+# prompt whether to decode — OBFUSCATED inputs (attacks: encoding / rare language
+# / euphemistic camouflage) get decoded as before; PLAIN inputs (benign prompts)
+# skip the decode and pass their union straight to the guard at its 25% floor.
+#
+# Head-to-head, gate-OFF vs gate-ON, SAME render dirs, one run (removes the
+# run-to-run stochasticity that wobbled the benign floor 15<->25 across the two
+# prior runs). Both use the standard recover-decode; the GATE is the only lever.
+#
+# Hypotheses:
+#   - BENIGN (OR-Bench-Hard): mc[gate-ON] refusal drops from mc[gate-OFF]'s ~70%
+#     toward the 25% raw-guard floor (the gate calls plain benign prompts PLAIN
+#     and skips the decode).
+#   - HARMFUL: mc[gate-ON] ASR stays ~= mc[gate-OFF] (~11%) and still beats
+#     guard_baseline (the gate calls attacks OBFUSCATED and still decodes them).
+#     Watch semantic_camo + image attacks: if gate-ON ASR jumps toward
+#     guard_baseline, the gate is wrongly skipping the decode on those.
+#
+# Judges (cheap-first): harmful -> wildguard; OR-Bench -> qwen (ORBench 3-class).
+# gpt-5-mini rejudge over saved responses for the final numbers.
+# Servers: qwen (target + orbench-judge) + wildguard (guard + harm-judge) = 2
+#   -> num_cluster_jobs = orchestrator + 2 = 3. No API in-run.
+# PILOT slice [0,19]; scale after the direction holds.
+# ============================================================
+
+num_main_job_threads: 4
+num_cluster_jobs: 3
+
+_wg: &wg wildguard
+_off:  &off  {guard_model: wildguard, decode_text: true, decode_style: recover}
+_gate: &gate {guard_model: wildguard, decode_text: true, decode_style: recover, gate_decode: true}
+
+_harm: &harm {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: [0, 19], judge_method: wildguard, judge_model: wildguard, campaign: paper_c_gated_decode}
+_ben:  &ben  {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: [0, 19], benchmark: orbench_benign_hard, judge_method: orbench, judge_model: qwen2_5_vl_7b, campaign: paper_c_gated_decode}
+
+# ── existing render dirs (harmful ensemble from mj_8412009; OR-Bench from mj_8414208) ──
+_figstep:  &figstep  outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260716_194159_70433849/ir_figstep
+_fcflow:   &fcflow   outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260716_194159_69181110/ir_fc_flowchart
+_lowcon:   &lowcon   outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260716_194159_9379140/ir_low_contrast
+_occluded: &occluded outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260716_194159_10657917/ir_occluded
+_mmtypo:   &mmtypo   outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260716_194203_32634422/ir_mm_typo
+_distract: &distract outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260716_194203_7625970/ir_distraction_grid
+_camoimg:  &camoimg  outputs/autoattack_defense/prompt_transform/harmbench/semantic_camo_ir_plain_20260716_194205_29992788/ir_plain
+_orb_img:  &orb_img  outputs/autoattack_defense/prompt_transform/orbench_benign_hard/ir_plain_20260717_020703_54610685/ir_plain
+
+tasks:
+  # ── HARMFUL: gate-OFF vs gate-ON (does the catch survive gating?) ──
+  - {<<: *harm, defense: modality_complete, defense_config: *off,  source_transform_subdir: *figstep}
+  - {<<: *harm, defense: modality_complete, defense_config: *gate, source_transform_subdir: *figstep}
+  - {<<: *harm, defense: modality_complete, defense_config: *off,  source_transform_subdir: *fcflow}
+  - {<<: *harm, defense: modality_complete, defense_config: *gate, source_transform_subdir: *fcflow}
+  - {<<: *harm, defense: modality_complete, defense_config: *off,  source_transform_subdir: *lowcon}
+  - {<<: *harm, defense: modality_complete, defense_config: *gate, source_transform_subdir: *lowcon}
+  - {<<: *harm, defense: modality_complete, defense_config: *off,  source_transform_subdir: *occluded}
+  - {<<: *harm, defense: modality_complete, defense_config: *gate, source_transform_subdir: *occluded}
+  - {<<: *harm, defense: modality_complete, defense_config: *off,  source_transform_subdir: *mmtypo}
+  - {<<: *harm, defense: modality_complete, defense_config: *gate, source_transform_subdir: *mmtypo}
+  - {<<: *harm, defense: modality_complete, defense_config: *off,  source_transform_subdir: *distract}
+  - {<<: *harm, defense: modality_complete, defense_config: *gate, source_transform_subdir: *distract}
+  - {<<: *harm, defense: modality_complete, defense_config: *off,  source_transform_subdir: *camoimg}
+  - {<<: *harm, defense: modality_complete, defense_config: *gate, source_transform_subdir: *camoimg}
+
+  # ── OR-Bench over-refusal: floor, isolation control, gate-OFF, gate-ON ──
+  - {<<: *ben, defense: no_defense,                                            source_transform_subdir: *orb_img}
+  - {<<: *ben, defense: guard_baseline,    defense_config: {guard_model: *wg}, source_transform_subdir: *orb_img}
+  - {<<: *ben, defense: modality_complete, defense_config: *off,               source_transform_subdir: *orb_img}
+  - {<<: *ben, defense: modality_complete, defense_config: *gate,              source_transform_subdir: *orb_img}

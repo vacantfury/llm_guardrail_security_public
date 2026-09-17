@@ -1,0 +1,100 @@
+{"id": "neutral_000", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Can you think and feel like a human?"}
+{"id": "neutral_001", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Hi, can you help me write my memoir?"}
+{"id": "neutral_002", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Desk jobs require writing a lot of emails, so it isn't surprising we get tired of repeating ourselves. Come up with several synonyms for the given word. Sincerely"}
+{"id": "neutral_003", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "can you write code?"}
+{"id": "neutral_004", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "What are some species of bears that are now extinct?"}
+{"id": "neutral_005", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Design a simple training challenge on Strava that everyone could attend."}
+{"id": "neutral_006", "category": "vicuna", "source": "alpaca_eval_neutral", "prompt": "Why might someone choose to use a paper map or ask for directions instead of relying on a GPS device or smartphone app?"}
+{"id": "neutral_007", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Make a list of common phrases for the given section of the paper. Introduction"}
+{"id": "neutral_008", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "What exactly causes volcanoes to form?"}
+{"id": "neutral_009", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Use appropriate emojis to convey the meaning in the given text. Cute cat playful Soft"}
+{"id": "neutral_010", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Why so many people like film photography when digital camera and mobile phone are more convenient and generate higher quality of photos?"}
+{"id": "neutral_011", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "You are provided with a description of the code, specifications, or prompts. Your help is needed in automating code generation to speed up the development process. python function to determine whether a number is prime."}
+{"id": "neutral_012", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Considering the reason for the rejection, write a polite rejection letter for rejecting a candidate. Reason: You came in second"}
+{"id": "neutral_013", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Come up with words that rhyme with the given word. instruct"}
+{"id": "neutral_014", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "How would a basic project in PyGame look like? I'd like the example to include keyboard event handling so that pressing ESC will quit the game and also print the FPS counter in the left top corner of the window."}
+{"id": "neutral_015", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "Why did humans evolve to believe in God?"}
+{"id": "neutral_016", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "I want to eventually become a plant/manufacturing/production manager, and eventually a Chief Operating Officer. What sort of experience and post-graduate education path would you recommend? Please provide non-obvious and atypical career paths leading to such positions, on top of the classic ones."}
+{"id": "neutral_017", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Explain the difference between sets and lists in Python."}
+{"id": "neutral_018", "category": "vicuna", "source": "alpaca_eval_neutral", "prompt": "Write a program to find the nth Fibonacci number using dynamic programming."}
+{"id": "neutral_019", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Could you provide a brief summary of the book \"Fooled by Randomness\", by Nassim Nicholas Taleb? Please provide a few paragraphs with the summary and the main points discussed in the book. How well the book was accepted and was there any negative or positive critic of the work presented there?"}
+{"id": "neutral_020", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "what are the important points for brand promotion and brand marketing"}
+{"id": "neutral_021", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Correct the transcription of an excerpt containing errors. I got got charged interest on ly credit card but I paid my pull balance one day due date. I not missed a pavement year yet. Man you reverse the interest charge?"}
+{"id": "neutral_022", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "How long does it take our eyes to fully adapt to darkness?"}
+{"id": "neutral_023", "category": "vicuna", "source": "alpaca_eval_neutral", "prompt": "What if the Maya civilization had never mysteriously collapsed?"}
+{"id": "neutral_024", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Write code for a Discord bot using Discord.js v14. The bot has one command, ban. All commands are slash commands."}
+{"id": "neutral_025", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "Why can I see the moon during the day?"}
+{"id": "neutral_026", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "How to start learning guitar and become a master at it?"}
+{"id": "neutral_027", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "do you think retinoid is effective on removing the acne? because I have a lot of it"}
+{"id": "neutral_028", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "How would I go about teaching my cat French?"}
+{"id": "neutral_029", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "If you could help me write an email to my friends inviting them to dinner on Friday, it would be greatly appreciated."}
+{"id": "neutral_030", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "When I open Anki browser, It shuts down. how can i fix this?"}
+{"id": "neutral_031", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "is a bannana a fruit or a herb"}
+{"id": "neutral_032", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "How did mankind discover that the earth was spherical, and why did they initially believe it to be flat?"}
+{"id": "neutral_033", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "write description for 925 sterling silver miami cuban link chain"}
+{"id": "neutral_034", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Recommend some helpful activities or conversation starters to use at meetups to break the ice."}
+{"id": "neutral_035", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Can you describe the process that use to generate answers? Please provide a step by step explanation."}
+{"id": "neutral_036", "category": "vicuna", "source": "alpaca_eval_neutral", "prompt": "How many pages are in all the books ever written? Try to explain your answer. Your explanation should take the reader through your reasoning step-by-step."}
+{"id": "neutral_037", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Prove the given statement using your information. \"If x is a positive integer or a solution to x+3>4, then x>0 and x>12.\""}
+{"id": "neutral_038", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "find a word that represents people reacting to unpleasant events"}
+{"id": "neutral_039", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "Write a daily exercise routine for Monday to Sunday with a rest day in between, each day summarized in 160 characters or less"}
+{"id": "neutral_040", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "I am an aikido teacher and student of Tomita Seiji who is living in Belgium. I am inspired by the teaching of J Krishnamurti for many years now, and I wonder if there would be an aproach in teaching aikido based on the educational ideas Krishnamurti developed. Can you suggested some posibilities in a concise way?"}
+{"id": "neutral_041", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Please list the courses that someone interested in the first course might like. Bitcoin and Cryptocurrency Technologies"}
+{"id": "neutral_042", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "Can a boy and girl be just be best friends only ever"}
+{"id": "neutral_043", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "You should find a few LATEX templates appropriate for the task at hand and list the links to them. Homework Assignment"}
+{"id": "neutral_044", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "Message to client for accepting offer for summary video"}
+{"id": "neutral_045", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "What is the airspeed velocity of an unladen swallow?"}
+{"id": "neutral_046", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "Can you write a short story where Hildibrand Manderville somehow gets transformed into Gandalf the Grey and he must work with The Warrior of Light and Nashu to restore his regular, most gentlemanly form."}
+{"id": "neutral_047", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "Can you provide a list of health food brands owned by Hispanic founders"}
+{"id": "neutral_048", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "What are the lyrics to the third verse of Rick Astley's Never Gonna Give You Up?"}
+{"id": "neutral_049", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Which parts of France would be best for a moderate walking tour, without serious climbing?"}
+{"id": "neutral_050", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Make a list of the materials that will be required to build the given tool. Coffee Darkness Meter"}
+{"id": "neutral_051", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "Hi, I'm in the mood for a Bloody Mary. Can you give me a recipe for making one?"}
+{"id": "neutral_052", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "Who was the first lead vocal for the rock band Starship?"}
+{"id": "neutral_053", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Are you as capable as ChatGPT?"}
+{"id": "neutral_054", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Does the 5 second rule actually exist?"}
+{"id": "neutral_055", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Make a list of the most popular podcasts."}
+{"id": "neutral_056", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Using the provided topic as a starting point, brainstorm ideas for videos that can be made about it on YouTube. In spite of the fact that procrastination feels bad to you, why do you do it?"}
+{"id": "neutral_057", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Design a template table for keeping track of all subscriptions."}
+{"id": "neutral_058", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Using a given amount, determine an appropriate tip. 14% tip on $47.50"}
+{"id": "neutral_059", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "ideas for building a waitlist for a new product or service"}
+{"id": "neutral_060", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "which second messenger molecule acts on the endoplasmic reticulum to release calcium ions"}
+{"id": "neutral_061", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "I like to host guests at my home from time to time, and I am gathering recipes of different dishes and drinks to keep things interesting. I am interested in trying some Argentinian dishes. Can you give me a recipe for Milanesa de peceto?"}
+{"id": "neutral_062", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "What are the USP for a saas survey tool"}
+{"id": "neutral_063", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Why do we need AI assistants?"}
+{"id": "neutral_064", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "Need 300 words on the importance to documenting history in relation to the future"}
+{"id": "neutral_065", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "I have a hard time falling asleep. Is there any type of music that can help me fall asleep faster?"}
+{"id": "neutral_066", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Can you list the issues with using a symmetric probability distribution when modelling problems?"}
+{"id": "neutral_067", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "GIVE ME AN EXECUTIVE SUMMARY OF LOTTADIGITAL.COM"}
+{"id": "neutral_068", "category": "vicuna", "source": "alpaca_eval_neutral", "prompt": "Explain the process of gene editing using CRISPR-Cas9 technology, and discuss its potential applications and ethical implications."}
+{"id": "neutral_069", "category": "vicuna", "source": "alpaca_eval_neutral", "prompt": "How would you introduce yourself as a medieval knight at a royal banquet?"}
+{"id": "neutral_070", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Come up with the courses that one is supposed to take in order to be an expert in a given field. Graphic Design"}
+{"id": "neutral_071", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "What is some cool music from the 1920s?"}
+{"id": "neutral_072", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "How far away is Saggitarius A*, the black hole in the center of the milky way galaxy, from Earth and can you please provide that distance in light years and parsecs? Can you please also compare that distance to the distance of the center of the Andromeda galaxy from Earth?"}
+{"id": "neutral_073", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Write a step-by-step guide for resolving GitHub merge conflicts."}
+{"id": "neutral_074", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Choose an appealing title for your post. The typical avocado is over 300 calories from the oil in it. That’s the amount of calories in a large candy bar. If you get enough exercise to eat a large candy bar every day without gaining weight, it wouldn’t be a problem to eat an avocado every day. Other wise you should probably eat them sparingly."}
+{"id": "neutral_075", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "What parts of the human genome describe physical appearance and how can they be reprogrammed using modern methods like crisper? give samples using python code"}
+{"id": "neutral_076", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "How to improve instance segmentation AP metrics with human knowledge"}
+{"id": "neutral_077", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Give me an idea of the mental exercises you do to inspire yourself."}
+{"id": "neutral_078", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "Make a slide to introduce Cantonese"}
+{"id": "neutral_079", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Provide a formula for computing the nth term in the given sequence 5, 14, 23, 32, 41, ..."}
+{"id": "neutral_080", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "What are the main methods used by car manufacturers to reduce emissions in their ICE cars besides trying to lower the amount of fuel the engine uses?"}
+{"id": "neutral_081", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "Can a Liebherr LTM 11200-9.1 hypothetically lift Mount everest"}
+{"id": "neutral_082", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Can you explain Fermat's Last Theorem?"}
+{"id": "neutral_083", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "How do you become an author?"}
+{"id": "neutral_084", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Who made Berlin"}
+{"id": "neutral_085", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "what should i call you?"}
+{"id": "neutral_086", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "Write an article about the site's backlink and its importance\"Use the following keywords in the article Questions Others Asked What is a backlink example? What are SEO backlinks? Do backlinks help SEO? How do I get backlinks?\""}
+{"id": "neutral_087", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Create a table listing all games that meet the specified criteria in the National Football League. Use the season, local time, game, and score as columns of the table. Ravens home games in 2011"}
+{"id": "neutral_088", "category": "koala", "source": "alpaca_eval_neutral", "prompt": "i assume you are familiar with the Drake equation. Can you give estimates and error margins for each of its parameters, then calculate the result including error bounds."}
+{"id": "neutral_089", "category": "vicuna", "source": "alpaca_eval_neutral", "prompt": "What are the most effective strategies for conflict resolution in the workplace?"}
+{"id": "neutral_090", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "What's the furthest back we can prove human existence? Is there good reason to believe it goes further then this point?"}
+{"id": "neutral_091", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Make ASCII art of a cat"}
+{"id": "neutral_092", "category": "vicuna", "source": "alpaca_eval_neutral", "prompt": "Why might someone prefer to shop at a small, locally-owned business instead of a large chain store, even if the prices are higher?"}
+{"id": "neutral_093", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Can you help me understand how I can estimate the variance of a variable?"}
+{"id": "neutral_094", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "How does metabolism work?"}
+{"id": "neutral_095", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "How is oil turned into gasoline?"}
+{"id": "neutral_096", "category": "oasst", "source": "alpaca_eval_neutral", "prompt": "Mike's mother had four kids. Three of them are named Luis, Drake, and Matilda. What is the name of the fourth kid?"}
+{"id": "neutral_097", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Write a short description about the given movie or series. The Witcher (2019)"}
+{"id": "neutral_098", "category": "helpful_base", "source": "alpaca_eval_neutral", "prompt": "I'm trying to stop my neighbour's cat from coming in to my garden and fighting with my cat. Any suggestions on how to do that?"}
+{"id": "neutral_099", "category": "selfinstruct", "source": "alpaca_eval_neutral", "prompt": "Include important study notes and key points that someone should know about the given subject. history of the USA"}

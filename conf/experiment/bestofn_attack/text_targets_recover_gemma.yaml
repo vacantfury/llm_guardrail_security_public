@@ -1,0 +1,27 @@
+num_main_job_threads: 6      # all 6 cells in flight; 4 replicas serve them, 2 queue briefly
+num_cluster_jobs: 6          # orchestrator + 4 gemma replicas + wildguard (5 servers <= AICR budget 7,
+                             # deliberately leaving 2 server slots free for the Paper C work)
+
+_e: &e
+  mode: defense+evaluate
+  target_model: gemma2_9b_it
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_p1_text_full
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+_SS: &ss {n_copies: 5, perturbation_model: null, judge_model: wildguard}   # null -> paraphrase with the target; free served vote
+
+# ORDER MATTERS: the two SemanticSmooth cells are the makespan drivers (SS+code ran 18.1h
+# on Llama, SS+surf 7.5h), so they are listed FIRST and grab replicas immediately. The
+# cheaper no_defense/sage cells fill in behind them as replicas free up.
+tasks:
+  - {<<: *e, source_transform_subdir: *code, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *e, source_transform_subdir: *surf, defense: semantic_smooth, defense_config: *ss}
+  - {<<: *e, source_transform_subdir: *code, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *code, defense: sage}
+  - {<<: *e, source_transform_subdir: *surf, defense: sage}

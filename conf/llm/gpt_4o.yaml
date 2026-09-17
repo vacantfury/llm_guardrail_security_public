@@ -1,0 +1,4 @@
+# GPT-4o (OpenAI) — primary target model + judge
+
+model:
+  model: gpt-4o

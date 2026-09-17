@@ -1,0 +1,11 @@
+
+num_main_job_threads: 1
+num_cluster_jobs: 1          # judge is an API model — no vLLM server needed.
+
+tasks:
+  - mode: rejudge
+    responses_from: outputs/image_presence_threshold/defense+evaluate/jailbreakbench_benign/qwen2_5_vl_7b_no_defense_non_llm_baseline_ir_blank_20260807_084227_74119019
+    benchmark: jailbreakbench_benign
+    judge_method: jbb_refusal
+    judge_model: gpt-5-mini
+    campaign: paper_b_threshold_shift_openweight

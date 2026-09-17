@@ -1,0 +1,23 @@
+
+num_main_job_threads: 4
+num_cluster_jobs: 1
+
+_h: &h {mode: rejudge, judge_model: gpt-5-mini, judge_method: harmbench, campaign: paper_c_fidelity_rerun_mini}
+_b: &b {mode: rejudge, judge_model: gpt-5-mini, judge_method: orbench,   campaign: paper_c_fidelity_rerun_mini}
+
+tasks:
+  # ── HARMFUL axis (ASR) ──
+  - {<<: *h, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_no_defense_code_attack_20260806_024100_84741354}
+  - {<<: *h, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_guard_baseline_code_attack_20260806_024100_6860754}
+  - {<<: *h, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_code_attack_20260806_024100_48322184}
+  - {<<: *h, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_no_defense_ir_figstep_20260806_024100_24186089}
+  - {<<: *h, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_guard_baseline_ir_figstep_20260806_024334_70225113}
+  - {<<: *h, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_figstep_20260806_024529_37835907}
+
+  # ── BENIGN axis (over-refusal) ──
+  - {<<: *b, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_no_defense_code_attack_20260806_024642_96836357}
+  - {<<: *b, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_guard_baseline_code_attack_20260806_024806_88969015}
+  - {<<: *b, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_modality_complete_code_attack_20260806_024825_54760196}
+  - {<<: *b, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_no_defense_ir_figstep_20260806_025222_43620609}
+  - {<<: *b, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_guard_baseline_ir_figstep_20260806_025232_43308472}
+  - {<<: *b, responses_from: outputs/autoattack_defense/defense+evaluate/orbench_benign_hard/qwen2_5_vl_7b_modality_complete_ir_figstep_20260806_025318_83229463}

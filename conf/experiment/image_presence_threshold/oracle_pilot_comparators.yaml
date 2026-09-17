@@ -1,0 +1,17 @@
+# Pilot comparator arms (same approved envelope, 2026-08-03): fresh SAME-DAY
+# oracle-arm (query_source: original) and no-defense decoy cells, so the
+# encoded-vs-oracle contrast is isolated from model drift since May.
+num_main_job_threads: 4
+
+_dec_formal: &df outputs/image_presence_threshold/prompt_transform/harmbench/llm_formal_logic_ir_constant_20260803_064343_72332881/ir_constant
+_dec_code: &dc outputs/image_presence_threshold/prompt_transform/harmbench/code_attack_ir_constant_20260803_064343_29961556/ir_constant
+
+tasks:
+  - {mode: defense+evaluate, benchmark: harmbench, source_transform_subdir: *dc, defense: ecso, defense_config: {query_source: original}, target_model: gemini-2.5-flash-lite, judge_model: gpt-5-mini}
+  - {mode: defense+evaluate, benchmark: harmbench, source_transform_subdir: *df, defense: ecso, defense_config: {query_source: original}, target_model: gemini-2.5-flash-lite, judge_model: gpt-5-mini}
+  - {mode: defense+evaluate, benchmark: harmbench, source_transform_subdir: *dc, defense: ecso, defense_config: {query_source: original}, target_model: gemini-2.5-flash, judge_model: gpt-5-mini}
+  - {mode: defense+evaluate, benchmark: harmbench, source_transform_subdir: *df, defense: ecso, defense_config: {query_source: original}, target_model: gemini-2.5-flash, judge_model: gpt-5-mini}
+  - {mode: defense+evaluate, benchmark: harmbench, source_transform_subdir: *dc, defense: no_defense, target_model: gemini-2.5-flash-lite, judge_model: gpt-5-mini}
+  - {mode: defense+evaluate, benchmark: harmbench, source_transform_subdir: *df, defense: no_defense, target_model: gemini-2.5-flash-lite, judge_model: gpt-5-mini}
+  - {mode: defense+evaluate, benchmark: harmbench, source_transform_subdir: *dc, defense: no_defense, target_model: gemini-2.5-flash, judge_model: gpt-5-mini}
+  - {mode: defense+evaluate, benchmark: harmbench, source_transform_subdir: *df, defense: no_defense, target_model: gemini-2.5-flash, judge_model: gpt-5-mini}

@@ -1,0 +1,92 @@
+
+num_main_job_threads: 8
+
+tasks:
+  # ==================== HarmBench ====================
+  - mode: defense+evaluate            # no_defense x full  [core baseline]
+    target_model: qwen2_5_vl_7b
+    defense: no_defense
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: harmbench
+    campaign: bestofn_r4
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/harmbench/CHAIN_HB_FULL/non_llm_best_of_n
+  - mode: defense+evaluate            # no_defense x tail  [adaptive baseline]
+    target_model: qwen2_5_vl_7b
+    defense: no_defense
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: harmbench
+    campaign: bestofn_r4
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/harmbench/CHAIN_HB_TAIL/non_llm_best_of_n
+  - mode: defense+evaluate            # canonicalize_guard x full
+    target_model: qwen2_5_vl_7b
+    defense: canonicalize_guard
+    defense_config: {guard_model: wildguard}
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: harmbench
+    campaign: bestofn_r4
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/harmbench/CHAIN_HB_FULL/non_llm_best_of_n
+  - mode: defense+evaluate            # canonicalize_guard x head  [collapse demo]
+    target_model: qwen2_5_vl_7b
+    defense: canonicalize_guard
+    defense_config: {guard_model: wildguard}
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: harmbench
+    campaign: bestofn_r4
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/harmbench/CHAIN_HB_HEAD/non_llm_best_of_n
+  - mode: defense+evaluate            # canonicalize_guard x tail  <== THE GATE
+    target_model: qwen2_5_vl_7b
+    defense: canonicalize_guard
+    defense_config: {guard_model: wildguard}
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: harmbench
+    campaign: bestofn_r4
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/harmbench/CHAIN_HB_TAIL/non_llm_best_of_n
+  # ==================== JailbreakBench ====================
+  - mode: defense+evaluate            # no_defense x full  [core baseline]
+    target_model: qwen2_5_vl_7b
+    defense: no_defense
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: jailbreakbench
+    campaign: bestofn_r4
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/jailbreakbench/CHAIN_JBB_FULL/non_llm_best_of_n
+  - mode: defense+evaluate            # no_defense x tail  [adaptive baseline]
+    target_model: qwen2_5_vl_7b
+    defense: no_defense
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: jailbreakbench
+    campaign: bestofn_r4
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/jailbreakbench/CHAIN_JBB_TAIL/non_llm_best_of_n
+  - mode: defense+evaluate            # canonicalize_guard x full
+    target_model: qwen2_5_vl_7b
+    defense: canonicalize_guard
+    defense_config: {guard_model: wildguard}
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: jailbreakbench
+    campaign: bestofn_r4
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/jailbreakbench/CHAIN_JBB_FULL/non_llm_best_of_n
+  - mode: defense+evaluate            # canonicalize_guard x head  [collapse demo]
+    target_model: qwen2_5_vl_7b
+    defense: canonicalize_guard
+    defense_config: {guard_model: wildguard}
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: jailbreakbench
+    campaign: bestofn_r4
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/jailbreakbench/CHAIN_JBB_HEAD/non_llm_best_of_n
+  - mode: defense+evaluate            # canonicalize_guard x tail  <== THE GATE
+    target_model: qwen2_5_vl_7b
+    defense: canonicalize_guard
+    defense_config: {guard_model: wildguard}
+    judge_model: wildguard
+    judge_method: wildguard
+    benchmark: jailbreakbench
+    campaign: bestofn_r4
+    source_transform_subdir: outputs/bestofn_defense/prompt_transform/jailbreakbench/CHAIN_JBB_TAIL/non_llm_best_of_n

@@ -1,0 +1,41 @@
+# Re-judge the 7 cross_modal_split cells with gpt-5-mini — 2026-07-29.
+#
+# Companion to cross_modal_split_eval.yaml (job 234905, COMPLETED 6m26s).
+#
+# ⚠️ THE THROWAWAY JUDGE DID NOT MERELY DISAGREE -- IT FAILED, AND FAILED UNSAFELY.
+# All 7 cells came back `fallback_parse_count: 100`: the WildGuard judge parsed ZERO
+# of the 700 rows, and the HarmBench evaluator's fallback scored every row as an
+# attack SUCCESS. Result: a uniform, confident-looking 89-96% ASR across every
+# condition -- including rows whose response is literally the guard's own block
+# string ("I cannot assist with this request because the guard model flagged it as
+# unsafe") or the target's plain refusal. Both were labelled asr=True, which is
+# impossible. Read naively this said "the split defeats every defense"; it says
+# nothing at all. (The 6-minute runtime was the tell: judge calls failed instantly,
+# where a real 7-cell run over 3 vLLM servers takes ~1h+.)
+#
+# This is the INVERSE of the silent-failure mode already in the repo's notes (dead
+# judge -> everything scored SAFE, fake ASR 0.00). Same root cause -- a fallback
+# parser that emits a confident label instead of refusing to score -- opposite sign.
+# Never report a cell with a nonzero fallback_parse_count.
+#
+# The TARGET responses are intact and varied (real generated articles, real refusals,
+# real guard blocks), so all 7 cells are fully recoverable by rejudging the stored
+# responses. gpt-5-mini is the decided main judge; wildguard was only ever the
+# throwaway (it is invalid as an ASR judge: 41-68% false positives on encoding
+# attacks, per the retracted "strategy dominates" headline).
+#
+# 7 cells x 100 = 700 judge calls, ~$0.60. No target calls, no GPU.
+num_cluster_jobs: 2
+num_main_job_threads: 7
+tasks:
+# attack validity — does the target reassemble the split at all?
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_no_defense_cross_modal_split_20260729_170640_56410712, judge_model: gpt-5-mini}
+# bare guard — the split should evade it (no recover step to union the channels)
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_guard_baseline_cross_modal_split_20260729_170640_94888147, judge_model: gpt-5-mini}   # wildguard
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_guard_baseline_cross_modal_split_20260729_170640_23999243, judge_model: gpt-5-mini}   # guardreasoner_vl_7b
+# amplifier — UNION should defeat the split
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_cross_modal_split_20260729_170640_25697019, judge_model: gpt-5-mini}  # wildguard mc
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_cross_modal_split_20260729_170937_49099053, judge_model: gpt-5-mini}  # guardreasoner mc
+# amplifier + reguard — the full conjunction G(d) ^ G(r)
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_cross_modal_split_20260729_171015_2412569, judge_model: gpt-5-mini}   # wildguard +rg
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_cross_modal_split_20260729_171103_36287938, judge_model: gpt-5-mini}  # guardreasoner +rg

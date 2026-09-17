@@ -1,0 +1,27 @@
+# ============================================================
+# Paper C · Render OR-Bench-Hard for the over-refusal (cost) axis  (2026-07-17)
+# ============================================================
+# OR-Bench-Hard = the standard over-refusal benchmark (seemingly-toxic-but-benign
+# prompts), scored by ORBench's own 3-class rubric (direct-refusal / indirect-
+# refusal / compliance). More principled + literature-comparable than JBB-benign
+# for measuring whether modality_complete over-refuses. Render to ir_plain (the
+# attack modality) + a plain-text baseline. PILOT slice [0,19]. Stage 1 only.
+# ============================================================
+
+num_main_job_threads: 4
+
+tasks:
+  - mode: prompt_transform
+    source_file: data/orbench_benign_hard_prompts.jsonl
+    prompt_range: [0, 19]
+    benchmark: orbench_benign_hard
+    transformation_list:
+      - type: ir_plain
+        params: {keep_text: false}
+
+  - mode: prompt_transform
+    source_file: data/orbench_benign_hard_prompts.jsonl
+    prompt_range: [0, 19]
+    benchmark: orbench_benign_hard
+    transformation_list:
+      - type: non_llm_baseline

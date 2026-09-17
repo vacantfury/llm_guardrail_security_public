@@ -1,0 +1,32 @@
+# Llama-3.2-11B-Vision-Instruct (Meta) — safety-aligned open multimodal
+# Paper C target #3. Gated HF repo (the xc HF token HAS the license accepted —
+# verified 2026-08-07 by an authorized HEAD on config.json; weights download fine).
+#
+# ⛔ CANNOT BE SERVED ON A MODERN vLLM — support was REMOVED upstream, this is not
+# a version-tuning problem (verified on xc 2026-08-07, vLLM 0.25.0 / transformers
+# 5.13.1, job 220):
+#   * server dies at startup with
+#     `AttributeError: 'MllamaProcessor' object has no attribute
+#      _get_num_multimodal_tokens`
+#   * `ModelRegistry.get_supported_archs()` contains Llama4ForConditionalGeneration
+#     but NO MllamaForConditionalGeneration — mllama is gone from the registry.
+#   * vLLM 0.25 requires `transformers>=5.5.3`, so downgrading transformers to
+#     restore the old processor API breaks vLLM itself. There is no combination
+#     of the two that works on this stack.
+# To use this model at all you would need a pinned OLD vLLM in a separate env.
+# It has never produced a result cell in this repo. Before spending time on it,
+# check whether a supported safety-aligned VLM answers the same question.
+#
+# NOTE the label matters for one experiment: this is the ONLY `alignment_tier:
+# strong` cluster-served VLM in the llm_utils registry, so the alignment-tier
+# scan (conf/experiment/image_presence_threshold/alignment_tier_scan.yaml) lost its
+# strong-tier arm to this. That scan therefore spans mid and weak only.
+
+model:
+  model: meta-llama/Llama-3.2-11B-Vision-Instruct
+  max_tokens: 4096
+
+# ~11B + vision encoder ≈ needs a 40GB+ card — exclude small GPUs.
+# (mllama on some vLLM versions also needs --enforce-eager; add if the smoke-test fails.)
+cluster:
+  gpu_types_excluded: ["v100-pcie", "v100-sxm2", "t4"]

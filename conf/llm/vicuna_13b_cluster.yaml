@@ -1,0 +1,33 @@
+# Vicuna-13B-v1.5 (lmsys) — Paper-D (bestofn_attack) free cluster HELPER model:
+# the paraphrase channel's paraphraser and the strategy channel's attack-bank LLM.
+# Never a target and never a judge.
+#
+# WHY THIS FILE EXISTS (added 2026-08-02): vicuna had no conf/llm entry, so it
+# inherited the cluster defaults — max_model_len=20480 and max_tokens=16384.
+# Vicuna-13B-v1.5 is Llama-2-based and its architectural ceiling is 4096
+# (the 16k context belongs to the separate `-16k` checkpoint, which this is not).
+# That made `bestofn_attack/experiment.yaml` a launch-time landmine in two ways:
+#   1. max_model_len 20480 > 4096 -> vLLM REFUSES TO START. The server job dies
+#      on launch and every task needing the paraphrase/strategy channel hangs
+#      until its endpoint timeout. Caught by Experiment._arch_ceiling_preflight.
+#   2. max_tokens 16384 > max_model_len -> vLLM 400s EVERY request, responses
+#      come back empty, and the judge scores empty text as "safe" -> a silent,
+#      fully-fake result. This is exactly the Gemma failure of round 174759
+#      (see conf/llm/gemma2_9b_it.yaml, which caps for the same reason).
+# The preset had never been run, so neither defect had surfaced yet.
+#
+# max_tokens basis (estimate, NOT a tokenizer measurement — vicuna's tokenizer is
+# not installed locally): the preset's dataset data/harmbench_bon_r4.jsonl is
+# 4000 prompts of p50 115 / p95 2336 / max 2732 CHARS, i.e. ~740 tokens worst
+# case at the repo's usual 3.7 chars/token. 1024 output tokens leaves ~3000 for
+# prompt + paraphrase instructions at the 4096 window, which clears the worst
+# case with room to spare; a paraphrase or strategy rewrite never needs a long
+# generation. TUNING PATH: measure with vicuna's own tokenizer on the cluster
+# (AutoTokenizer, lmsys/vicuna-13b-v1.5) the way Gemma's 3072 was measured, and
+# replace this estimate — the Gemma case showed a chars/3.7 heuristic can
+# underestimate the real max prompt by 26%.
+model:
+  model: lmsys/vicuna-13b-v1.5
+  max_tokens: 1024
+cluster:
+  max_model_len: 4096

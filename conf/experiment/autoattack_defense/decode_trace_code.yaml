@@ -1,0 +1,24 @@
+# Decode-trace capture — CodeAttack ONLY (for NURC, which has the code_attack source but not the
+# distraction render). Runs the recover+decode amplifier on 10 CodeAttack behaviors and SAVES the
+# decode intermediates (save_trace) so the appendix §B example carries the ACTUAL decode text. Target
+# Qwen2.5-VL-7B; guard/judge = WildGuard (free). n=10. Trace lands at
+# outputs/autoattack_defense/decode_traces/code_attack_trace.jsonl. (Distraction stays as the
+# mechanistic note; the AICR job 175039 remains queued for it if a node frees.)
+num_cluster_jobs: 3
+num_main_job_threads: 2
+
+tasks:
+  - mode: defense+evaluate
+    target_model: qwen2_5_vl_7b
+    prompt_range: [0, 9]
+    judge_method: wildguard
+    judge_model: wildguard
+    campaign: paper_c_decode_trace
+    defense: modality_complete
+    defense_config:
+      guard_model: wildguard
+      decode_text: true
+      decode_style: recover
+      save_trace: true
+      trace_path: outputs/autoattack_defense/decode_traces/code_attack_trace.jsonl
+    source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack

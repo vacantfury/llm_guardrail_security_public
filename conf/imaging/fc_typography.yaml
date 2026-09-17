@@ -1,0 +1,10 @@
+
+renderer_type: fc_typography
+
+# Typography-specific overrides
+font_family: "Pacifico"
+font_size: 40
+fg_color: "#333333"
+padding: 30
+spacing: 8
+wrap_width: 40

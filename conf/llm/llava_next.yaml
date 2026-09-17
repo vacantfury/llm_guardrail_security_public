@@ -1,0 +1,5 @@
+# LLaVA-NeXT (Open-source) — comparison to FigStep 2023 open-source results
+
+model:
+  model: llava-next
+  max_tokens: 4096

@@ -1,0 +1,25 @@
+
+num_main_job_threads: 2
+num_cluster_jobs: 3
+
+_rng: &rng [0, 99]
+
+_mc_ss: &mc_ss
+  guard_model: wildguard
+  decode_text: true
+  decode_style: recover
+  downstream_defense: semantic_smooth
+  downstream_defense_config: {query_source: encoded}
+
+_fcflow: &fcflow outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+_orbimg: &orbimg outputs/autoattack_defense/prompt_transform/orbench_benign_hard/ir_plain_20260718_183504_7866920/ir_plain
+
+tasks:
+  - {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: *rng,
+     benchmark: harmbench, judge_method: harmbench, judge_model: gpt-5-mini,
+     defense: modality_complete, campaign: paper_c_composed_semsm_deployable,
+     defense_config: *mc_ss, source_transform_subdir: *fcflow}
+  - {mode: defense+evaluate, target_model: qwen2_5_vl_7b, prompt_range: *rng,
+     benchmark: orbench_benign_hard, judge_model: gpt-5-mini,
+     defense: modality_complete, campaign: paper_c_composed_semsm_deployable_benign,
+     defense_config: *mc_ss, source_transform_subdir: *orbimg}

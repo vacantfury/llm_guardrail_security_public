@@ -1,0 +1,12 @@
+# Deployable-arm rerun (query_source: encoded) — oracle-leak fix 2026-08-05.
+# Target llama3_1_8b_cluster: cluster-served, so target inference is FREE; cost is the
+# gpt-5-mini ASR judge only. One preset per target — the replica allocator is
+# floor division, so mixing targets collapses each to 1 replica.
+num_main_job_threads: 6
+num_cluster_jobs: 4
+
+tasks:
+  - {"mode": "defense+evaluate", "benchmark": "harmbench", "source_transform_subdir": "outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack", "defense": "semantic_smooth", "defense_config": {"query_source": "encoded"}, "target_model": "llama3_1_8b_cluster", "judge_model": "gpt-5-mini"}
+  - {"mode": "defense+evaluate", "benchmark": "harmbench", "source_transform_subdir": "outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon", "defense": "semantic_smooth", "defense_config": {"query_source": "encoded"}, "target_model": "llama3_1_8b_cluster", "judge_model": "gpt-5-mini"}
+  - {"mode": "defense+evaluate", "benchmark": "harmbench", "source_transform_subdir": "outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon", "defense": "semantic_smooth", "defense_config": {"query_source": "encoded"}, "target_model": "llama3_1_8b_cluster", "judge_model": "gpt-5-mini"}
+  - {"mode": "defense+evaluate", "benchmark": "harmbench", "source_transform_subdir": "outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack", "defense": "semantic_smooth", "defense_config": {"query_source": "encoded"}, "target_model": "llama3_1_8b_cluster", "judge_model": "gpt-5-mini"}

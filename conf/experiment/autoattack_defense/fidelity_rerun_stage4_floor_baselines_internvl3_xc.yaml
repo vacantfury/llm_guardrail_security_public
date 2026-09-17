@@ -1,0 +1,32 @@
+
+num_main_job_threads: 4
+num_cluster_jobs: 3
+
+_code: &code outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260805_215649_22270770/code_attack
+_fig:  &fig  outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260805_215649_72871103/ir_figstep
+
+_base: &base
+  mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range: [0, 99]
+  judge_model: gpt-5-mini
+  campaign: paper_c_fidelity_rerun
+
+tasks:
+  # ── Undefended floor (abstract: "89--91%") ──
+  - {<<: *base, defense: no_defense, source_transform_subdir: *code}
+  - {<<: *base, defense: no_defense, source_transform_subdir: *fig}
+
+  # ── ECSO baseline · published arm (oracle default) ──
+  - {<<: *base, defense: ecso, source_transform_subdir: *code, defense_config: {query_source: original}}
+  - {<<: *base, defense: ecso, source_transform_subdir: *fig,  defense_config: {query_source: original}}
+  # ── ECSO baseline · deployable arm (threat-model-faithful) ──
+  - {<<: *base, defense: ecso, source_transform_subdir: *code, defense_config: {query_source: encoded}}
+  - {<<: *base, defense: ecso, source_transform_subdir: *fig,  defense_config: {query_source: encoded}}
+
+  # ── SemanticSmooth baseline · published arm (oracle default) ──
+  - {<<: *base, defense: semantic_smooth, source_transform_subdir: *code, defense_config: {query_source: original}}
+  - {<<: *base, defense: semantic_smooth, source_transform_subdir: *fig,  defense_config: {query_source: original}}
+  # ── SemanticSmooth baseline · deployable arm (threat-model-faithful) ──
+  - {<<: *base, defense: semantic_smooth, source_transform_subdir: *code, defense_config: {query_source: encoded}}
+  - {<<: *base, defense: semantic_smooth, source_transform_subdir: *fig,  defense_config: {query_source: encoded}}

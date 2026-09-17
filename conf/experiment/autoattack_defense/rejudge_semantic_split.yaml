@@ -1,0 +1,29 @@
+# Re-judge the 7 ir_semantic_split cells with gpt-5-mini — 2026-07-29.
+#
+# Companion to semantic_split_eval.yaml (job 234985, COMPLETED 5m28s).
+#
+# ⚠️ SAME judge failure as cross_modal_split (2026-07-29): the WildGuard self-judge
+# hit fallback_parse_count=100 on all 7 cells and the HarmBench fallback scored
+# every row an attack SUCCESS -> a uniform, impossible 88-96% ASR across floor AND
+# fully-defended conditions. The 5m28s runtime was the tell (real 7-cell / 3-server
+# runs take ~1h+). Canary that caught it: identical ASR across floor and defended =
+# judge failure. The WildGuard-as-HarmBench-judge path is broken for image-input
+# runs (list-typed content breaks its string concatenation); use it as a THROWAWAY
+# only. Target responses are intact, so the cells recover by rejudging stored
+# responses. See memory note project_api_judge_run_gotchas.
+#
+# 7 cells x 100 = 700 judge calls, ~$0.60. No target calls, no GPU.
+num_cluster_jobs: 2
+num_main_job_threads: 7
+tasks:
+# attack validity — does the target reassemble the fluent-carrier + full-image split?
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_no_defense_ir_semantic_split_20260729_174220_8904765, judge_model: gpt-5-mini}
+# bare guard — benign carrier, unreadable image: text-only guard should be blind
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_guard_baseline_ir_semantic_split_20260729_174220_19350001, judge_model: gpt-5-mini}   # wildguard
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_guard_baseline_ir_semantic_split_20260729_174220_81184479, judge_model: gpt-5-mini}   # guardreasoner_vl_7b
+# amplifier — recover surfaces the full-request image, union defeats it
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_semantic_split_20260729_174220_8748335, judge_model: gpt-5-mini}  # wildguard mc
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_semantic_split_20260729_174534_87191337, judge_model: gpt-5-mini}  # guardreasoner mc
+# amplifier + reguard — the full conjunction G(d) ^ G(r)
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_semantic_split_20260729_174551_2510974, judge_model: gpt-5-mini}   # wildguard +rg
+- {mode: rejudge, responses_from: outputs/autoattack_defense/defense+evaluate/harmbench/qwen2_5_vl_7b_modality_complete_ir_semantic_split_20260729_174611_85888948, judge_model: gpt-5-mini}  # guardreasoner +rg

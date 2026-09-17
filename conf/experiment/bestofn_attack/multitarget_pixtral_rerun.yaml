@@ -1,0 +1,21 @@
+# bestofn_attack — R5 rerun of the 3 Pixtral cells that timed out (1 server + slow
+# code outputs + 4 cells contending -> 3 exceeded the 10000s endpoint wait). Running
+# Pixtral ALONE (3 cells, ~2h serial) fits the timeout. Reuses existing transforms.
+num_main_job_threads: 3
+num_cluster_jobs: 3          # orchestrator + pixtral + wildguard(guard+judge)
+
+_e: &e
+  mode: defense+evaluate
+  target_model: pixtral_12b
+  judge_model: wildguard
+  judge_method: wildguard
+  benchmark: harmbench
+  campaign: bestofn_attack_r5_multitarget
+
+_CODE: &code outputs/bestofn_attack/prompt_transform/harmbench/code_attack_20260718_213010_40825967/code_attack
+_SURF: &surf outputs/bestofn_attack/prompt_transform/harmbench/variance_channel_bon_20260718_050205_56951903/variance_channel_bon
+
+tasks:
+  - {<<: *e, source_transform_subdir: *surf, defense: no_defense}
+  - {<<: *e, source_transform_subdir: *code, defense: canonicalize_guard, defense_config: {guard_model: wildguard}}
+  - {<<: *e, source_transform_subdir: *surf, defense: canonicalize_guard, defense_config: {guard_model: wildguard}}

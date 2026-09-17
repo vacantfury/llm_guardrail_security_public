@@ -1,0 +1,1257 @@
+num_main_job_threads: 4
+num_cluster_jobs: 6
+tasks:
+- mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/qwen2_5_vl_7b_llm_set_theory.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+- mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/qwen2_5_vl_7b_llm_formal_logic.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+- mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/qwen2_5_vl_7b_llm_classical_language.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_ir_constant_20260710_002424_56524373/llm_classical_language
+- mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/qwen2_5_vl_7b_non_llm_cipher.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/non_llm_cipher_20260718_183504_42666777/non_llm_cipher
+- mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/qwen2_5_vl_7b_code_attack.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+- mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/qwen2_5_vl_7b_ir_figstep.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+- mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/qwen2_5_vl_7b_ir_fc_flowchart.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+- mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/qwen2_5_vl_7b_ir_low_contrast.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast
+- mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/qwen2_5_vl_7b_ir_occluded.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded
+- mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/qwen2_5_vl_7b_ir_mm_typo.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo
+- mode: defense+evaluate
+  target_model: qwen2_5_vl_7b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/qwen2_5_vl_7b_ir_distraction_grid.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/internvl3_8b_llm_set_theory.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/internvl3_8b_llm_formal_logic.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/internvl3_8b_llm_classical_language.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_ir_constant_20260710_002424_56524373/llm_classical_language
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/internvl3_8b_non_llm_cipher.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/non_llm_cipher_20260718_183504_42666777/non_llm_cipher
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/internvl3_8b_code_attack.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/internvl3_8b_ir_figstep.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/internvl3_8b_ir_fc_flowchart.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/internvl3_8b_ir_low_contrast.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/internvl3_8b_ir_occluded.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/internvl3_8b_ir_mm_typo.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_decode_fidelity
+  defense: modality_complete
+  defense_config:
+    guard_model: wildguard
+    decode_text: true
+    decode_style: recover
+    save_trace: true
+    trace_path: outputs/autoattack_defense/decode_traces/fidelity/internvl3_8b_ir_distraction_grid.jsonl
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: llama_guard_3_8b
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: llama_guard_3_8b
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: llama_guard_3_8b
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_ir_constant_20260710_002424_56524373/llm_classical_language
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_ir_constant_20260710_002424_56524373/llm_classical_language
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_ir_constant_20260710_002424_56524373/llm_classical_language
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: llama_guard_3_8b
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/non_llm_cipher_20260718_183504_42666777/non_llm_cipher
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/non_llm_cipher_20260718_183504_42666777/non_llm_cipher
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/non_llm_cipher_20260718_183504_42666777/non_llm_cipher
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: llama_guard_3_8b
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: llama_guard_3_8b
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: llama_guard_3_8b
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: llama_guard_3_8b
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: llama_guard_3_8b
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: llama_guard_3_8b
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: llama_guard_3_8b
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: llama_guard_3_8b
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: thinkguard
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/set_theory_20260531_055707_10045511/llm_set_theory
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: thinkguard
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/formal_logic_20260531_055707_75502107/llm_formal_logic
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: thinkguard
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_ir_constant_20260710_002424_56524373/llm_classical_language
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_ir_constant_20260710_002424_56524373/llm_classical_language
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/classical_chinese_simplified_ir_constant_20260710_002424_56524373/llm_classical_language
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: thinkguard
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/non_llm_cipher_20260718_183504_42666777/non_llm_cipher
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/non_llm_cipher_20260718_183504_42666777/non_llm_cipher
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/non_llm_cipher_20260718_183504_42666777/non_llm_cipher
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: thinkguard
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/code_attack_20260531_055707_73740181/code_attack
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: thinkguard
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_figstep_20260718_183457_7682501/ir_figstep
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: thinkguard
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_fc_flowchart_20260718_183457_52987863/ir_fc_flowchart
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: thinkguard
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_low_contrast_20260718_183457_77423812/ir_low_contrast
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: thinkguard
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_occluded_20260718_183457_84223144/ir_occluded
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: thinkguard
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_mm_typo_20260718_183500_58590499/ir_mm_typo
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: guard_baseline
+  defense_config:
+    guard_model: thinkguard
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid
+- mode: defense+evaluate
+  target_model: internvl3_8b
+  prompt_range:
+  - 0
+  - 99
+  judge_method: wildguard
+  judge_model: wildguard
+  campaign: paper_c_gen2_internvl3
+  defense: modality_complete
+  defense_config:
+    guard_model: thinkguard
+    decode_text: true
+    decode_style: recover
+    reguard_original: true
+  source_transform_subdir: outputs/autoattack_defense/prompt_transform/harmbench/ir_distraction_grid_20260718_183500_23630684/ir_distraction_grid

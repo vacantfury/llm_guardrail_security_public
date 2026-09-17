@@ -1,0 +1,7 @@
+
+# null = screen with the TARGET model itself. This IS the borrowed-strength
+# condition and is the default on purpose — changing it silently converts the
+# experiment into its own control. The paper's phrase is "another instance of
+# an LLM", and its own experiments screen GPT-3.5 with GPT-3.5 and Llama-2
+# with Llama-2, so same-model is the faithful reading.
+filter_model: null

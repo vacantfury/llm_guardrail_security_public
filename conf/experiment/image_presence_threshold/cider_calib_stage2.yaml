@@ -1,0 +1,46 @@
+num_main_job_threads: 1
+
+_base: &base
+  mode: defense+evaluate
+  target_model: qwen2_5_vl_7b        # free cluster GPU; the target is incidental
+                                     # here — deltas depend only on (text, image)
+                                     # and are computed BEFORE any target call.
+  judge_model: gpt-5-mini
+  campaign: paper_b_cider_calibration
+  defense: cider
+  defense_config:
+    threshold: null                  # CALIBRATION PASS — score all, block none
+    trace_dir: outputs/image_presence_threshold/cider_deltas
+
+# COST: 4 cells x 100 prompts. Target is cluster-served (free); the only spend is
+# the judge, ~400 gpt-5-mini judgments ≈ $0.08 — under the standing $1 bar. The
+# judge is gpt-5-mini rather than a free cluster judge on purpose: the benign
+# cells' refusal numbers ARE the reported over-refusal floor for CIDER, so judging
+# them cheaply now would only force a rejudge later for the same money.
+
+tasks:
+  # ---- BENIGN calibration channels (clean images -> the tau distribution) ----
+  # <<< PASTE stage 1's dirs here. They will look like:
+  #     outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/ir_plain_<TS>_<RAND>/ir_plain
+  #     outputs/image_presence_threshold/prompt_transform/jailbreakbench_benign/ir_constant_<TS>_<RAND>/ir_constant
+  - <<: *base
+    benchmark: jailbreakbench_benign
+    prompt_range: [0, 99]
+    source_transform_subdir: REPLACE_ME_benign_ir_plain
+
+  - <<: *base
+    benchmark: jailbreakbench_benign
+    prompt_range: [0, 99]
+    source_transform_subdir: REPLACE_ME_benign_ir_constant
+
+  # ---- ATTACK channels (Paper B's decoy arm, FIXED encoders) ----
+  # These paths are real and already on every cluster.
+  - <<: *base
+    benchmark: harmbench
+    prompt_range: [0, 99]
+    source_transform_subdir: outputs/image_presence_threshold/prompt_transform/harmbench/code_attack_ir_constant_20260805_213025_3168031/ir_constant
+
+  - <<: *base
+    benchmark: harmbench
+    prompt_range: [0, 99]
+    source_transform_subdir: outputs/image_presence_threshold/prompt_transform/harmbench/llm_semantic_camo_ir_constant_20260805_213349_39577158/ir_constant
